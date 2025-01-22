@@ -1,3 +1,6 @@
-*.html
+__pycache__
+.ipynb_checkpoints
 .DS_Store
 other_assets/
+*.html
+*.ipynb
