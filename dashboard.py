@@ -1,21 +1,29 @@
-import dash
-import dash.dcc as dcc
-from dash import html
+from dash import Dash, dcc, html, Input, Output
 import plotly.express as px
-import pandas as pd
+import plotly.graph_objects as go
 import dawlish_final_digital_twin_script_upgraded as ddt
 import penzance_final_digital_twin_script_upgraded as pdt
 import dash_bootstrap_components as dbc
 
 # Create the app
+SPLASH_Digital_Twin_models_folder = './other_assets/penzance_models'
 external_stylesheets = ['./assets/css/dashboard.css']
-app = dash.Dash(__name__, external_stylesheets=external_stylesheets)
+app = Dash(__name__, external_stylesheets=external_stylesheets)
 
 # Get overtopping counts of Dawlish
 def get_dawlish_wave_overtopping():
     final_DawlishTwin_dataset = ddt.get_digital_twin_dataset()
-    df_adjusted = ddt.adjust_features(final_DawlishTwin_dataset)
-    data_rf1_rf2_tmp, data_rf3_rf4_tmp = ddt.process_wave_overtopping(df_adjusted)
+    ddt.load_models(SPLASH_Digital_Twin_models_folder)
+
+    data_rf1_rf2_tmp, data_rf3_rf4_tmp = ddt.process_wave_overtopping(final_DawlishTwin_dataset)
+    return data_rf1_rf2_tmp, data_rf3_rf4_tmp
+
+def get_penzance_wave_overtopping():    
+    final_Penzance_Twin_dataset, start_time, start_date_block = pdt.get_digital_twin_dataset()
+    pdt.load_model_files(SPLASH_Digital_Twin_models_folder)
+    pdt.add_selected_model_col(final_Penzance_Twin_dataset, start_time)
+
+    data_rf1_rf2_tmp, data_rf3_rf4_tmp = pdt.process_wave_overtopping(final_Penzance_Twin_dataset)
     return data_rf1_rf2_tmp, data_rf3_rf4_tmp
 
 # Render overtopping plot
@@ -112,14 +120,31 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
 # Render all plots and graphs
 def render_all_graphs():
     # Plot for RF1 & RF2 - Dawlish Seawall Crest
-    fig_rf1_rf2 = render_overtopping_plot('Dawlish Seawall Crest', 'dawlish_seawall_crest.png', data_seawall_crest)
+    fig_dawlish_seawall_crest = render_overtopping_plot('Dawlish Seawall Crest', 'dawlish_seawall_crest.png', data_seawall_crest)
     # Plot for RF3 & RF4 - Dawlish Railway Line
-    fig_rf3_rf4 = render_overtopping_plot('Dawlish Railway Line', 'dawlish_railway_line.png', data_railway_line)
+    fig_dawlish_railway_line = render_overtopping_plot('Dawlish Railway Line', 'dawlish_railway_line.png', data_railway_line)
+    # Plot for RF1 & RF2 - Penzance Seawall Crest
+    fig_penzance_seawall_crest = render_overtopping_plot('Penzance Seawall Crest', 'dawlish_seawall_crest.png', data_penzance_seawall_crest)
+    # # Plot for RF2 & RF4 - Penzance, Seawall Crest (sheltered)
+    fig_penzance_seawall_crest_sheltered = render_overtopping_plot('Penzance, Seawall Crest (sheltered) ', 'dawlish_seawall_crest.png', data_penzance_seawall_crest_sheltered)
     
-    return fig_rf1_rf2, fig_rf3_rf4
+    return fig_dawlish_seawall_crest, fig_dawlish_railway_line, fig_penzance_seawall_crest, fig_penzance_seawall_crest_sheltered
+
 
 # Render Splash dashboard
 def render_dashboard():
+
+    # Search components
+    dropdown_container = html.Div([
+        "Site location",
+        dcc.Dropdown(
+        id='dd_site_location',
+        options=['Dawlish', 'Penzance'],
+        value='Dawlish',
+        clearable=False,
+    )
+    ])
+
     # App layout
     app.layout = dbc.Container([
         dbc.Row([
@@ -149,6 +174,14 @@ def render_dashboard():
             html.Div("With sea level rise accelerating and weather extremes becoming increasingly stronger, tools to help climate adaptation of coastal communities are of paramount importance. SPLASH provides an overtopping tool that will act as forecast model directly helping coastal communities mitigate effects of this coastal hazard, and ultimately, guiding new climate adaptation strategies.", className="dashboard-summary"),
             style={'padding-left': '72px'}
         ),
+        dbc.Row([
+            dbc.Col([
+                dropdown_container,
+            ],
+            width="3",
+            className="site-dropdown",
+            )
+        ]),
         dbc.Row([
             dbc.Col([
                 html.Div(
@@ -197,20 +230,38 @@ def render_dashboard():
         ]),
         dbc.Row([
             dbc.Col([
-                dcc.Graph(id="scatter-plot-dsc", figure=fig_dawlish_seawall_crest)
+                dcc.Graph(id="scatter-plot-rig1")
             ], width=12, style={'border': '1.011px solid #8A8D90'})    
         ], style={'padding': '0px 72px'}),
         dbc.Row([
             dbc.Col([
-                dcc.Graph(id="scatter-plot-drl", figure=fig_dawlish_railway_line)
+                dcc.Graph(id="scatter-plot-rig2")
             ], width=12, style={'border': '1.011px solid #8A8D90'})    
         ], style={'padding': '24px 72px'})
     ], fluid=True, className='body-container')
 
 data_seawall_crest, data_railway_line = get_dawlish_wave_overtopping()
-fig_dawlish_seawall_crest, fig_dawlish_railway_line = render_all_graphs()
+data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered = get_penzance_wave_overtopping()
+
+fig_dawlish_seawall_crest, fig_dawlish_railway_line, fig_penzance_seawall_crest, fig_penzance_seawall_crest_crest_sheltered = render_all_graphs()
+
 
 render_dashboard()
+
+# Define event for site location dropdown
+@app.callback(
+    Output("scatter-plot-rig1", "figure"), 
+    Input("dd_site_location", "value"))
+def display_color(site_location):
+    fig = fig_dawlish_seawall_crest if site_location == 'Dawlish' else fig_penzance_seawall_crest
+    return fig
+
+@app.callback(
+    Output("scatter-plot-rig2", "figure"), 
+    Input("dd_site_location", "value"))
+def display_color(site_location):
+    fig = fig_dawlish_railway_line if site_location == 'Dawlish' else fig_penzance_seawall_crest_crest_sheltered
+    return fig
 
 # Run the app
 if __name__ == "__main__":

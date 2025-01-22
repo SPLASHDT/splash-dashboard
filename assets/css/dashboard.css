@@ -65,3 +65,9 @@
     padding-left: 43px;
     padding-right: 43px;
 }
+
+.site-dropdown {
+    width: 349px;
+    height: 56px;
+    padding: 22px 72px;
+}
