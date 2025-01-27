@@ -6,21 +6,23 @@ import penzance_final_digital_twin_script_upgraded as pdt
 import dash_bootstrap_components as dbc
 
 # Create the app
-SPLASH_Digital_Twin_models_folder = './other_assets/penzance_models'
+SPLASH_DT_Dawlish_models_folder = './other_assets/dawlish_models'
+SPLASH_DT_Penzance_models_folder = './other_assets/penzance_models'
+
 external_stylesheets = ['./assets/css/dashboard.css']
 app = Dash(__name__, external_stylesheets=external_stylesheets)
 
 # Get overtopping counts of Dawlish
 def get_dawlish_wave_overtopping():
     final_DawlishTwin_dataset = ddt.get_digital_twin_dataset()
-    ddt.load_models(SPLASH_Digital_Twin_models_folder)
+    ddt.load_models(SPLASH_DT_Dawlish_models_folder)
 
     data_rf1_rf2_tmp, data_rf3_rf4_tmp = ddt.process_wave_overtopping(final_DawlishTwin_dataset)
     return data_rf1_rf2_tmp, data_rf3_rf4_tmp
 
 def get_penzance_wave_overtopping():    
     final_Penzance_Twin_dataset, start_time, start_date_block = pdt.get_digital_twin_dataset()
-    pdt.load_model_files(SPLASH_Digital_Twin_models_folder)
+    pdt.load_model_files(SPLASH_DT_Penzance_models_folder)
     pdt.add_selected_model_col(final_Penzance_Twin_dataset, start_time)
 
     data_rf1_rf2_tmp, data_rf3_rf4_tmp = pdt.process_wave_overtopping(final_Penzance_Twin_dataset)
@@ -120,9 +122,9 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
 # Render all plots and graphs
 def render_all_graphs():
     # Plot for RF1 & RF2 - Dawlish Seawall Crest
-    fig_dawlish_seawall_crest = render_overtopping_plot('Dawlish Seawall Crest', 'dawlish_seawall_crest.png', data_seawall_crest)
+    fig_dawlish_seawall_crest = render_overtopping_plot('Dawlish Seawall Crest', 'dawlish_seawall_crest.png', data_dawlish_seawall_crest)
     # Plot for RF3 & RF4 - Dawlish Railway Line
-    fig_dawlish_railway_line = render_overtopping_plot('Dawlish Railway Line', 'dawlish_railway_line.png', data_railway_line)
+    fig_dawlish_railway_line = render_overtopping_plot('Dawlish Railway Line', 'dawlish_railway_line.png', data_dawlish_railway_line)
     # Plot for RF1 & RF2 - Penzance Seawall Crest
     fig_penzance_seawall_crest = render_overtopping_plot('Penzance Seawall Crest', 'dawlish_seawall_crest.png', data_penzance_seawall_crest)
     # # Plot for RF2 & RF4 - Penzance, Seawall Crest (sheltered)
@@ -240,7 +242,7 @@ def render_dashboard():
         ], style={'padding': '24px 72px'})
     ], fluid=True, className='body-container')
 
-data_seawall_crest, data_railway_line = get_dawlish_wave_overtopping()
+data_dawlish_seawall_crest, data_dawlish_railway_line = get_dawlish_wave_overtopping()
 data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered = get_penzance_wave_overtopping()
 
 fig_dawlish_seawall_crest, fig_dawlish_railway_line, fig_penzance_seawall_crest, fig_penzance_seawall_crest_crest_sheltered = render_all_graphs()
