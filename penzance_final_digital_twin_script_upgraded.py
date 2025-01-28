@@ -58,7 +58,7 @@ Penzance_wave_buoy_LATITUDE = 50.10811
 Penzance_wave_buoy_LONGITUDE = -5.51515
 
 # SPLASH_Digital_Twin_models_folder = '/content/drive/MyDrive/splash/data_inputs/models/penzance'
-SPLASH_Digital_Twin_models_folder = './other_assets/penzance_models'
+SPLASH_Digital_Twin_models_folder = './other_assets/data_inputs/models/penzance'
 
 models = {
     'RF1': {},
@@ -573,7 +573,7 @@ def save_combined_features_plot(df, hourly_freeboard, send_to_this_output_path_f
     plt.close(fig)
 
 
-def combine_features():
+def combine_features(df):
     hourly_freeboard = pd.read_csv(
         wl_file, sep='\s+', header=None, skiprows=2,
         names=['date', 'time', 'water_level'], engine='python'
@@ -589,10 +589,10 @@ def combine_features():
     save_combined_features_plot(df, hourly_freeboard, send_to_this_output_path_folder, overtopping_times)
 
 
-def plot_significant_wave_height():
+def plot_significant_wave_height(start_date_block):
     # Step 9. Now we also want to plot Hs and wave direction geospatially and save to figures folder.
 
-    send_here_wave_folder = './other_assets/data_inputs/wave'
+    send_here_wave_folder = './other_assets/datasets/wave_level/Jan25'
     output_folder = './other_assets/data_outputs/penzance/waves'
     state_file = './other_assets/last_processed_block.txt'
 
@@ -696,7 +696,7 @@ def generate_overtopping_graphs():
     display(significant_wave_height_slider_SPLASH, mean_period_slider_SPLASH, shore_wave_direction_slider_SPLASH, wind_speed_slider_SPLASH, shore_wind_direction_slider_SPLASH, freeboard_slider_SPLASH, submit_button)
     process_wave_overtopping(df)
 
-    combine_features()
-    plot_significant_wave_height()
+    combine_features(df)
+    plot_significant_wave_height(start_date_block)
 
 # generate_overtopping_graphs()
