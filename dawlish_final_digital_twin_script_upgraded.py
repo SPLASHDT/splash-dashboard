@@ -39,6 +39,9 @@ import matplotlib.pyplot as plt
 from matplotlib.colors import LinearSegmentedColormap
 # from google.colab import drive
 from datetime import datetime
+import seaborn as sns
+from matplotlib.colors import Normalize
+from matplotlib.lines import Line2D
 
 # Connect to google drive, as this was origionally done on google colab
 # drive.mount('/content/drive')
@@ -64,7 +67,7 @@ Dawlish_Wave_Buoy_LONGITUDE = -3.42424
 # Step 4: Now we load our SPLASH models
 
 # SPLASH_DIGITAL_TWIN_models_folder = '/content/drive/MyDrive/splash/data_inputs/models/dawlish' # Locate to the Dawlish forlder, this is the same for Penzance but just for the Penzance folder.
-SPLASH_DIGITAL_TWIN_models_folder = './other_assets/dawlish_models' # Locate to the Dawlish forlder, this is the same for Penzance but just for the Penzance folder.
+SPLASH_DIGITAL_TWIN_models_folder = './other_assets/data_inputs/models/dawlish' # Locate to the Dawlish forlder, this is the same for Penzance but just for the Penzance folder.
 
 machine_learning_models = {
     'RF1': {},
@@ -551,7 +554,7 @@ def save_penazance_combined_features_plot_with_overtopping(df, overtopping_times
     plt.close(fig)
 
 
-def save_combined_features():
+def save_combined_features(final_DawlishTwin_dataset):
     # use_this_output_path_dawlish = '/content/drive/MyDrive/splash/data_outputs/dawlish/all_plots/dawlish_combined_features.png'
     use_this_output_path_dawlish = './other_assets/data_outputs/dawlish/all_plots/dawlish_combined_features.png'
     overtopping_times_dawlish = final_DawlishTwin_dataset[final_DawlishTwin_dataset['RF1_Final_Predictions'] == 1]['time']
@@ -562,36 +565,38 @@ def save_combined_features():
         final_DawlishTwin_dataset, overtopping_times_dawlish, use_this_output_path_dawlish, block_start_date, block_end_date
     )
 
+# Function to adjust the number of arrows
+def adjust_arrow_density(latitudes, longitudes, density_factor=12):
+    return (
+        slice(None, None, max(1, len(latitudes) // density_factor)),
+        slice(None, None, max(1, len(longitudes) // density_factor))
+    )
+
 
 def plot_significant_wave_height():
-    # Step 11. Now we also want to plot our Hs geospatially and send to our figures folder.
+    # Step 11: Plot Hs geospatially and save to the figures folder
 
     # send_here_wave_folder = '/content/drive/MyDrive/splash/data_inputs/wave'
-    send_here_wave_folder = './other_assets/data_inputs/wave'
+    send_here_wave_folder = './other_assets/datasets/wave_level/Jan25'
     # output_folder = '/content/drive/MyDrive/splash/data_outputs/dawlish/waves'
     output_folder = './other_assets/data_outputs/dawlish/waves'
     # state_file = '/content/drive/MyDrive/last_processed_block.txt'
     state_file = './other_assets/last_processed_block.txt'
 
-
     current_block_Met_office_final = datetime.now().strftime('%Y%m%d')
     print(f"Processing Block: {current_block_Met_office_final}")
-
 
     block_files = sorted(
         [os.path.join(send_here_wave_folder, f) for f in os.listdir(send_here_wave_folder) if f.endswith('.nc') and f'b{current_block_Met_office_final}' in f]
     )
 
-
     if not block_files:
         print(f"No files found for Block {current_block_Met_office_final}. Falling back to the previous day's block.")
         current_block_Met_office_final = (datetime.strptime(current_block_Met_office_final, '%Y%m%d') - timedelta(days=1)).strftime('%Y%m%d')
         block_files = sorted(
-            [os.path.join(send_here_wave_folder, f) for f in os.listdir(send_here_wave_folder)
-            if f.endswith('.nc') and f'b{current_block_Met_office_final}' in f]
+            [os.path.join(send_here_wave_folder, f) for f in os.listdir(send_here_wave_folder) if f.endswith('.nc') and f'b{current_block_Met_office_final}' in f]
         )
         print(f"Retrying with Block: {current_block_Met_office_final}")
-
 
     if block_files:
         hs_list = []
@@ -599,7 +604,7 @@ def plot_significant_wave_height():
 
         for file in block_files:
             ds = xr.open_dataset(file)
-            hs = ds['VHM0']  # Hs variable
+            hs = ds[['VHM0', 'VMDR']]  
             times = ds['time'].values
             hs_list.append(hs)
             time_list.extend(times)
@@ -611,48 +616,85 @@ def plot_significant_wave_height():
             # Coordinates (Southwest England)
             lat_bound_Dawlish_Seawall = [49.5, 51.5]
             lon_bounds_Dawlish_Seawall = [-6.0, -2.0]
-            hs_combined_for_Dawlish_study_site['longitude'] = xr.where(hs_combined_for_Dawlish_study_site['longitude'] > 180, hs_combined_for_Dawlish_study_site['longitude'] - 360, hs_combined_for_Dawlish_study_site['longitude'])
+            hs_combined_for_Dawlish_study_site['longitude'] = xr.where(
+                hs_combined_for_Dawlish_study_site['longitude'] > 180,
+                hs_combined_for_Dawlish_study_site['longitude'] - 360,
+                hs_combined_for_Dawlish_study_site['longitude']
+            )
             hs_southwest = hs_combined_for_Dawlish_study_site.sel(
-                latitude=slice( lat_bound_Dawlish_Seawall[0],  lat_bound_Dawlish_Seawall[1]),
+                latitude=slice(lat_bound_Dawlish_Seawall[0], lat_bound_Dawlish_Seawall[1]),
                 longitude=slice(lon_bounds_Dawlish_Seawall[0], lon_bounds_Dawlish_Seawall[1])
             )
 
-            # Coordinates for Dawlish (our study site)
             dawlish_lat_seawall = 50.56757
             dawlish_lon_seawall = -3.42424
-            Location_map_every6hours = LinearSegmentedColormap.from_list('blue_to_red', ['blue', 'red'])
+            penzance_lat_seawall = 50.1186
+            penzance_lon_seawall = -5.5373
 
-        for time_idx, time_value in enumerate(time_combined):
-            if time_idx % 6 == 0:
-                hs_frame_digital_twin = hs_southwest.sel(time=time_value)
-                time_label = pd.Timestamp(time_value).strftime('%Y-%m-%d %H:%M:%S')
-                plt.figure(figsize=(10, 8))
+            for time_idx, time_value in enumerate(time_combined):
+                if time_idx % 6 == 0: 
+                    hs_frame_digital_twin = hs_southwest.sel(time=time_value)
 
-                z_data = hs_frame_digital_twin.squeeze().values
-                if z_data.ndim > 2:
-                    z_data = z_data[0]
+                    time_label = pd.Timestamp(time_value).strftime('%Y-%m-%d %H:%M:%S')
+                    plt.figure(figsize=(10, 8))
 
-                # Plot contourf
-                contour = plt.contourf(
-                    hs_frame_digital_twin['longitude'].values,
-                    hs_frame_digital_twin['latitude'].values,
-                    z_data,
-                    levels=20,
-                    cmap=Location_map_every6hours
-                )
+                    z_data = hs_frame_digital_twin['VHM0'].squeeze().values
+                    if z_data.ndim > 2:
+                        z_data = z_data[0]
 
-                plt.colorbar(label='Significant Wave Height (Hs) [m]')
-                plt.scatter(dawlish_lon_seawall, dawlish_lat_seawall, color='black', marker='x', s=100, label='Dawlish')
-                plt.title(f'Significant Wave Height (Hs)\nBlock: {current_block_Met_office_final}, Time: {time_label}')
-                plt.xlabel('Longitude')
-                plt.ylabel('Latitude')
-                plt.legend(loc='upper left')
-                plt.grid(False)
+                    wave_dir_frame = hs_frame_digital_twin['VMDR']
+                    wave_dir = wave_dir_frame.values
 
-                output_file = os.path.join(output_folder, f'hs_plot_block_{current_block_Met_office_final}_time_{time_label.replace(":", "_")}.png')
-                plt.savefig(output_file, dpi=300)
-                plt.close()
-                print(f"Saved plot for time {time_label} to {output_file}")
+                    longitudes = hs_frame_digital_twin['longitude'].values
+                    latitudes = hs_frame_digital_twin['latitude'].values
+                    lon_grid, lat_grid = np.meshgrid(longitudes, latitudes)
+
+                    U = -np.sin(np.deg2rad(wave_dir))
+                    V = -np.cos(np.deg2rad(wave_dir))
+
+                    land_margin_mask = ~np.isnan(z_data) & (z_data > 0.2)
+                    U = np.where(land_margin_mask, U, np.nan)
+                    V = np.where(land_margin_mask, V, np.nan)
+
+                    skip = adjust_arrow_density(latitudes, longitudes, density_factor=12)
+
+                    mako_cmap = sns.color_palette("mako", as_cmap=True) 
+                    norm = Normalize(vmin=0, vmax=11)
+
+                    contour = plt.contourf(
+                        longitudes, latitudes, z_data,
+                        levels=np.linspace(0, 11, 21),  
+                        cmap=mako_cmap, norm=norm
+                    )
+                    cbar = plt.colorbar(contour, label='Significant Wave Height (Hs) [m]')
+                    cbar.set_ticks(np.linspace(0, 11, 12))
+
+                    plt.quiver(
+                        lon_grid[skip], lat_grid[skip], U[skip], V[skip],
+                        color='white', scale=50, width=0.002
+                    )
+
+
+                    legend_elements = [
+                        Line2D([0], [0], color='white', lw=1, marker='>', markersize=10, label='Wave Direction (°)', markerfacecolor='white'),
+                        Line2D([0], [0], marker='o', color='red', markersize=8, label='Dawlish', linestyle='None'),
+                        Line2D([0], [0], marker='s', color='red', markersize=8, label='Penzance', linestyle='None')
+                    ]
+                    plt.legend(handles=legend_elements, loc='upper left')
+
+                    plt.title(f'Significant Wave Height (Hs)\nBlock: {current_block_Met_office_final}, Time: {time_label}')
+                    plt.xlabel('Longitude')
+                    plt.ylabel('Latitude')
+                    plt.grid(False)
+
+                    output_file = os.path.join(output_folder, f'hs_wave_direction_plot_block_{current_block_Met_office_final}_time_{time_label.replace(":", "_")}.png')
+                    plt.savefig(output_file, dpi=300)
+                    plt.close()
+                    print(f"Saved plot for time {time_label} to {output_file}")
+
+    with open(state_file, 'w') as f:
+        f.write(current_block_Met_office_final)
+    print(f"Updated state file to block: {current_block_Met_office_final}")
 
 
 def generate_overtopping_graphs():
@@ -664,7 +706,7 @@ def generate_overtopping_graphs():
             wind_speed_slider, Cross_shore_wind_dir_slider, freeboard_slider, submit_button)
     submit_button.on_click(on_submit_clicked)
 
-    save_combined_features()
+    save_combined_features(final_DawlishTwin_dataset)
     plot_significant_wave_height()
 
 
