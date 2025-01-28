@@ -6,8 +6,8 @@ import penzance_final_digital_twin_script_upgraded as pdt
 import dash_bootstrap_components as dbc
 
 # Create the app
-SPLASH_DT_Dawlish_models_folder = './other_assets/dawlish_models'
-SPLASH_DT_Penzance_models_folder = './other_assets/penzance_models'
+SPLASH_DT_Dawlish_models_folder = './other_assets/data_inputs/models/dawlish'
+SPLASH_DT_Penzance_models_folder = './other_assets/data_inputs/models/penzance'
 
 external_stylesheets = ['./assets/css/dashboard.css']
 app = Dash(__name__, external_stylesheets=external_stylesheets)
