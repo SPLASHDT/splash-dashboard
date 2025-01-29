@@ -4,10 +4,18 @@ import plotly.graph_objects as go
 import dawlish_final_digital_twin_script_upgraded as ddt
 import penzance_final_digital_twin_script_upgraded as pdt
 import dash_bootstrap_components as dbc
+import seaborn as sns
+import numpy as np
+import os
+from matplotlib.colors import Normalize
 
 # Create the app
 SPLASH_DT_Dawlish_models_folder = './other_assets/data_inputs/models/dawlish'
 SPLASH_DT_Penzance_models_folder = './other_assets/data_inputs/models/penzance'
+dawlish_lat_seawall = 50.56757
+dawlish_lon_seawall = -3.42424
+penzance_lat_seawall = 50.1186
+penzance_lon_seawall = -5.5373
 
 external_stylesheets = ['./assets/css/dashboard.css']
 app = Dash(__name__, external_stylesheets=external_stylesheets)
@@ -28,6 +36,9 @@ def get_penzance_wave_overtopping():
     data_rf1_rf2_tmp, data_rf3_rf4_tmp = pdt.process_wave_overtopping(final_Penzance_Twin_dataset)
     return data_rf1_rf2_tmp, data_rf3_rf4_tmp
 
+def get_significant_wave_height_data():
+    return ddt.plot_significant_wave_height()
+    
 # Render overtopping plot
 def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
 
@@ -119,6 +130,118 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
 
     return fig_rf1_rf2_tmp
 
+# Render countour significant wave height
+def render_contour_wave_height(longitudes, latitudes, z_data, U, V, lon_grid, lat_grid, skip,
+                       current_block_Met_office_final, time_label, output_folder, zmin=0):
+    """
+    Generates a Plotly plot of wave height, direction, and location markers.
+
+    Args:
+        longitudes (array-like): Longitude values.
+        latitudes (array-like): Latitude values.
+        z_data (array-like): Wave height data.
+        U (array-like): U component of wave direction.
+        V (array-like): V component of wave direction.
+        lon_grid (array-like): Grid of longitudes for quiver plot.
+        lat_grid (array-like): Grid of latitudes for quiver plot.
+        skip (int): Sampling interval for quiver plot.
+        current_block_Met_office_final (str): Block identifier.
+        time_label (str): Time label for the plot.
+        output_folder (str): Directory to save the plot.
+    """
+
+    mako_cmap = sns.color_palette("mako", as_cmap=True)
+    norm = Normalize(vmin=zmin, vmax=11)  # Use zmin in normalization
+
+    # Generate colorscale from zmin (Corrected)
+    colorscale = [[(i - zmin) / (11 - zmin), f'rgb({int(r*255)},{int(g*255)},{int(b*255)})'] 
+                  for i in range(zmin, 12) 
+                  for r, g, b, _ in [mako_cmap((i - zmin) / (11 - zmin))]] 
+
+
+    # Create contour plot
+    contour = go.Contour(
+        z=z_data,
+        x=latitudes,
+        y=longitudes,
+        colorscale='Picnic',
+        contours=dict(
+            start=0,
+            end=11,
+            size=0.5,
+        ),
+        colorbar=dict(
+            title='Significant Wave Height (Hs) [m]',
+            tickvals=np.linspace(0, 11, 12)
+        )
+    )
+
+    # Create quiver plot
+    quiver = go.Cone(
+        x=lon_grid[skip],
+        y=lat_grid[skip],
+        u=U[skip],
+        v=V[skip],
+        anchor="tail",
+        colorscale=[[0, 'white'], [1, 'white']],  # Set color to white
+        showscale=False,
+        sizeref=20,  # Adjust arrow size here
+    )
+
+    # Create scatter plot for markers
+    # Create scatter plot for Dawlish marker
+    scatter_dawlish = go.Scatter(
+        x=[dawlish_lon_seawall],
+        y=[dawlish_lat_seawall],
+        mode='markers',
+        marker=dict(
+            color='red',
+            size=10,
+            symbol='circle'
+        ),
+        name='Dawlish',  # Separate name for Dawlish
+        text=['Dawlish'],
+        hoverinfo='text'
+    )
+
+    # Create scatter plot for Penzance marker
+    scatter_penzance = go.Scatter(
+        x=[penzance_lon_seawall],
+        y=[penzance_lat_seawall],
+        mode='markers',
+        marker=dict(
+            color='red',
+            size=10,
+            symbol='square'
+        ),
+        name='Penzance',  # Separate name for Penzance
+        text=['Penzance'],
+        hoverinfo='text'
+    )
+
+    # Create layout
+    layout = go.Layout(
+        title=f'Significant Wave Height (Hs)<br>Block: {current_block_Met_office_final}, Time: {time_label}',
+        xaxis=dict(title='Longitude'),
+        yaxis=dict(title='Latitude'),
+        showlegend=True,  # Show the legend
+        legend=dict(
+            x=0,  # Set x-coordinate to 0 (left side)
+            y=1,  # Set y-coordinate to 1 (top)
+            xanchor='left',  # Anchor legend to the left
+            yanchor='top'   # Anchor legend to the top
+        )
+    )
+
+    # Create figure
+    fig = go.Figure(data=[contour, quiver, scatter_dawlish, scatter_penzance], layout=layout)
+
+    # Save the plot
+    output_file = os.path.join(output_folder, f'hs_wave_direction_plot_block_{current_block_Met_office_final}_time_{time_label.replace(":", "_")}.html')
+    fig.write_html(output_file)
+    print(f"Saved plot for time {time_label} to {output_file}")
+
+
 # Render all plots and graphs
 def render_all_graphs():
     # Plot for RF1 & RF2 - Dawlish Seawall Crest
@@ -129,6 +252,8 @@ def render_all_graphs():
     fig_penzance_seawall_crest = render_overtopping_plot('Penzance Seawall Crest', 'dawlish_seawall_crest.png', data_penzance_seawall_crest)
     # # Plot for RF2 & RF4 - Penzance, Seawall Crest (sheltered)
     fig_penzance_seawall_crest_sheltered = render_overtopping_plot('Penzance, Seawall Crest (sheltered) ', 'dawlish_seawall_crest.png', data_penzance_seawall_crest_sheltered)
+    
+    # render_contour_wave_height(longitudes, latitudes, z_data, U, V, lon_grid, lat_grid, skip, current_block_Met_office_final, time_label, output_folder, 0)
     
     return fig_dawlish_seawall_crest, fig_dawlish_railway_line, fig_penzance_seawall_crest, fig_penzance_seawall_crest_sheltered
 
@@ -244,6 +369,7 @@ def render_dashboard():
 
 data_dawlish_seawall_crest, data_dawlish_railway_line = get_dawlish_wave_overtopping()
 data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered = get_penzance_wave_overtopping()
+# longitudes, latitudes, z_data, U, V, lon_grid, lat_grid, skip, current_block_Met_office_final, time_label, output_folder = get_significant_wave_height_data()
 
 fig_dawlish_seawall_crest, fig_dawlish_railway_line, fig_penzance_seawall_crest, fig_penzance_seawall_crest_crest_sheltered = render_all_graphs()
 
