@@ -4,3 +4,4 @@ __pycache__
 other_assets/
 *.html
 *.ipynb
+*.code-workspace
