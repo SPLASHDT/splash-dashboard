@@ -575,7 +575,6 @@ def adjust_arrow_density(latitudes, longitudes, density_factor=12):
 
 def plot_significant_wave_height():
     # Step 11: Plot Hs geospatially and save to the figures folder
-
     # send_here_wave_folder = '/content/drive/MyDrive/splash/data_inputs/wave'
     send_here_wave_folder = './other_assets/datasets/wave_level/Jan25'
     # output_folder = '/content/drive/MyDrive/splash/data_outputs/dawlish/waves'
@@ -674,6 +673,9 @@ def plot_significant_wave_height():
                         color='white', scale=50, width=0.002
                     )
 
+                    # Colour markers
+                    plt.scatter(dawlish_lon_seawall, dawlish_lat_seawall, color='red', label='Dawlish', s=50, marker='o')
+                    plt.scatter(penzance_lon_seawall, penzance_lat_seawall, color='red', label='Penzance', s=50, marker='s')
 
                     legend_elements = [
                         Line2D([0], [0], color='white', lw=1, marker='>', markersize=10, label='Wave Direction (°)', markerfacecolor='white'),
@@ -707,7 +709,7 @@ def generate_overtopping_graphs():
     submit_button.on_click(on_submit_clicked)
 
     save_combined_features(final_DawlishTwin_dataset)
-    plot_significant_wave_height()
+    # plot_significant_wave_height()
 
 
 # generate_overtopping_graphs()
