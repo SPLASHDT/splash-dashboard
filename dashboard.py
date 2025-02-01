@@ -7,11 +7,16 @@ import dash_bootstrap_components as dbc
 import seaborn as sns
 import numpy as np
 import os
+import requests
+import pandas as pd
+from datetime import datetime
 from matplotlib.colors import Normalize
 
 # Create the app
 SPLASH_DT_Dawlish_models_folder = './other_assets/data_inputs/models/dawlish'
 SPLASH_DT_Penzance_models_folder = './other_assets/data_inputs/models/penzance'
+DAWLISH_API_ENDPOINT = "http://127.0.0.1:8000/splash/dawlish/wave-overtopping"
+PENZANCE_API_ENDPOINT = "http://127.0.0.1:8000/splash/penzance/wave-overtopping"
 dawlish_lat_seawall = 50.56757
 dawlish_lon_seawall = -3.42424
 penzance_lat_seawall = 50.1186
@@ -20,21 +25,65 @@ penzance_lon_seawall = -5.5373
 external_stylesheets = ['./assets/css/dashboard.css']
 app = Dash(__name__, external_stylesheets=external_stylesheets)
 
+def convert_list_to_dataframe(data_list):
+    """Converts a list of dictionaries to a Pandas DataFrame with a numerical index.
+
+    Args:
+        data_list: A list of dictionaries.
+
+    Returns:
+        A Pandas DataFrame with a numerical index starting from 0, or None if the 
+        input list is invalid. Handles potential errors in time string parsing.
+    """
+
+    if not isinstance(data_list, list):
+        return None
+
+    if not data_list:
+        return pd.DataFrame(columns=["time", "overtopping_count", "confidence"])
+
+    try:
+        df_data = []
+        for item in data_list:
+            try:
+                time_obj = datetime.strptime(item['time'], "%a, %d %b %Y %H:%M:%S GMT")
+                time_str = time_obj.strftime("%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                print(f"Warning: Invalid time format: {item['time']}")
+                time_str = None
+
+            df_data.append({
+                "time": time_str,
+                "overtopping_count": item['overtopping_count'],
+                "confidence": item['confidence']
+            })
+
+        df = pd.DataFrame(df_data)
+
+        # The key change: Reset the index to a numerical one starting from 0
+        df = df.reset_index(drop=True)  # drop=True discards the old index
+
+        return df
+    except (KeyError, TypeError) as e:
+        print(f"Error converting list to DataFrame: {e}")
+        return None
+    
 # Get overtopping counts of Dawlish
 def get_dawlish_wave_overtopping():
-    final_DawlishTwin_dataset = ddt.get_digital_twin_dataset()
-    ddt.load_models(SPLASH_DT_Dawlish_models_folder)
+    response = requests.get(DAWLISH_API_ENDPOINT)
+    response.raise_for_status()
+    overtopping_data = response.json()
+    seawall_crest_overtopping_df = convert_list_to_dataframe(overtopping_data["seawall_crest_overtopping"])
+    railway_line_overtopping_df = convert_list_to_dataframe(overtopping_data["railway_line_overtopping"])
+    return seawall_crest_overtopping_df, railway_line_overtopping_df
 
-    data_rf1_rf2_tmp, data_rf3_rf4_tmp = ddt.process_wave_overtopping(final_DawlishTwin_dataset)
-    return data_rf1_rf2_tmp, data_rf3_rf4_tmp
-
-def get_penzance_wave_overtopping():    
-    final_Penzance_Twin_dataset, start_time, start_date_block = pdt.get_digital_twin_dataset()
-    pdt.load_model_files(SPLASH_DT_Penzance_models_folder)
-    pdt.add_selected_model_col(final_Penzance_Twin_dataset, start_time)
-
-    data_rf1_rf2_tmp, data_rf3_rf4_tmp = pdt.process_wave_overtopping(final_Penzance_Twin_dataset)
-    return data_rf1_rf2_tmp, data_rf3_rf4_tmp
+def get_penzance_wave_overtopping():        
+    response = requests.get(PENZANCE_API_ENDPOINT)
+    response.raise_for_status()
+    overtopping_data = response.json()
+    seawall_crest_overtopping_df = convert_list_to_dataframe(overtopping_data["seawall_crest_overtopping"])
+    seawall_crest_sheltered_overtopping_df = convert_list_to_dataframe(overtopping_data["seawall_crest_sheltered_overtopping"])
+    return seawall_crest_overtopping_df, seawall_crest_sheltered_overtopping_df
 
 def get_significant_wave_height_data():
     return ddt.plot_significant_wave_height()
@@ -44,13 +93,13 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
 
     fig_rf1_rf2_tmp = px.scatter(
         overtopping_data,
-        x='Time',
-        y='Overtopping Count',
+        x='time',
+        y='overtopping_count',
         color_continuous_scale=['aqua', 'skyblue', 'blue'],
         labels={
-            'Time': 'Time',
-            'Overtopping Count': 'No. of Overtopping Occurrences (Per 10 Mins)',
-            'Confidence': 'Confidence Level'
+            'time': 'Time',
+            'overtopping_count': 'No. of Overtopping Occurrences (Per 10 Mins)',
+            'confidence': 'Confidence Level'
         }
     )
 
@@ -104,7 +153,7 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
                 'circle' if c >= 0.50 and c <= 0.8 and o > 0 else
                 'square' if c < 0.50 and o > 0 else
                 'circle' 
-                for c, o in zip(overtopping_data['Confidence'], overtopping_data['Overtopping Count'])
+                for c, o in zip(overtopping_data['confidence'], overtopping_data['overtopping_count'])
             ],
             color=[
                 'black' if o == 0 else
@@ -112,7 +161,7 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
                 '#2A5485' if c >= 0.50 and c <= 0.8 and o > 0 else
                 '#AAD3E3' if c < 0.50 and o > 0 else
                 '#AAD3E3' 
-                for c, o in zip(overtopping_data['Confidence'], overtopping_data['Overtopping Count'])
+                for c, o in zip(overtopping_data['confidence'], overtopping_data['overtopping_count'])
             ],
             line_color=[
                 'black' if o == 0 else
@@ -120,7 +169,7 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
                 '#2A5485' if c >= 0.50 and c <= 0.80 and o > 0 else
                 '#AAD3E3' if c < 0.50 and o > 0 else
                 '#AAD3E3' 
-                for c, o in zip(overtopping_data['Confidence'], overtopping_data['Overtopping Count']) # Corrected order
+                for c, o in zip(overtopping_data['confidence'], overtopping_data['overtopping_count']) # Corrected order
             ]
         )
     )
