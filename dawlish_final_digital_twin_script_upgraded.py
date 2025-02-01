@@ -53,11 +53,11 @@ from matplotlib.lines import Line2D
 
 # this is our 3 main folder file paths: wave, wind and wl (water level), we must extract data and concatenate from this these path folders.
 # Met_office_wave_folder = '/content/drive/MyDrive/splash/data_inputs/wave'
-Met_office_wave_folder = './other_assets/datasets/wave_level/Jan25/'
+Met_office_wave_folder = './other_assets/data_inputs/wave_level/Jan25/'
 # Met_office_wind_folder = '/content/drive/MyDrive/splash/data_inputs/wind'
-Met_office_wind_folder = './other_assets/datasets/wind/Jan25/'
+Met_office_wind_folder = './other_assets/data_inputs/wind/Jan25/'
 # wl_file = '/content/drive/MyDrive/splash/data_inputs/wl/EXMOUTH Jan 22 to Dec 26.txt'
-wl_file = './other_assets/datasets/water_level/Jan25/EXMOUTH Jan 22 to Dec 26.txt'
+wl_file = './other_assets/data_inputs/water_level/Jan25/EXMOUTH Jan 22 to Dec 26.txt'
 state_file = 'last_processed_block.txt' # reminds the code to process each block sequentially.
 
 # We extract the data from these coordinates, this is the Dawlish wave buoy coordinates.
@@ -96,13 +96,7 @@ rf3_hs_threshold_regularisation = 1.65
 rf3_wind_threshold_regularisation = 8.47
 rf3_wave_dir_min_regularisation = 50
 rf3_wave_dir_max_regularisation = 93
-
-time_stamps = pd.DataFrame()
-overtopping_counts_rf1_rf2 = []
-overtopping_counts_rf3_rf4 = []
-rf1_confidences_GINI = []
-rf3_confidences_GINI = []
-rf1_predictions = []
+final_DawlishTwin_dataset = pd.DataFrame()
 
 # This takes data from the wave block
 def get_wave_files(block_date):
@@ -351,6 +345,11 @@ def adjust_features(df):
 
 def process_wave_overtopping(df_adjusted_slideronly):
     time_stamps = df_adjusted_slideronly['time'].dropna()
+    overtopping_counts_rf1_rf2 = []
+    overtopping_counts_rf3_rf4 = []
+    rf1_confidences_GINI = []
+    rf3_confidences_GINI = []
+    rf1_predictions = []
 
     for idx, row in df_adjusted_slideronly.iterrows():
         if pd.isna(row['time']):
@@ -419,12 +418,12 @@ def process_wave_overtopping(df_adjusted_slideronly):
         'Confidence': rf3_confidences_GINI
     })
 
-    # plot_overtopping_graphs(df_adjusted_slideronly)
+    # plot_overtopping_graphs(df_adjusted_slideronly, overtopping_counts_rf1_rf2, overtopping_counts_rf3_rf4, rf1_confidences_GINI, rf3_confidences_GINI)
 
     return data_rf1_rf2, data_rf3_rf4
 
 #  Plot overtopping graphs using Matplotlib
-def plot_overtopping_graphs(df_adjusted_slideronly_tmp):
+def plot_overtopping_graphs(df_adjusted_slideronly_tmp, overtopping_counts_rf1_rf2, overtopping_counts_rf3_rf4, rf1_confidences_GINI, rf3_confidences_GINI):
 # Step 9, now we plot our results
     clear_output(wait=True)
     fig, (axes1_DG_Plot, axes2_DG_Plot) = plt.subplots(2, 1, figsize=(16, 10), dpi=300)
@@ -576,7 +575,7 @@ def adjust_arrow_density(latitudes, longitudes, density_factor=12):
 def plot_significant_wave_height():
     # Step 11: Plot Hs geospatially and save to the figures folder
     # send_here_wave_folder = '/content/drive/MyDrive/splash/data_inputs/wave'
-    send_here_wave_folder = './other_assets/datasets/wave_level/Jan25'
+    send_here_wave_folder = './other_assets/data_inputs/wave_level/Jan25'
     # output_folder = '/content/drive/MyDrive/splash/data_outputs/dawlish/waves'
     output_folder = './other_assets/data_outputs/dawlish/waves'
     # state_file = '/content/drive/MyDrive/last_processed_block.txt'
@@ -700,6 +699,7 @@ def plot_significant_wave_height():
 
 
 def generate_overtopping_graphs():
+    global final_DawlishTwin_dataset
     final_DawlishTwin_dataset = get_digital_twin_dataset()
     load_models(SPLASH_DIGITAL_TWIN_models_folder)
 
