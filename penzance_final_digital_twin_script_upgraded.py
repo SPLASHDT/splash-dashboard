@@ -46,11 +46,11 @@ from matplotlib.colors import LinearSegmentedColormap
 
 # We extract from thee file paths (wave, wind, water level(wl)). NB: we have a state file so if we do not have the proceeding data we proceed using the nearest time.
 # SPLASH_wave_folder = '/content/drive/MyDrive/splash/data_inputs/wave'
-SPLASH_wave_folder = './other_assets/datasets/wave_level/Jan25/'
+SPLASH_wave_folder = './other_assets/data_inputs/wave_level/Jan25/'
 # SPLASH_wind_folder = '/content/drive/MyDrive/splash/data_inputs/wind'
-SPLASH_wind_folder = './other_assets/datasets/wind/Jan25/'
+SPLASH_wind_folder = './other_assets/data_inputs/wind/Jan25/'
 # wl_file = '/content/drive/MyDrive/splash/data_inputs/wl/NEWLYN Jan 22 to Dec 26.txt'
-wl_file = './other_assets/datasets/water_level/Jan25/NEWLYN Jan 22 to Dec 26.txt'
+wl_file = './other_assets/data_inputs/water_level/Jan25/NEWLYN Jan 22 to Dec 26.txt'
 state_file = 'last_processed_block.txt'
 
 # We must extract from the lat/long coordinates for Penzance wave buoy.
@@ -83,14 +83,7 @@ use_our_previous_SPLASH_rf1_rf2 = None
 use_our_previous_SPLASH_rf3_rf4 = None
 previous_rf1_confidences = None
 previous_rf3_confidences = None
-
-
-
-Met_office_time_stamps = pd.DataFrame()
-Our_overtopping_counts_rig1_rf1_rf2 = []
-Our_overtopping_counts_rig2_rf3_rf4 = []
-rf1_confidences = []
-rf3_confidences = []
+df = pd.DataFrame()
 
 # Extracting wave data
 def get_wave_files(block_date):
@@ -361,11 +354,16 @@ def add_selected_model_col(dt_df, start_time_tmp):
 
 def process_wave_overtopping(df_adjusted): 
     Met_office_time_stamps = df_adjusted['time'].dropna()
+    Our_overtopping_counts_rig1_rf1_rf2 = []
+    Our_overtopping_counts_rig2_rf3_rf4 = []
+    rf1_confidences = []
+    rf3_confidences = []
+
     rf1_final_predictions = []
 
     for idx, row in df_adjusted.iterrows():
         if pd.isna(row['time']):
-            rf1_final_predictions.append(0)  
+            rf1_final_predictions.append(0)
             continue
         selected_model = row['Selected_Model']
         input_data = row[['Hs', 'Tm', 'shoreWaveDir', 'Wind(m/s)', 'shoreWindDir', 'Freeboard']].to_frame().T
@@ -425,14 +423,13 @@ def process_wave_overtopping(df_adjusted):
         'Confidence': rf3_confidences
     })
 
-    # plot_overtopping_graphs(Met_office_time_stamps)
+    # plot_overtopping_graphs(Met_office_time_stamps, Our_overtopping_counts_rig1_rf1_rf2, Our_overtopping_counts_rig2_rf3_rf4, rf1_confidences, rf3_confidences)
 
     return data_rf1_rf2, data_rf3_rf4
 
 
-def plot_overtopping_graphs(Met_office_time_stamps_df):    
+def plot_overtopping_graphs(Met_office_time_stamps_df, Our_overtopping_counts_rig1_rf1_rf2, Our_overtopping_counts_rig2_rf3_rf4, rf1_confidences, rf3_confidences):    
     global use_our_previous_SPLASH_rf1_rf2, use_our_previous_SPLASH_rf3_rf4, previous_rf1_confidences, previous_rf3_confidences
-    
     clear_output(wait=True)
 
     fig, (ax1, ax2) = plt.subplots(2, 1, figsize=(16, 10), dpi=300)
@@ -592,7 +589,7 @@ def combine_features(df):
 def plot_significant_wave_height(start_date_block):
     # Step 9. Now we also want to plot Hs and wave direction geospatially and save to figures folder.
 
-    send_here_wave_folder = './other_assets/datasets/wave_level/Jan25'
+    send_here_wave_folder = './other_assets/data_inputs/wave_level/Jan25'
     output_folder = './other_assets/data_outputs/penzance/waves'
     state_file = './other_assets/last_processed_block.txt'
 
@@ -686,7 +683,8 @@ def plot_significant_wave_height(start_date_block):
                     plt.close()
                     print(f"Saved plot for time {time_label} to {output_file}")
 
-def generate_overtopping_graphs():    
+def generate_overtopping_graphs():  
+    global df 
     df, start_time, start_date_block = get_digital_twin_dataset()
     load_model_files(SPLASH_Digital_Twin_models_folder)
     add_selected_model_col(df, start_time)
@@ -697,6 +695,6 @@ def generate_overtopping_graphs():
     process_wave_overtopping(df)
 
     combine_features(df)
-    plot_significant_wave_height(start_date_block)
+    # plot_significant_wave_height(start_date_block)
 
 # generate_overtopping_graphs()
