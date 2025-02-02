@@ -26,6 +26,7 @@ penzance_lon_seawall = os.environ.get("PENZANCE_LON_SEAWALL")
 external_stylesheets = ['./assets/css/dashboard.css']
 app = Dash(__name__, external_stylesheets=external_stylesheets)
 
+# Convert lit to dataframe object
 def convert_list_to_dataframe(data_list):
     """Converts a list of dictionaries to a Pandas DataFrame with a numerical index.
 
@@ -68,7 +69,8 @@ def convert_list_to_dataframe(data_list):
     except (KeyError, TypeError) as e:
         print(f"Error converting list to DataFrame: {e}")
         return None
-    
+
+
 # Get overtopping counts of Dawlish
 def get_dawlish_wave_overtopping():
     response = requests.get(DAWLISH_API_ENDPOINT)
@@ -78,6 +80,7 @@ def get_dawlish_wave_overtopping():
     railway_line_overtopping_df = convert_list_to_dataframe(overtopping_data["railway_line_overtopping"])
     return seawall_crest_overtopping_df, railway_line_overtopping_df
 
+
 def get_penzance_wave_overtopping():        
     response = requests.get(PENZANCE_API_ENDPOINT)
     response.raise_for_status()
@@ -86,9 +89,11 @@ def get_penzance_wave_overtopping():
     seawall_crest_sheltered_overtopping_df = convert_list_to_dataframe(overtopping_data["seawall_crest_sheltered_overtopping"])
     return seawall_crest_overtopping_df, seawall_crest_sheltered_overtopping_df
 
+
 # def get_significant_wave_height_data():
 #     return ddt.plot_significant_wave_height()
     
+
 # Render overtopping plot
 def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
 
@@ -179,6 +184,7 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
     fig_rf1_rf2_tmp.add_hline(y=54, line_dash='dash', line_color='#8A8D90', annotation_text='75% IQR (54)')
 
     return fig_rf1_rf2_tmp
+
 
 # Render countour significant wave height
 def render_contour_wave_height(longitudes, latitudes, z_data, U, V, lon_grid, lat_grid, skip,
@@ -329,27 +335,27 @@ def render_dashboard():
             children=[
                 html.Div(
                     children=[
-                        html.Img(src="./assets/imgs/splash_logo.png", style={'width': '120.77px', 'height': '102.19px', 'margin-top': '15.61px'}),  # Add image here
+                        html.Img(src="./assets/imgs/splash_logo.png", className="splash-logo"),  # Add image here
                         html.Div(
                             children=[
-                                html.Div("SPLASH", style={'color': '#3279B7', 'font-size': '87.22px', 'font-family': 'Viga', 'font-weight': '400', 'line-height': '104.66px', 'letter-spacing': '2.62px'}),
-                                html.Div("DIGITAL APPROACHES TO PREDICT WAVE OVERTOPPING HAZARDS", style={'color': '#2A5485', 'font-size': '20.87px', 'font-family': 'Urbanist', 'font-weight': '600', 'line-height': '31.31px', 'letter-spacing': '0.83px', 'margin-top': '10px'})
+                                html.Div("SPLASH", className="dashboard-title"),
+                                html.Div("DIGITAL APPROACHES TO PREDICT WAVE OVERTOPPING HAZARDS", className="dashboard-sub-title")
                             ],
-                            style={'width': '784.23px', 'height': '121.31px', 'margin-left': '34.92px'}
+                            className="title-sub-title-container"
                         )
                     ],
                     className="head-container"
                 )
             ],
-            style={'padding-left': '72px'}
+            style={'paddingLeft': '72px'}
         )]),
         dbc.Row(
             html.Div("Advancing current understanding on wave-related coastal hazards", className="dashboard-description"),
-            style={'padding-left': '72px'}
+            style={'paddingLeft': '72px'}
         ),
         dbc.Row(
             html.Div("With sea level rise accelerating and weather extremes becoming increasingly stronger, tools to help climate adaptation of coastal communities are of paramount importance. SPLASH provides an overtopping tool that will act as forecast model directly helping coastal communities mitigate effects of this coastal hazard, and ultimately, guiding new climate adaptation strategies.", className="dashboard-summary"),
-            style={'padding-left': '72px'}
+            style={'paddingLeft': '72px'}
         ),
         dbc.Row([
             dbc.Col([
@@ -363,41 +369,41 @@ def render_dashboard():
             dbc.Col([
                 html.Div(
                     children=[
-                        html.Div("Key", style={'color': 'black', 'font-size': '14.40px', 'font-family': 'Helvetica Neue', 'font-weight': '700', 'line-height': '21.60px', 'margin-top': '5px', 'width': '65px'}),
+                        html.Div("Key", style={'color': 'black', 'fontSize': '14.40px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '700', 'lineHeight': '21.60px', 'marginTop': '5px', 'width': '65px'}),
                         html.Div(
                             children=[
-                                html.Div(style={'width': '26px', 'height': '26px', 'border-radius': '9999px', 'border': '2px #FF0004 solid', 'margin-left': '18px', 'margin-top': '3px'}),
-                                html.Div("High confidence > 80%", style={'color': 'black', 'font-size': '12px', 'font-family': 'Helvetica Neue', 'font-weight': '400', 'line-height': '16.80px', 'margin-left': '11px', 'width': '88px'})
+                                html.Div(style={'width': '26px', 'height': '26px', 'borderRadius': '9999px', 'border': '2px #FF0004 solid', 'marginLeft': '18px', 'marginTop': '3px'}),
+                                html.Div("High confidence > 80%", style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '88px'})
                             ],
-                            style={'display': 'flex', 'margin-left': '37px'}
+                            style={'display': 'flex', 'marginLeft': '37px'}
                         ),
                         html.Div(
                             children=[
-                                html.Div(style={'width': '26px', 'height': '26px', 'background': '#2A5485', 'border-radius': '9999px', 'margin-top': '3px'}),
-                                html.Div("Medium confidence 50-80%", style={'color': 'black', 'font-size': '12px', 'font-family': 'Helvetica Neue', 'font-weight': '400', 'line-height': '16.80px', 'margin-left': '11px', 'width': '107px'}),
+                                html.Div(style={'width': '26px', 'height': '26px', 'background': '#2A5485', 'borderRadius': '9999px', 'marginTop': '3px'}),
+                                html.Div("Medium confidence 50-80%", style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '107px'}),
                             ],
-                            style={'display': 'flex', 'margin-left': '37px'}
+                            style={'display': 'flex', 'marginLeft': '37px'}
                         ), 
                         html.Div(
                             children=[
-                                html.Div(style={'width': '24px', 'height': '24px', 'background': '#AAD3E3', 'margin-top': '4px'}),
-                                html.Div("Low confidence < 50%", style={'color': 'black', 'font-size': '12px', 'font-family': 'Helvetica Neue', 'font-weight': '400', 'line-height': '16.80px', 'margin-left': '11px', 'width': '86px'})
+                                html.Div(style={'width': '24px', 'height': '24px', 'background': '#AAD3E3', 'marginTop': '4px'}),
+                                html.Div("Low confidence < 50%", style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '86px'})
                             ],
-                            style={'display': 'flex', 'margin-left': '37px'}
+                            style={'display': 'flex', 'marginLeft': '37px'}
                         ),
                         html.Div(
                             children=[
-                                html.Img(src='./assets/imgs/no_overtopping_marker.png', style={'width': '20px', 'height': '20px', 'margin-top': '6px'}),  # Add the image here   
-                                html.Div("No overtopping", style={'color': 'black', 'font-size': '12px', 'font-family': 'Helvetica Neue', 'font-weight': '400', 'line-height': '16.80px', 'margin-top': '8px', 'margin-left': '11px', 'width': '84px'})
+                                html.Img(src='./assets/imgs/no_overtopping_marker.png', style={'width': '20px', 'height': '20px', 'marginTop': '6px'}),  # Add the image here   
+                                html.Div("No overtopping", style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginTop': '8px', 'marginLeft': '11px', 'width': '84px'})
                                 ],
-                            style={'display': 'flex', 'margin-left': '37px'}
+                            style={'display': 'flex', 'marginLeft': '37px'}
                         ),
                         html.Div(
                             children=[
-                                html.Div(style={'width': '46px', 'height': '0px', 'border': '1px #8A8D90 dashed', 'margin-top': '16px'}),
-                                html.Div("Interquartile range (25th and 75th)", style={'color': 'black', 'font-size': '12px', 'font-family': 'Helvetica Neue', 'font-weight': '400', 'line-height': '16.80px', 'margin-left': '11px', 'width': '101px'}),
+                                html.Div(style={'width': '46px', 'height': '0px', 'border': '1px #8A8D90 dashed', 'marginTop': '16px'}),
+                                html.Div("Interquartile range (25th and 75th)", style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '101px'}),
                             ],
-                            style={'display': 'flex', 'margin-left': '37px'}
+                            style={'display': 'flex', 'marginLeft': '37px'}
                         ),
 
                     ],
@@ -417,6 +423,7 @@ def render_dashboard():
         ], style={'padding': '24px 72px'})
     ], fluid=True, className='body-container')
 
+
 data_dawlish_seawall_crest, data_dawlish_railway_line = get_dawlish_wave_overtopping()
 data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered = get_penzance_wave_overtopping()
 # longitudes, latitudes, z_data, U, V, lon_grid, lat_grid, skip, current_block_Met_office_final, time_label, output_folder = get_significant_wave_height_data()
@@ -426,6 +433,7 @@ fig_dawlish_seawall_crest, fig_dawlish_railway_line, fig_penzance_seawall_crest,
 
 render_dashboard()
 
+
 # Define event for site location dropdown
 @app.callback(
     Output("scatter-plot-rig1", "figure"), 
@@ -433,6 +441,7 @@ render_dashboard()
 def display_color(site_location):
     fig = fig_dawlish_seawall_crest if site_location == 'Dawlish' else fig_penzance_seawall_crest
     return fig
+
 
 @app.callback(
     Output("scatter-plot-rig2", "figure"), 

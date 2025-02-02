@@ -1,3 +1,14 @@
+@font-face {
+    font-family: Viga;
+    src: url("../fonts/Viga/Viga-Regular.ttf");
+    font-weight: bold;
+ }
+
+ @font-face {
+    font-family: Urbanist;
+    src: url("../fonts/Urbanist/Urbanist-VariableFont_wght.ttf");
+ }
+
 .head-container {
     width: 1250px;
     height: 121.31px;
@@ -7,6 +18,18 @@
 
 .body-container {
     background: var(--Background-pale-blue, #F4F8FB);
+}
+
+.splash-logo {
+    width: 120.77px; 
+    height: 102.19px;
+    margin-top: 15.61px
+}
+
+.title-sub-title-container {
+    width: 784.23px;
+    height: 121.31px; 
+    margin-left: 34.92px;
 }
 
 .dashboard-title {
@@ -26,6 +49,7 @@
     font-weight: 600; 
     line-height: 31.31px; 
     letter-spacing: 0.83px; 
+    margin-top: 10px;
     word-wrap: break-word;
 }
 
