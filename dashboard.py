@@ -11,16 +11,19 @@ import requests
 import pandas as pd
 from datetime import datetime
 from matplotlib.colors import Normalize
+import utils
+
+utils.loadConfigFile()
 
 # Create the app
-SPLASH_DT_Dawlish_models_folder = './other_assets/data_inputs/models/dawlish'
-SPLASH_DT_Penzance_models_folder = './other_assets/data_inputs/models/penzance'
-DAWLISH_API_ENDPOINT = "http://127.0.0.1:8000/splash/dawlish/wave-overtopping"
-PENZANCE_API_ENDPOINT = "http://127.0.0.1:8000/splash/penzance/wave-overtopping"
-dawlish_lat_seawall = 50.56757
-dawlish_lon_seawall = -3.42424
-penzance_lat_seawall = 50.1186
-penzance_lon_seawall = -5.5373
+SPLASH_DT_Dawlish_models_folder = os.environ.get("SPLASH_DT_DAWLISH_MODELS_FOLDER")
+SPLASH_DT_Penzance_models_folder = os.environ.get("SPLASH_DT_PENZANCE_MODELS_FOLDER")
+DAWLISH_API_ENDPOINT = os.environ.get("DAWLISH_API_ENDPOINT")
+PENZANCE_API_ENDPOINT = os.environ.get("PENZANCE_API_ENDPOINT")
+dawlish_lat_seawall = os.environ.get("DAWLISH_LAT_SEAWALL")
+dawlish_lon_seawall = os.environ.get("DAWLISH_LON_SEAWALL")
+penzance_lat_seawall = os.environ.get("PENZANCE_LAT_SEAWALL")
+penzance_lon_seawall = os.environ.get("PENZANCE_LON_SEAWALL")
 
 external_stylesheets = ['./assets/css/dashboard.css']
 app = Dash(__name__, external_stylesheets=external_stylesheets)

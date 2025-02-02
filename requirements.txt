@@ -13,3 +13,4 @@ ipywidgets>=7.6
 dash>=2.18.2
 dash-bootstrap-components>=1.7.1
 seaborn>=0.13.2
+python-dotenv>=1.0.1
