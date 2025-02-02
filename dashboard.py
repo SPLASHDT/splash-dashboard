@@ -1,8 +1,6 @@
 from dash import Dash, dcc, html, Input, Output
 import plotly.express as px
 import plotly.graph_objects as go
-import dawlish_final_digital_twin_script_upgraded as ddt
-import penzance_final_digital_twin_script_upgraded as pdt
 import dash_bootstrap_components as dbc
 import seaborn as sns
 import numpy as np
@@ -88,8 +86,8 @@ def get_penzance_wave_overtopping():
     seawall_crest_sheltered_overtopping_df = convert_list_to_dataframe(overtopping_data["seawall_crest_sheltered_overtopping"])
     return seawall_crest_overtopping_df, seawall_crest_sheltered_overtopping_df
 
-def get_significant_wave_height_data():
-    return ddt.plot_significant_wave_height()
+# def get_significant_wave_height_data():
+#     return ddt.plot_significant_wave_height()
     
 # Render overtopping plot
 def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
