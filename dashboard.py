@@ -72,8 +72,8 @@ def convert_list_to_dataframe(data_list):
 
 
 # Get overtopping counts of Dawlish
-def get_dawlish_wave_overtopping():
-    response = requests.get(DAWLISH_API_ENDPOINT)
+def get_dawlish_wave_overtopping(option: str = "dawlish"):
+    response = requests.get(DAWLISH_API_ENDPOINT + '?option='+ option)
     response.raise_for_status()
     overtopping_data = response.json()
     seawall_crest_overtopping_df = convert_list_to_dataframe(overtopping_data["seawall_crest_overtopping"])
@@ -81,8 +81,8 @@ def get_dawlish_wave_overtopping():
     return seawall_crest_overtopping_df, railway_line_overtopping_df
 
 
-def get_penzance_wave_overtopping():        
-    response = requests.get(PENZANCE_API_ENDPOINT)
+def get_penzance_wave_overtopping(option: str = "penzance"):        
+    response = requests.get(PENZANCE_API_ENDPOINT+ '?option='+ option)
     response.raise_for_status()
     overtopping_data = response.json()
     seawall_crest_overtopping_df = convert_list_to_dataframe(overtopping_data["seawall_crest_overtopping"])
@@ -313,16 +313,44 @@ def render_all_graphs():
     
     return fig_dawlish_seawall_crest, fig_dawlish_railway_line, fig_penzance_seawall_crest, fig_penzance_seawall_crest_sheltered
 
+def render_dawlish_seawall_crest_graph(data_dawlish_seawall_crest):
+    # Plot for RF1 & RF2 - Dawlish Seawall Crest
+    fig_dawlish_seawall_crest = render_overtopping_plot('Dawlish Seawall Crest', 'dawlish_seawall_crest.png', data_dawlish_seawall_crest)
+
+    return fig_dawlish_seawall_crest
+
+def render_dawlish_railway_line_graph(data_dawlish_railway_line):
+    # Plot for RF3 & RF4 - Dawlish Railway Line
+    fig_dawlish_railway_line = render_overtopping_plot('Dawlish Railway Line', 'dawlish_railway_line.png', data_dawlish_railway_line)
+
+    return fig_dawlish_railway_line
+
+
+def render_penzance_seawall_crest_graph(data_penzance_seawall_crest):
+    # Plot for RF1 & RF2 - Penzance Seawall Crest
+    fig_penzance_seawall_crest = render_overtopping_plot('Penzance Seawall Crest', 'dawlish_seawall_crest.png', data_penzance_seawall_crest)
+
+    return fig_penzance_seawall_crest
+
+def render_penzance_seawall_crest_sheltered_graph(data_penzance_seawall_crest_sheltered):
+    # # Plot for RF2 & RF4 - Penzance, Seawall Crest (sheltered)
+    fig_penzance_seawall_crest_sheltered = render_overtopping_plot('Penzance, Seawall Crest (sheltered) ', 'dawlish_seawall_crest.png', data_penzance_seawall_crest_sheltered)
+
+    return fig_penzance_seawall_crest_sheltered
+
+
+
+
+
 
 # Render Splash dashboard
 def render_dashboard():
-
     # Search components
     dropdown_container = html.Div([
         "Site location",
         dcc.Dropdown(
         id='dd_site_location',
-        options=['Dawlish', 'Penzance'],
+        options=['Dawlish', 'Penzance', 'Dawlish Storm Bert - overtopping', 'Penzance Storm Bert - overtopping', 'Dawlish - no overtopping', 'Penzance - no overtopping'],
         value='Dawlish',
         clearable=False,
     )
@@ -423,14 +451,6 @@ def render_dashboard():
         ], style={'padding': '24px 72px'})
     ], fluid=True, className='body-container')
 
-
-data_dawlish_seawall_crest, data_dawlish_railway_line = get_dawlish_wave_overtopping()
-data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered = get_penzance_wave_overtopping()
-# longitudes, latitudes, z_data, U, V, lon_grid, lat_grid, skip, current_block_Met_office_final, time_label, output_folder = get_significant_wave_height_data()
-
-fig_dawlish_seawall_crest, fig_dawlish_railway_line, fig_penzance_seawall_crest, fig_penzance_seawall_crest_crest_sheltered = render_all_graphs()
-
-
 render_dashboard()
 
 
@@ -438,16 +458,48 @@ render_dashboard()
 @app.callback(
     Output("scatter-plot-rig1", "figure"), 
     Input("dd_site_location", "value"))
-def display_color(site_location):
-    fig = fig_dawlish_seawall_crest if site_location == 'Dawlish' else fig_penzance_seawall_crest
+def display_graph(site_location):
+    if site_location == "Dawlish":
+        option = "dawlish"
+    elif utils.find_words_with_suffix(site_location, "Storm Bert"):
+        option = "storm_bert"
+    elif utils.find_words_with_suffix(site_location, "no overtopping"):
+        option = "no_overtopping"
+    else: 
+        option = "penzance"
+
+    if utils.find_words_with_suffix(site_location, "Dawlish"):
+        data_dawlish_seawall_crest, data_dawlish_railway_line = get_dawlish_wave_overtopping(option)
+        fig_dawlish_seawall_crest = render_dawlish_seawall_crest_graph(data_dawlish_seawall_crest)
+    else:
+        data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered = get_penzance_wave_overtopping(option)
+        fig_penzance_seawall_crest = render_penzance_seawall_crest_graph(data_penzance_seawall_crest)
+
+    fig = fig_dawlish_seawall_crest if utils.find_words_with_suffix(site_location, "Dawlish") else fig_penzance_seawall_crest
     return fig
 
 
 @app.callback(
     Output("scatter-plot-rig2", "figure"), 
     Input("dd_site_location", "value"))
-def display_color(site_location):
-    fig = fig_dawlish_railway_line if site_location == 'Dawlish' else fig_penzance_seawall_crest_crest_sheltered
+def display_graph(site_location):
+    if site_location == "Penzance":
+        option = "penzance"
+    elif utils.find_words_with_suffix(site_location, "Storm Bert"):
+        option = "storm_bert"
+    elif utils.find_words_with_suffix(site_location, "no overtopping"):
+        option = "no_overtopping"
+    else: 
+        option = "dawlish"
+
+    if utils.find_words_with_suffix(site_location, "Dawlish"):
+        data_dawlish_seawall_crest, data_dawlish_railway_line = get_dawlish_wave_overtopping(option)
+        fig_dawlish_railway_line = render_dawlish_railway_line_graph(data_dawlish_railway_line)
+    else:
+        data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered = get_penzance_wave_overtopping(option)
+        fig_penzance_seawall_crest_sheltered = render_penzance_seawall_crest_sheltered_graph(data_penzance_seawall_crest_sheltered)
+
+    fig = fig_penzance_seawall_crest_sheltered if utils.find_words_with_suffix(site_location, "Penzance") else fig_dawlish_railway_line
     return fig
 
 # Run the app
