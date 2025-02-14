@@ -72,8 +72,9 @@ def convert_list_to_dataframe(data_list):
 
 
 # Get overtopping counts of Dawlish
-def get_dawlish_wave_overtopping(option: str = "dawlish"):
-    response = requests.get(DAWLISH_API_ENDPOINT + '?option='+ option)
+def get_dawlish_wave_overtopping(start_date, option: str = "dawlish"):
+    backend_api = DAWLISH_API_ENDPOINT + '?option='+ option + '&start_date='+ start_date if start_date != "" else DAWLISH_API_ENDPOINT + '?option='+ option
+    response = requests.get(backend_api)
     response.raise_for_status()
     overtopping_data = response.json()
     seawall_crest_overtopping_df = convert_list_to_dataframe(overtopping_data["seawall_crest_overtopping"])
@@ -339,10 +340,6 @@ def render_penzance_seawall_crest_sheltered_graph(data_penzance_seawall_crest_sh
     return fig_penzance_seawall_crest_sheltered
 
 
-
-
-
-
 # Render Splash dashboard
 def render_dashboard():
     # Search components
@@ -461,15 +458,19 @@ render_dashboard()
 def display_graph(site_location):
     if site_location == "Dawlish":
         option = "dawlish"
+        start_date = ""
     elif utils.find_words_with_suffix(site_location, "Storm Bert"):
         option = "storm_bert"
+        start_date = "21-11-2024"
     elif utils.find_words_with_suffix(site_location, "no overtopping"):
         option = "no_overtopping"
+        start_date = "10-12-2024"
     else: 
         option = "penzance"
+        start_date = ""
 
     if utils.find_words_with_suffix(site_location, "Dawlish"):
-        data_dawlish_seawall_crest, data_dawlish_railway_line = get_dawlish_wave_overtopping(option)
+        data_dawlish_seawall_crest, data_dawlish_railway_line = get_dawlish_wave_overtopping(start_date, option)
         fig_dawlish_seawall_crest = render_dawlish_seawall_crest_graph(data_dawlish_seawall_crest)
     else:
         data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered = get_penzance_wave_overtopping(option)
@@ -485,15 +486,19 @@ def display_graph(site_location):
 def display_graph(site_location):
     if site_location == "Penzance":
         option = "penzance"
+        start_date = ""
     elif utils.find_words_with_suffix(site_location, "Storm Bert"):
         option = "storm_bert"
+        start_date = "21-11-2024"
     elif utils.find_words_with_suffix(site_location, "no overtopping"):
         option = "no_overtopping"
+        start_date = "10-12-2024"
     else: 
         option = "dawlish"
+        start_date = ""
 
     if utils.find_words_with_suffix(site_location, "Dawlish"):
-        data_dawlish_seawall_crest, data_dawlish_railway_line = get_dawlish_wave_overtopping(option)
+        data_dawlish_seawall_crest, data_dawlish_railway_line = get_dawlish_wave_overtopping(start_date, option)
         fig_dawlish_railway_line = render_dawlish_railway_line_graph(data_dawlish_railway_line)
     else:
         data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered = get_penzance_wave_overtopping(option)
