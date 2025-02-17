@@ -82,8 +82,9 @@ def get_dawlish_wave_overtopping(start_date, option: str = "dawlish"):
     return seawall_crest_overtopping_df, railway_line_overtopping_df
 
 
-def get_penzance_wave_overtopping(option: str = "penzance"):        
-    response = requests.get(PENZANCE_API_ENDPOINT+ '?option='+ option)
+def get_penzance_wave_overtopping(start_date, option: str = "penzance"):        
+    backend_api = PENZANCE_API_ENDPOINT + '?option='+ option + '&start_date='+ start_date if start_date != "" else PENZANCE_API_ENDPOINT + '?option='+ option
+    response = requests.get(backend_api)
     response.raise_for_status()
     overtopping_data = response.json()
     seawall_crest_overtopping_df = convert_list_to_dataframe(overtopping_data["seawall_crest_overtopping"])
@@ -299,21 +300,6 @@ def render_contour_wave_height(longitudes, latitudes, z_data, U, V, lon_grid, la
     print(f"Saved plot for time {time_label} to {output_file}")
 
 
-# Render all plots and graphs
-def render_all_graphs():
-    # Plot for RF1 & RF2 - Dawlish Seawall Crest
-    fig_dawlish_seawall_crest = render_overtopping_plot('Dawlish Seawall Crest', 'dawlish_seawall_crest.png', data_dawlish_seawall_crest)
-    # Plot for RF3 & RF4 - Dawlish Railway Line
-    fig_dawlish_railway_line = render_overtopping_plot('Dawlish Railway Line', 'dawlish_railway_line.png', data_dawlish_railway_line)
-    # Plot for RF1 & RF2 - Penzance Seawall Crest
-    fig_penzance_seawall_crest = render_overtopping_plot('Penzance Seawall Crest', 'dawlish_seawall_crest.png', data_penzance_seawall_crest)
-    # # Plot for RF2 & RF4 - Penzance, Seawall Crest (sheltered)
-    fig_penzance_seawall_crest_sheltered = render_overtopping_plot('Penzance, Seawall Crest (sheltered) ', 'dawlish_seawall_crest.png', data_penzance_seawall_crest_sheltered)
-    
-    # render_contour_wave_height(longitudes, latitudes, z_data, U, V, lon_grid, lat_grid, skip, current_block_Met_office_final, time_label, output_folder, 0)
-    
-    return fig_dawlish_seawall_crest, fig_dawlish_railway_line, fig_penzance_seawall_crest, fig_penzance_seawall_crest_sheltered
-
 def render_dawlish_seawall_crest_graph(data_dawlish_seawall_crest):
     # Plot for RF1 & RF2 - Dawlish Seawall Crest
     fig_dawlish_seawall_crest = render_overtopping_plot('Dawlish Seawall Crest', 'dawlish_seawall_crest.png', data_dawlish_seawall_crest)
@@ -473,7 +459,7 @@ def display_graph(site_location):
         data_dawlish_seawall_crest, data_dawlish_railway_line = get_dawlish_wave_overtopping(start_date, option)
         fig_dawlish_seawall_crest = render_dawlish_seawall_crest_graph(data_dawlish_seawall_crest)
     else:
-        data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered = get_penzance_wave_overtopping(option)
+        data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered = get_penzance_wave_overtopping(start_date, option)
         fig_penzance_seawall_crest = render_penzance_seawall_crest_graph(data_penzance_seawall_crest)
 
     fig = fig_dawlish_seawall_crest if utils.find_words_with_suffix(site_location, "Dawlish") else fig_penzance_seawall_crest
@@ -501,7 +487,7 @@ def display_graph(site_location):
         data_dawlish_seawall_crest, data_dawlish_railway_line = get_dawlish_wave_overtopping(start_date, option)
         fig_dawlish_railway_line = render_dawlish_railway_line_graph(data_dawlish_railway_line)
     else:
-        data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered = get_penzance_wave_overtopping(option)
+        data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered = get_penzance_wave_overtopping(start_date, option)
         fig_penzance_seawall_crest_sheltered = render_penzance_seawall_crest_sheltered_graph(data_penzance_seawall_crest_sheltered)
 
     fig = fig_penzance_seawall_crest_sheltered if utils.find_words_with_suffix(site_location, "Penzance") else fig_dawlish_railway_line
