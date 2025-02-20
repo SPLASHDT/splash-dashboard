@@ -63,7 +63,6 @@
     font-style: normal;
     font-weight: 700;
     line-height: 120%;
-    padding-top: 60px;
 }
 
 .dashboard-summary {
@@ -91,7 +90,11 @@
 }
 
 .site-dropdown {
+    color: var(--Black, #222);
     width: 349px;
     height: 56px;
-    padding: 22px 72px;
+}
+
+.label-dropdown {
+    color: var(--SPLASH---Primary-Blue, #2A5485);
 }

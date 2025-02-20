@@ -23,7 +23,7 @@ dawlish_lon_seawall = os.environ.get("DAWLISH_LON_SEAWALL")
 penzance_lat_seawall = os.environ.get("PENZANCE_LAT_SEAWALL")
 penzance_lon_seawall = os.environ.get("PENZANCE_LON_SEAWALL")
 
-external_stylesheets = ['./assets/css/dashboard.css']
+external_stylesheets = [dbc.themes.BOOTSTRAP, './assets/css/dashboard.css']
 app = Dash(__name__, external_stylesheets=external_stylesheets)
 
 # Convert lit to dataframe object
@@ -104,6 +104,7 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
         x='time',
         y='overtopping_count',
         color_continuous_scale=['aqua', 'skyblue', 'blue'],
+        height=513,
         labels={
             'time': 'Time',
             'overtopping_count': 'No. of Overtopping Occurrences (Per 10 Mins)',
@@ -116,8 +117,8 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
         dict(
             source="./assets/imgs/" + plot_logo,
             xref="paper", yref="paper",
-            x=0, y=1,  # Adjust position as needed
-            sizex=0.15, sizey=0.15,  # Adjust size as needed
+            x=0.25, y=1,  # Adjust position as needed
+            sizex=0.06, sizey=0.06,  # Adjust size as needed
             xanchor="left", yanchor="bottom"
         )
     )
@@ -127,12 +128,12 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
             text=plot_title,  # Just the text title
             font=dict(
                 family='Helvetica Neue',
-                size=44.489,
+                size=22,
                 color='#3279B7',
                 weight=500
             ),
             xref="paper", yref="paper",
-            x=0.04, y=1,  # Adjust title position if necessary
+            x=0.3, y=1,  # Adjust title position if necessary
             xanchor='left', yanchor='bottom'
         ),
         plot_bgcolor='white',  # Set the plot background color to white
@@ -154,7 +155,7 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
         selector=dict(type='scatter', mode='markers'),
         marker=dict(
             line=dict(width=2),
-            size=16,
+            size=12,
             symbol=[
                 'x-thin' if o == 0 else
                 'circle-open' if c > 0.80 and o > 0 else
@@ -336,8 +337,9 @@ def render_dashboard():
         options=['Dawlish', 'Penzance', 'Dawlish Storm Bert - overtopping', 'Penzance Storm Bert - overtopping', 'Dawlish - no overtopping', 'Penzance - no overtopping'],
         value='Dawlish',
         clearable=False,
+        className='site-dropdown'
     )
-    ])
+    ], className='label-dropdown')
 
     # App layout
     app.layout = dbc.Container([
@@ -362,22 +364,14 @@ def render_dashboard():
         )]),
         dbc.Row(
             html.Div("Advancing current understanding on wave-related coastal hazards", className="dashboard-description"),
-            style={'paddingLeft': '72px'}
+            style={'paddingLeft': '72px', 'paddingTop': '60px', 'padding-bottom': '5px'}
         ),
         dbc.Row(
             html.Div("With sea level rise accelerating and weather extremes becoming increasingly stronger, tools to help climate adaptation of coastal communities are of paramount importance. SPLASH provides an overtopping tool that will act as forecast model directly helping coastal communities mitigate effects of this coastal hazard, and ultimately, guiding new climate adaptation strategies.", className="dashboard-summary"),
             style={'paddingLeft': '72px'}
         ),
-        dbc.Row([
-            dbc.Col([
-                dropdown_container,
-            ],
-            width="3",
-            className="site-dropdown",
-            )
-        ]),
-        dbc.Row([
-            dbc.Col([
+        dbc.Row(dbc.Col(dropdown_container, width="3"), style={'paddingTop': '52px', 'paddingLeft': '72px'}),
+        dbc.Row(dbc.Col(
                 html.Div(
                     children=[
                         html.Div("Key", style={'color': 'black', 'fontSize': '14.40px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '700', 'lineHeight': '21.60px', 'marginTop': '5px', 'width': '65px'}),
@@ -420,18 +414,12 @@ def render_dashboard():
                     ],
                     className="dawlish-legend"
                 )
-            ], width=10, style={"padding": "22px 72px"})
-        ]),
+            , width=10),
+        style={'paddingTop': '27px', 'paddingLeft': '72px'}),
         dbc.Row([
-            dbc.Col([
-                dcc.Graph(id="scatter-plot-rig1")
-            ], width=12, style={'border': '1.011px solid #8A8D90'})    
-        ], style={'padding': '0px 72px'}),
-        dbc.Row([
-            dbc.Col([
-                dcc.Graph(id="scatter-plot-rig2")
-            ], width=12, style={'border': '1.011px solid #8A8D90'})    
-        ], style={'padding': '24px 72px'})
+            dbc.Col(dcc.Graph(id="scatter-plot-rig1", style={'border': '1.011px solid #8A8D90'}), md=6),
+            dbc.Col(dcc.Graph(id="scatter-plot-rig2", style={'border': '1.011px solid #8A8D90'}), md=6)
+        ], style={'paddingTop': '22px', 'paddingLeft': '72px', 'paddingRight': '72px'}),
     ], fluid=True, className='body-container')
 
 render_dashboard()
