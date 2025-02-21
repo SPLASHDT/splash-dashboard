@@ -1,4 +1,4 @@
-from dash import Dash, dcc, html, Input, Output
+from dash import Dash, dcc, html, Input, Output, State
 import plotly.express as px
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
@@ -14,17 +14,16 @@ import utils
 utils.loadConfigFile()
 
 # Create the app
-SPLASH_DT_Dawlish_models_folder = os.environ.get("SPLASH_DT_DAWLISH_MODELS_FOLDER")
-SPLASH_DT_Penzance_models_folder = os.environ.get("SPLASH_DT_PENZANCE_MODELS_FOLDER")
-DAWLISH_API_ENDPOINT = os.environ.get("DAWLISH_API_ENDPOINT")
-PENZANCE_API_ENDPOINT = os.environ.get("PENZANCE_API_ENDPOINT")
-dawlish_lat_seawall = os.environ.get("DAWLISH_LAT_SEAWALL")
-dawlish_lon_seawall = os.environ.get("DAWLISH_LON_SEAWALL")
-penzance_lat_seawall = os.environ.get("PENZANCE_LAT_SEAWALL")
-penzance_lon_seawall = os.environ.get("PENZANCE_LON_SEAWALL")
+DAWLISH_API_ENDPOINT = os.environ.get('DAWLISH_API_ENDPOINT')
+PENZANCE_API_ENDPOINT = os.environ.get('PENZANCE_API_ENDPOINT')
+dawlish_lat_seawall = os.environ.get('DAWLISH_LAT_SEAWALL')
+dawlish_lon_seawall = os.environ.get('DAWLISH_LON_SEAWALL')
+penzance_lat_seawall = os.environ.get('PENZANCE_LAT_SEAWALL')
+penzance_lon_seawall = os.environ.get('PENZANCE_LON_SEAWALL')
 
 external_stylesheets = [dbc.themes.BOOTSTRAP, './assets/css/dashboard.css']
 app = Dash(__name__, external_stylesheets=external_stylesheets)
+
 
 # Convert lit to dataframe object
 def convert_list_to_dataframe(data_list):
@@ -42,7 +41,7 @@ def convert_list_to_dataframe(data_list):
         return None
 
     if not data_list:
-        return pd.DataFrame(columns=["time", "overtopping_count", "confidence"])
+        return pd.DataFrame(columns=['time', 'overtopping_count', 'confidence'])
 
     try:
         df_data = []
@@ -55,9 +54,9 @@ def convert_list_to_dataframe(data_list):
                 time_str = None
 
             df_data.append({
-                "time": time_str,
-                "overtopping_count": item['overtopping_count'],
-                "confidence": item['confidence']
+                'time': time_str,
+                'overtopping_count': item['overtopping_count'],
+                'confidence': item['confidence']
             })
 
         df = pd.DataFrame(df_data)
@@ -67,28 +66,29 @@ def convert_list_to_dataframe(data_list):
 
         return df
     except (KeyError, TypeError) as e:
-        print(f"Error converting list to DataFrame: {e}")
+        print(f'Error converting list to DataFrame: {e}')
         return None
 
 
+# def add_input_variables(api_endpoint, ):
+
+
 # Get overtopping counts of Dawlish
-def get_dawlish_wave_overtopping(start_date, option: str = "dawlish"):
-    backend_api = DAWLISH_API_ENDPOINT + '?option='+ option + '&start_date='+ start_date if start_date != "" else DAWLISH_API_ENDPOINT + '?option='+ option
-    response = requests.get(backend_api)
+def get_dawlish_wave_overtopping(api_url):
+    # backend_api = DAWLISH_API_ENDPOINT + '?option='+ option + '&start_date='+ start_date if start_date != "" else DAWLISH_API_ENDPOINT + '?option='+ option
+    response = requests.get(api_url)
     response.raise_for_status()
     overtopping_data = response.json()
-    seawall_crest_overtopping_df = convert_list_to_dataframe(overtopping_data["seawall_crest_overtopping"])
-    railway_line_overtopping_df = convert_list_to_dataframe(overtopping_data["railway_line_overtopping"])
+    seawall_crest_overtopping_df = convert_list_to_dataframe(overtopping_data['seawall_crest_overtopping'])
+    railway_line_overtopping_df = convert_list_to_dataframe(overtopping_data['railway_line_overtopping'])
     return seawall_crest_overtopping_df, railway_line_overtopping_df
 
-
-def get_penzance_wave_overtopping(start_date, option: str = "penzance"):        
-    backend_api = PENZANCE_API_ENDPOINT + '?option='+ option + '&start_date='+ start_date if start_date != "" else PENZANCE_API_ENDPOINT + '?option='+ option
-    response = requests.get(backend_api)
+def get_penzance_wave_overtopping(api_url):        
+    response = requests.get(api_url)
     response.raise_for_status()
     overtopping_data = response.json()
-    seawall_crest_overtopping_df = convert_list_to_dataframe(overtopping_data["seawall_crest_overtopping"])
-    seawall_crest_sheltered_overtopping_df = convert_list_to_dataframe(overtopping_data["seawall_crest_sheltered_overtopping"])
+    seawall_crest_overtopping_df = convert_list_to_dataframe(overtopping_data['seawall_crest_overtopping'])
+    seawall_crest_sheltered_overtopping_df = convert_list_to_dataframe(overtopping_data['seawall_crest_sheltered_overtopping'])
     return seawall_crest_overtopping_df, seawall_crest_sheltered_overtopping_df
 
 
@@ -307,6 +307,7 @@ def render_dawlish_seawall_crest_graph(data_dawlish_seawall_crest):
 
     return fig_dawlish_seawall_crest
 
+
 def render_dawlish_railway_line_graph(data_dawlish_railway_line):
     # Plot for RF3 & RF4 - Dawlish Railway Line
     fig_dawlish_railway_line = render_overtopping_plot('Dawlish Railway Line', 'dawlish_railway_line.png', data_dawlish_railway_line)
@@ -320,6 +321,7 @@ def render_penzance_seawall_crest_graph(data_penzance_seawall_crest):
 
     return fig_penzance_seawall_crest
 
+
 def render_penzance_seawall_crest_sheltered_graph(data_penzance_seawall_crest_sheltered):
     # # Plot for RF2 & RF4 - Penzance, Seawall Crest (sheltered)
     fig_penzance_seawall_crest_sheltered = render_overtopping_plot('Penzance, Seawall Crest (sheltered) ', 'dawlish_seawall_crest.png', data_penzance_seawall_crest_sheltered)
@@ -331,7 +333,7 @@ def render_penzance_seawall_crest_sheltered_graph(data_penzance_seawall_crest_sh
 def render_dashboard():
     # Search components
     dropdown_container = html.Div([
-        "Site location",
+        'Site location',
         dcc.Dropdown(
         id='dd_site_location',
         options=['Dawlish', 'Penzance', 'Dawlish Storm Bert - overtopping', 'Penzance Storm Bert - overtopping', 'Dawlish - no overtopping', 'Penzance - no overtopping'],
@@ -341,6 +343,214 @@ def render_dashboard():
     )
     ], className='label-dropdown')
 
+    # Wave variables and mean wave direction panels
+    wave_variables_panels = dbc.Row([
+        dbc.Col(
+            dbc.Card(
+                dbc.CardBody([
+                    html.Div(
+                        'Adjusted data', className='adjusted-data-panel'
+                    ),
+                    # Significant wave height
+                    html.Div(
+                        children=[
+                            html.Div(
+                                'Significant wave height',
+                                className='variable-full-title'
+                            ),
+                            html.Div(
+                                'Hs [metres]',
+                                className='variable-short-title'
+                            )
+                        ],
+                        className='variable-section'
+                    ),
+                    html.Div(
+                        dcc.Slider(id='sig-wave-height', min=-100, max=100, step=1, value=-100, marks=None, 
+                                   tooltip={
+                                    'always_visible': True,
+                                    'template': '{value}%',
+                                    'placement': 'top',
+                                    'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
+                                },
+                        ),
+                        className='slider-panel'
+                    ),
+                    # Freeboard
+                    html.Div(
+                        children=[
+                            html.Div(
+                                'Freeboard',
+                                className='variable-full-title'
+                            ),
+                            html.Div(
+                                'Rc [metres]',
+                                className='variable-short-title'
+                            )
+                        ],
+                        className='variable-section'
+                    ),
+                    html.Div(
+                        dcc.Slider(id='freeboard', min=-100, max=100, step=1, value=-100, marks=None, 
+                                   tooltip={
+                                    'always_visible': True,
+                                    'template': '{value}%',
+                                    'placement': 'top',
+                                    'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
+                                },
+                        ),
+                        className='slider-panel'
+                    ),
+                    # Mean Wave Period
+                    html.Div(
+                        children=[
+                            html.Div(
+                                'Mean wave period',
+                                className='variable-full-title'
+                            ),
+                            html.Div(
+                                'Tz [seconds]',
+                                className='variable-short-title'
+                            )
+                        ],
+                        className='variable-section'
+                    ),
+                    html.Div(
+                        dcc.Slider(id='mean-wave-period', min=-100, max=100, step=1, value=-100, marks=None, 
+                                   tooltip={
+                                    'always_visible': True,
+                                    'template': '{value}%',
+                                    'placement': 'top',
+                                    'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
+                                },
+                        ),
+                        className='slider-panel'
+                    ),
+                ])
+
+            ),
+            md=8,
+            style={'paddingTop': '38px'}
+        ),
+        dbc.Col(
+            dbc.Card(
+            dbc.CardBody(
+                [
+                    # Mean wave direction
+                    html.Div(
+                        children=[
+                            html.Div(
+                                'Mean wave direction',
+                                className='variable-full-title'
+                            ),
+                            html.Div(
+                                'Dir [degrees]',
+                                className='variable-short-title'
+                            )
+                        ],
+                        className='variable-section'
+                    ),
+                    html.Div(
+                        dcc.Slider(id='mean-wave-direction', min=0, max=360, step=1, value=0, marks=None, 
+                                   tooltip={
+                                    'always_visible': True,
+                                    'template': '{value}°',
+                                    'placement': 'top',
+                                    'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
+                                },
+                        ),
+                        className='slider-panel'
+                    ),
+                ]
+            )
+            ),
+            style={'paddingTop': '38px'}
+        )
+    ])
+
+    # Atmospheric variables and wind direction panels
+    atmospheric_variables_panels = dbc.Row([
+        dbc.Col(
+            dbc.Card(
+                dbc.CardBody([
+                    html.Div(
+                        'Adjusted data', className='adjusted-data-panel'
+                    ),
+                    # Wind speed
+                    html.Div(
+                        children=[
+                            html.Div(
+                                'Wind speed',
+                                className='variable-full-title'
+                            ),
+                            html.Div(
+                                'U10 [metres per second]',
+                                className='variable-short-title'
+                            )
+                        ],
+                        className='variable-section'
+                    ),
+                    html.Div(
+                        dcc.Slider(id='wind-speed', min=-100, max=100, step=1, value=-100, marks=None, 
+                                   tooltip={
+                                    'always_visible': True,
+                                    'template': '{value}%',
+                                    'placement': 'top',
+                                    'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
+                                },
+                        ),
+                        className='slider-panel'
+                    ),
+                ])
+
+            ),
+            md=8,
+            style={'paddingTop': '38px'}
+        ),
+        dbc.Col(
+            dbc.Card(
+            dbc.CardBody(
+                [
+                    # Wind direction
+                    html.Div(
+                        children=[
+                            html.Div(
+                                'Wind direction',
+                                className='variable-full-title'
+                            ),
+                            html.Div(
+                                'U10 Dir [degrees]',
+                                className='variable-short-title'
+                            )
+                        ],
+                        className='variable-section'
+                    ),
+                    html.Div(
+                        dcc.Slider(id='wind-direction', min=0, max=360, step=1, value=0, marks=None, 
+                                   tooltip={
+                                    'always_visible': True,
+                                    'template': '{value}°',
+                                    'placement': 'top',
+                                    'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
+                                },
+                        ),
+                        className='slider-panel'
+                    ),
+                ]
+            )
+            ),
+            style={'paddingTop': '38px'}
+        )
+    ])
+
+    # Buttons panel
+    buttons_panel = dbc.Row([
+        dbc.Col(
+            dbc.Button('Submit', id='submit-button', style={'backgroundColor':'#2A5485', 'borderColor': '#2A5485', 'width': '230px', 'height': '48px'}),
+        )],
+        style={'paddingTop': '38px'}
+    )
+    
     # App layout
     app.layout = dbc.Container([
         dbc.Row([
@@ -348,139 +558,139 @@ def render_dashboard():
             children=[
                 html.Div(
                     children=[
-                        html.Img(src="./assets/imgs/splash_logo.png", className="splash-logo"),  # Add image here
+                        html.Img(src='./assets/imgs/splash_logo.png', className='splash-logo'),  # Add image here
                         html.Div(
                             children=[
-                                html.Div("SPLASH", className="dashboard-title"),
-                                html.Div("DIGITAL APPROACHES TO PREDICT WAVE OVERTOPPING HAZARDS", className="dashboard-sub-title")
+                                html.Div('SPLASH', className='dashboard-title'),
+                                html.Div('DIGITAL APPROACHES TO PREDICT WAVE OVERTOPPING HAZARDS', className='dashboard-sub-title')
                             ],
-                            className="title-sub-title-container"
+                            className='title-sub-title-container'
                         )
                     ],
-                    className="head-container"
+                    className='head-container'
                 )
             ],
             style={'paddingLeft': '72px'}
         )]),
         dbc.Row(
-            html.Div("Advancing current understanding on wave-related coastal hazards", className="dashboard-description"),
-            style={'paddingLeft': '72px', 'paddingTop': '60px', 'padding-bottom': '5px'}
+            html.Div('Advancing current understanding on wave-related coastal hazards', className='dashboard-description'),
+            style={'paddingLeft': '72px', 'paddingTop': '60px', 'paddingBottom': '5px'}
         ),
         dbc.Row(
-            html.Div("With sea level rise accelerating and weather extremes becoming increasingly stronger, tools to help climate adaptation of coastal communities are of paramount importance. SPLASH provides an overtopping tool that will act as forecast model directly helping coastal communities mitigate effects of this coastal hazard, and ultimately, guiding new climate adaptation strategies.", className="dashboard-summary"),
+            html.Div('With sea level rise accelerating and weather extremes becoming increasingly stronger, tools to help climate adaptation of coastal communities are of paramount importance. SPLASH provides an overtopping tool that will act as forecast model directly helping coastal communities mitigate effects of this coastal hazard, and ultimately, guiding new climate adaptation strategies.', className='dashboard-summary'),
             style={'paddingLeft': '72px'}
         ),
-        dbc.Row(dbc.Col(dropdown_container, width="3"), style={'paddingTop': '52px', 'paddingLeft': '72px'}),
+        dbc.Row(dbc.Col(dropdown_container, width='3'), style={'paddingTop': '52px', 'paddingLeft': '72px'}),
+        dbc.Row(
+            dbc.Col(dbc.Accordion([
+                        dbc.AccordionItem(
+                            [
+                                html.Div('Wave variables', className='wave-variables-panel'),
+                                wave_variables_panels,
+                                html.Div('Atmospheric variables', className='atmospheric-variables-panel'),
+                                atmospheric_variables_panels,
+                                buttons_panel
+                            ],
+                            title='Wave and atmospheric variables',
+                            class_name='wave-atmospheric-variables-panel'
+                        )
+                ])
+            )
+        , style={'paddingTop': '25px', 'paddingLeft': '72px', 'paddingRight': '72px'}),
         dbc.Row(dbc.Col(
                 html.Div(
                     children=[
-                        html.Div("Key", style={'color': 'black', 'fontSize': '14.40px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '700', 'lineHeight': '21.60px', 'marginTop': '5px', 'width': '65px'}),
+                        html.Div('Key', style={'color': 'black', 'fontSize': '14.40px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '700', 'lineHeight': '21.60px', 'marginTop': '5px', 'width': '65px'}),
                         html.Div(
                             children=[
                                 html.Div(style={'width': '26px', 'height': '26px', 'borderRadius': '9999px', 'border': '2px #FF0004 solid', 'marginLeft': '18px', 'marginTop': '3px'}),
-                                html.Div("High confidence > 80%", style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '88px'})
+                                html.Div('High confidence > 80%', style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '88px'})
                             ],
                             style={'display': 'flex', 'marginLeft': '37px'}
                         ),
                         html.Div(
                             children=[
                                 html.Div(style={'width': '26px', 'height': '26px', 'background': '#2A5485', 'borderRadius': '9999px', 'marginTop': '3px'}),
-                                html.Div("Medium confidence 50-80%", style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '107px'}),
+                                html.Div('Medium confidence 50-80%', style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '107px'}),
                             ],
                             style={'display': 'flex', 'marginLeft': '37px'}
                         ), 
                         html.Div(
                             children=[
                                 html.Div(style={'width': '24px', 'height': '24px', 'background': '#AAD3E3', 'marginTop': '4px'}),
-                                html.Div("Low confidence < 50%", style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '86px'})
+                                html.Div('Low confidence < 50%', style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '86px'})
                             ],
                             style={'display': 'flex', 'marginLeft': '37px'}
                         ),
                         html.Div(
                             children=[
                                 html.Img(src='./assets/imgs/no_overtopping_marker.png', style={'width': '20px', 'height': '20px', 'marginTop': '6px'}),  # Add the image here   
-                                html.Div("No overtopping", style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginTop': '8px', 'marginLeft': '11px', 'width': '84px'})
+                                html.Div('No overtopping', style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginTop': '8px', 'marginLeft': '11px', 'width': '84px'})
                                 ],
                             style={'display': 'flex', 'marginLeft': '37px'}
                         ),
                         html.Div(
                             children=[
                                 html.Div(style={'width': '46px', 'height': '0px', 'border': '1px #8A8D90 dashed', 'marginTop': '16px'}),
-                                html.Div("Interquartile range (25th and 75th)", style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '101px'}),
+                                html.Div('Interquartile range (25th and 75th)', style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '101px'}),
                             ],
                             style={'display': 'flex', 'marginLeft': '37px'}
                         ),
 
                     ],
-                    className="dawlish-legend"
+                    className='dawlish-legend'
                 )
             , width=10),
         style={'paddingTop': '27px', 'paddingLeft': '72px'}),
         dbc.Row([
-            dbc.Col(dcc.Graph(id="scatter-plot-rig1", style={'border': '1.011px solid #8A8D90'}), md=6),
-            dbc.Col(dcc.Graph(id="scatter-plot-rig2", style={'border': '1.011px solid #8A8D90'}), md=6)
+            dbc.Col(dcc.Graph(id='scatter-plot-rig1', style={'border': '1.011px solid #8A8D90'}), md=6),
+            dbc.Col(dcc.Graph(id='scatter-plot-rig2', style={'border': '1.011px solid #8A8D90'}), md=6)
         ], style={'paddingTop': '22px', 'paddingLeft': '72px', 'paddingRight': '72px'}),
     ], fluid=True, className='body-container')
 
 render_dashboard()
 
 
-# Define event for site location dropdown
 @app.callback(
-    Output("scatter-plot-rig1", "figure"), 
-    Input("dd_site_location", "value"))
-def display_graph(site_location):
-    if site_location == "Dawlish":
-        option = "dawlish"
-        start_date = ""
-    elif utils.find_words_with_suffix(site_location, "Storm Bert"):
-        option = "storm_bert"
-        start_date = "21-11-2024"
-    elif utils.find_words_with_suffix(site_location, "no overtopping"):
-        option = "no_overtopping"
-        start_date = "10-12-2024"
-    else: 
-        option = "penzance"
-        start_date = ""
+    [Output('scatter-plot-rig1', 'figure'),  # Output 1
+     Output('scatter-plot-rig2', 'figure')],  # Output 2
+    Input('submit-button', 'n_clicks'),
+    Input('dd_site_location', 'value'),
+    State('sig-wave-height', 'value'),
+    State('freeboard', 'value'),
+    State('mean-wave-period', 'value'),
+    State('mean-wave-direction', 'value'),
+    State('wind-speed', 'value'),
+    State('wind-direction', 'value'),
+)
+def submit_slider_values(n_clicks, site_location_val, sig_wave_height_val, freeboard_val, mean_wave_period_val, mean_wave_dir_val, wind_speed_val, wind_dir_val):
 
-    if utils.find_words_with_suffix(site_location, "Dawlish"):
-        data_dawlish_seawall_crest, data_dawlish_railway_line = get_dawlish_wave_overtopping(start_date, option)
-        fig_dawlish_seawall_crest = render_dawlish_seawall_crest_graph(data_dawlish_seawall_crest)
+    if n_clicks is None or n_clicks == 0:
+        option, start_date = utils.get_dataset_params(site_location_val)
+        params = {'start_date': start_date, 'option': option}
     else:
-        data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered = get_penzance_wave_overtopping(start_date, option)
-        fig_penzance_seawall_crest = render_penzance_seawall_crest_graph(data_penzance_seawall_crest)
+        option, start_date = utils.get_dataset_params(site_location_val)
+        params = {'sig_wave_height': sig_wave_height_val, 'freeboard': freeboard_val, 'mean_wave_period': mean_wave_period_val, 'mean_wave_dir': mean_wave_dir_val, 'wind_speed': wind_speed_val, 'wind_direction': wind_dir_val}
+        params['start_date'] = start_date
+        params['option'] = option
 
-    fig = fig_dawlish_seawall_crest if utils.find_words_with_suffix(site_location, "Dawlish") else fig_penzance_seawall_crest
-    return fig
-
-
-@app.callback(
-    Output("scatter-plot-rig2", "figure"), 
-    Input("dd_site_location", "value"))
-def display_graph(site_location):
-    if site_location == "Penzance":
-        option = "penzance"
-        start_date = ""
-    elif utils.find_words_with_suffix(site_location, "Storm Bert"):
-        option = "storm_bert"
-        start_date = "21-11-2024"
-    elif utils.find_words_with_suffix(site_location, "no overtopping"):
-        option = "no_overtopping"
-        start_date = "10-12-2024"
-    else: 
-        option = "dawlish"
-        start_date = ""
-
-    if utils.find_words_with_suffix(site_location, "Dawlish"):
-        data_dawlish_seawall_crest, data_dawlish_railway_line = get_dawlish_wave_overtopping(start_date, option)
+    if utils.find_words_with_suffix(site_location_val, 'Dawlish'):
+        api_url = utils.add_query_params(DAWLISH_API_ENDPOINT, params)
+        data_dawlish_seawall_crest, data_dawlish_railway_line = get_dawlish_wave_overtopping(api_url)
+        fig_dawlish_seawall_crest = render_dawlish_seawall_crest_graph(data_dawlish_seawall_crest)
         fig_dawlish_railway_line = render_dawlish_railway_line_graph(data_dawlish_railway_line)
     else:
-        data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered = get_penzance_wave_overtopping(start_date, option)
+        api_url = utils.add_query_params(PENZANCE_API_ENDPOINT, params)
+        data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered = get_penzance_wave_overtopping(api_url)
+        fig_penzance_seawall_crest = render_penzance_seawall_crest_graph(data_penzance_seawall_crest)
         fig_penzance_seawall_crest_sheltered = render_penzance_seawall_crest_sheltered_graph(data_penzance_seawall_crest_sheltered)
 
-    fig = fig_penzance_seawall_crest_sheltered if utils.find_words_with_suffix(site_location, "Penzance") else fig_dawlish_railway_line
-    return fig
+    fig1 = fig_dawlish_seawall_crest if utils.find_words_with_suffix(site_location_val, 'Dawlish') else fig_penzance_seawall_crest
+    fig2 = fig_penzance_seawall_crest_sheltered if utils.find_words_with_suffix(site_location_val, 'Penzance') else fig_dawlish_railway_line
 
+    return fig1, fig2
+        
+        
 # Run the app
 if __name__ == "__main__":
     app.run_server(debug=True)
