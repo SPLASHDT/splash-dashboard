@@ -364,18 +364,19 @@ def render_dashboard():
                                     className='variable-short-title'
                                 )
                             ],
-                            className='variable-section'
+                            className='variable-section',
+                            style={'paddingTop': '32px'}
                         ),
                         html.Div(
                             dcc.Slider(id='sig-wave-height', min=-100, max=100, step=1, value=-100, marks=None, 
-                                    tooltip={
-                                        'always_visible': True,
-                                        'template': '{value}%',
-                                        'placement': 'top',
-                                        'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
-                                    },
+                                        tooltip={
+                                            'always_visible': True,
+                                            'template': '{value}%',
+                                            'placement': 'top', 
+                                            'style': {'color': '#2A5485', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
+                                        },
                             ),
-                            className='slider-panel'
+                            style={'paddingTop': '25px', 'paddingLeft': '73px', 'width': '581px'}
                         ),
                         # Freeboard
                         html.Div(
@@ -397,10 +398,10 @@ def render_dashboard():
                                         'always_visible': True,
                                         'template': '{value}%',
                                         'placement': 'top',
-                                        'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
+                                        'style': {'color': '#2A5485', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
                                     },
                             ),
-                            className='slider-panel'
+                            style={'paddingTop': '25px', 'paddingLeft': '73px', 'width': '581px'}
                         ),
                         # Mean Wave Period
                         html.Div(
@@ -422,10 +423,10 @@ def render_dashboard():
                                         'always_visible': True,
                                         'template': '{value}%',
                                         'placement': 'top',
-                                        'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
+                                        'style': {'color': '#2A5485', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
                                     },
                             ),
-                            className='slider-panel'
+                            style={'paddingTop': '25px', 'paddingLeft': '73px', 'width': '581px'}
                         ),
                     ])
 
@@ -457,10 +458,10 @@ def render_dashboard():
                                         'always_visible': True,
                                         'template': '{value}°',
                                         'placement': 'top',
-                                        'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
+                                        'style': {'color': '#2A5485', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
                                     },
                             ),
-                            className='slider-panel'
+                            style={'paddingTop': '25px', 'paddingLeft': '73px', 'width': '581px'}
                         ),
                     ]
                 )
@@ -500,10 +501,10 @@ def render_dashboard():
                                         'always_visible': True,
                                         'template': '{value}%',
                                         'placement': 'top',
-                                        'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
+                                        'style': {'color': '#2A5485', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
                                     },
                             ),
-                            className='slider-panel'
+                            style={'paddingTop': '25px', 'paddingLeft': '73px', 'width': '581px'}
                         ),
                     ])
 
@@ -535,10 +536,10 @@ def render_dashboard():
                                         'always_visible': True,
                                         'template': '{value}°',
                                         'placement': 'top',
-                                        'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
+                                        'style': {'color': '#2A5485', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
                                     },
                             ),
-                            className='slider-panel'
+                            style={'paddingTop': '25px', 'paddingLeft': '73px', 'width': '581px'}
                         ),
                     ]
                 )
