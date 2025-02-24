@@ -344,212 +344,221 @@ def render_dashboard():
     ], className='label-dropdown')
 
     # Wave variables and mean wave direction panels
-    wave_variables_panels = dbc.Row([
-        dbc.Col(
-            dbc.Card(
-                dbc.CardBody([
-                    html.Div(
-                        'Adjusted data', className='adjusted-data-panel'
-                    ),
-                    # Significant wave height
-                    html.Div(
-                        children=[
-                            html.Div(
-                                'Significant wave height',
-                                className='variable-full-title'
-                            ),
-                            html.Div(
-                                'Hs [metres]',
-                                className='variable-short-title'
-                            )
-                        ],
-                        className='variable-section'
-                    ),
-                    html.Div(
-                        dcc.Slider(id='sig-wave-height', min=-100, max=100, step=1, value=-100, marks=None, 
-                                   tooltip={
-                                    'always_visible': True,
-                                    'template': '{value}%',
-                                    'placement': 'top',
-                                    'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
-                                },
+    wave_variables_panels = dbc.Container(
+        dbc.Row([
+            dbc.Col(
+                dbc.Card(
+                    dbc.CardBody([
+                        html.Div(
+                            'Adjusted data', className='adjusted-data-panel'
                         ),
-                        className='slider-panel'
-                    ),
-                    # Freeboard
-                    html.Div(
-                        children=[
-                            html.Div(
-                                'Freeboard',
-                                className='variable-full-title'
-                            ),
-                            html.Div(
-                                'Rc [metres]',
-                                className='variable-short-title'
-                            )
-                        ],
-                        className='variable-section'
-                    ),
-                    html.Div(
-                        dcc.Slider(id='freeboard', min=-100, max=100, step=1, value=-100, marks=None, 
-                                   tooltip={
-                                    'always_visible': True,
-                                    'template': '{value}%',
-                                    'placement': 'top',
-                                    'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
-                                },
+                        # Significant wave height
+                        html.Div(
+                            children=[
+                                html.Div(
+                                    'Significant wave height',
+                                    className='variable-full-title'
+                                ),
+                                html.Div(
+                                    'Hs [metres]',
+                                    className='variable-short-title'
+                                )
+                            ],
+                            className='variable-section'
                         ),
-                        className='slider-panel'
-                    ),
-                    # Mean Wave Period
-                    html.Div(
-                        children=[
-                            html.Div(
-                                'Mean wave period',
-                                className='variable-full-title'
+                        html.Div(
+                            dcc.Slider(id='sig-wave-height', min=-100, max=100, step=1, value=-100, marks=None, 
+                                    tooltip={
+                                        'always_visible': True,
+                                        'template': '{value}%',
+                                        'placement': 'top',
+                                        'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
+                                    },
                             ),
-                            html.Div(
-                                'Tz [seconds]',
-                                className='variable-short-title'
-                            )
-                        ],
-                        className='variable-section'
-                    ),
-                    html.Div(
-                        dcc.Slider(id='mean-wave-period', min=-100, max=100, step=1, value=-100, marks=None, 
-                                   tooltip={
-                                    'always_visible': True,
-                                    'template': '{value}%',
-                                    'placement': 'top',
-                                    'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
-                                },
+                            className='slider-panel'
                         ),
-                        className='slider-panel'
-                    ),
-                ])
+                        # Freeboard
+                        html.Div(
+                            children=[
+                                html.Div(
+                                    'Freeboard',
+                                    className='variable-full-title'
+                                ),
+                                html.Div(
+                                    'Rc [metres]',
+                                    className='variable-short-title'
+                                )
+                            ],
+                            className='variable-section'
+                        ),
+                        html.Div(
+                            dcc.Slider(id='freeboard', min=-100, max=100, step=1, value=-100, marks=None, 
+                                    tooltip={
+                                        'always_visible': True,
+                                        'template': '{value}%',
+                                        'placement': 'top',
+                                        'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
+                                    },
+                            ),
+                            className='slider-panel'
+                        ),
+                        # Mean Wave Period
+                        html.Div(
+                            children=[
+                                html.Div(
+                                    'Mean wave period',
+                                    className='variable-full-title'
+                                ),
+                                html.Div(
+                                    'Tz [seconds]',
+                                    className='variable-short-title'
+                                )
+                            ],
+                            className='variable-section'
+                        ),
+                        html.Div(
+                            dcc.Slider(id='mean-wave-period', min=-100, max=100, step=1, value=-100, marks=None, 
+                                    tooltip={
+                                        'always_visible': True,
+                                        'template': '{value}%',
+                                        'placement': 'top',
+                                        'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
+                                    },
+                            ),
+                            className='slider-panel'
+                        ),
+                    ])
 
+                ),
+                width=7,
+                style={'padding': '38px 0px 0px 87px'}
             ),
-            md=8,
-            style={'paddingTop': '38px'}
-        ),
-        dbc.Col(
-            dbc.Card(
-            dbc.CardBody(
-                [
-                    # Mean wave direction
-                    html.Div(
-                        children=[
-                            html.Div(
-                                'Mean wave direction',
-                                className='variable-full-title'
-                            ),
-                            html.Div(
-                                'Dir [degrees]',
-                                className='variable-short-title'
-                            )
-                        ],
-                        className='variable-section'
-                    ),
-                    html.Div(
-                        dcc.Slider(id='mean-wave-direction', min=0, max=360, step=1, value=0, marks=None, 
-                                   tooltip={
-                                    'always_visible': True,
-                                    'template': '{value}°',
-                                    'placement': 'top',
-                                    'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
-                                },
+            dbc.Col(
+                dbc.Card(
+                dbc.CardBody(
+                    [
+                        # Mean wave direction
+                        html.Div(
+                            children=[
+                                html.Div(
+                                    'Mean wave direction',
+                                    className='variable-full-title'
+                                ),
+                                html.Div(
+                                    'Dir [degrees]',
+                                    className='variable-short-title'
+                                )
+                            ],
+                            className='variable-section'
                         ),
-                        className='slider-panel'
-                    ),
-                ]
+                        html.Div(
+                            dcc.Slider(id='mean-wave-direction', min=0, max=360, step=1, value=0, marks=None, 
+                                    tooltip={
+                                        'always_visible': True,
+                                        'template': '{value}°',
+                                        'placement': 'top',
+                                        'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
+                                    },
+                            ),
+                            className='slider-panel'
+                        ),
+                    ]
+                )
+                ),
+                style={'padding': '38px 67px 0px 16px'}
             )
-            ),
-            style={'paddingTop': '38px'}
-        )
-    ])
+        ]), fluid=True
+    )
+
 
     # Atmospheric variables and wind direction panels
-    atmospheric_variables_panels = dbc.Row([
-        dbc.Col(
-            dbc.Card(
-                dbc.CardBody([
-                    html.Div(
-                        'Adjusted data', className='adjusted-data-panel'
-                    ),
-                    # Wind speed
-                    html.Div(
-                        children=[
-                            html.Div(
-                                'Wind speed',
-                                className='variable-full-title'
-                            ),
-                            html.Div(
-                                'U10 [metres per second]',
-                                className='variable-short-title'
-                            )
-                        ],
-                        className='variable-section'
-                    ),
-                    html.Div(
-                        dcc.Slider(id='wind-speed', min=-100, max=100, step=1, value=-100, marks=None, 
-                                   tooltip={
-                                    'always_visible': True,
-                                    'template': '{value}%',
-                                    'placement': 'top',
-                                    'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
-                                },
+    atmospheric_variables_panels = dbc.Container(
+        dbc.Row([
+            dbc.Col(
+                dbc.Card(
+                    dbc.CardBody([
+                        html.Div(
+                            'Adjusted data', className='adjusted-data-panel'
                         ),
-                        className='slider-panel'
-                    ),
-                ])
+                        # Wind speed
+                        html.Div(
+                            children=[
+                                html.Div(
+                                    'Wind speed',
+                                    className='variable-full-title'
+                                ),
+                                html.Div(
+                                    'U10 [metres per second]',
+                                    className='variable-short-title'
+                                )
+                            ],
+                            className='variable-section'
+                        ),
+                        html.Div(
+                            dcc.Slider(id='wind-speed', min=-100, max=100, step=1, value=-100, marks=None, 
+                                    tooltip={
+                                        'always_visible': True,
+                                        'template': '{value}%',
+                                        'placement': 'top',
+                                        'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
+                                    },
+                            ),
+                            className='slider-panel'
+                        ),
+                    ])
 
+                ),
+                width=7,
+                style={'padding': '39px 0px 0px 87px'}
             ),
-            md=8,
-            style={'paddingTop': '38px'}
-        ),
-        dbc.Col(
-            dbc.Card(
-            dbc.CardBody(
-                [
-                    # Wind direction
-                    html.Div(
-                        children=[
-                            html.Div(
-                                'Wind direction',
-                                className='variable-full-title'
-                            ),
-                            html.Div(
-                                'U10 Dir [degrees]',
-                                className='variable-short-title'
-                            )
-                        ],
-                        className='variable-section'
-                    ),
-                    html.Div(
-                        dcc.Slider(id='wind-direction', min=0, max=360, step=1, value=0, marks=None, 
-                                   tooltip={
-                                    'always_visible': True,
-                                    'template': '{value}°',
-                                    'placement': 'top',
-                                    'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
-                                },
+            dbc.Col(
+                dbc.Card(
+                dbc.CardBody(
+                    [
+                        # Wind direction
+                        html.Div(
+                            children=[
+                                html.Div(
+                                    'Wind direction',
+                                    className='variable-full-title'
+                                ),
+                                html.Div(
+                                    'U10 Dir [degrees]',
+                                    className='variable-short-title'
+                                )
+                            ],
+                            className='variable-section'
                         ),
-                        className='slider-panel'
-                    ),
-                ]
+                        html.Div(
+                            dcc.Slider(id='wind-direction', min=0, max=360, step=1, value=0, marks=None, 
+                                    tooltip={
+                                        'always_visible': True,
+                                        'template': '{value}°',
+                                        'placement': 'top',
+                                        'style': {'color': '#AAD3E3', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
+                                    },
+                            ),
+                            className='slider-panel'
+                        ),
+                    ]
+                )
+                ),
+                style={'padding': '39px 67px 0px 16px'}
             )
-            ),
-            style={'paddingTop': '38px'}
-        )
-    ])
+        ]), fluid=True
+    )
+
 
     # Buttons panel
-    buttons_panel = dbc.Row([
-        dbc.Col(
-            dbc.Button('Submit', id='submit-button', style={'backgroundColor':'#2A5485', 'borderColor': '#2A5485', 'width': '230px', 'height': '48px'}),
-        )],
-        style={'paddingTop': '38px'}
+    buttons_panel = dbc.Container(
+        dbc.Row([
+            dbc.Col(
+                dbc.Button('Submit', id='submit-button', style={'backgroundColor':'#2A5485', 'borderColor': '#2A5485', 'width': '230px', 'height': '48px'}),
+            )],
+            style={'padding': '38px 0px 0px 87px'}
+        ), fluid=True
     )
+
     
     # App layout
     app.layout = dbc.Container([
@@ -580,7 +589,7 @@ def render_dashboard():
             html.Div('With sea level rise accelerating and weather extremes becoming increasingly stronger, tools to help climate adaptation of coastal communities are of paramount importance. SPLASH provides an overtopping tool that will act as forecast model directly helping coastal communities mitigate effects of this coastal hazard, and ultimately, guiding new climate adaptation strategies.', className='dashboard-summary'),
             style={'paddingLeft': '72px'}
         ),
-        dbc.Row(dbc.Col(dropdown_container, width='3'), style={'paddingTop': '52px', 'paddingLeft': '72px'}),
+        dbc.Row(dbc.Col(dropdown_container, width='3', style={'padding': '0px'}), style={'paddingTop': '52px', 'paddingLeft': '72px'}),
         dbc.Row(
             dbc.Col(dbc.Accordion([
                         dbc.AccordionItem(
@@ -594,7 +603,7 @@ def render_dashboard():
                             title='Wave and atmospheric variables',
                             class_name='wave-atmospheric-variables-panel'
                         )
-                ])
+                ]), style={'padding': '0px'}
             )
         , style={'paddingTop': '25px', 'paddingLeft': '72px', 'paddingRight': '72px'}),
         dbc.Row(dbc.Col(
@@ -640,11 +649,11 @@ def render_dashboard():
                     ],
                     className='dawlish-legend'
                 )
-            , width=10),
+            , md=9, lg=11, xl=9, style={'padding': '0px'}),
         style={'paddingTop': '27px', 'paddingLeft': '72px'}),
         dbc.Row([
-            dbc.Col(dcc.Graph(id='scatter-plot-rig1', style={'border': '1.011px solid #8A8D90'}), md=6),
-            dbc.Col(dcc.Graph(id='scatter-plot-rig2', style={'border': '1.011px solid #8A8D90'}), md=6)
+            dbc.Col(dcc.Graph(id='scatter-plot-rig1', style={'border': '1.011px solid #8A8D90'}), md=6, style={'padding': '0px'}),
+            dbc.Col(dcc.Graph(id='scatter-plot-rig2', style={'border': '1.011px solid #8A8D90'}), md=6, style={'paddingLeft': '16px', 'paddingRight': '0px'})
         ], style={'paddingTop': '22px', 'paddingLeft': '72px', 'paddingRight': '72px'}),
     ], fluid=True, className='body-container')
 

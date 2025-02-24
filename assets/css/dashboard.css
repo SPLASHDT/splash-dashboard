@@ -63,6 +63,7 @@
     font-style: normal;
     font-weight: 700;
     line-height: 120%;
+    padding: 0px;
 }
 
 .dashboard-summary {
@@ -75,10 +76,12 @@
     font-style: normal;
     font-weight: 400;
     line-height: 160%;
+    padding: 0px;
 }
 
 .dawlish-legend {
-    width: 1088px; 
+    min-width: 950px;
+    max-width: 1088px;
     height: 64px; 
     background: white; 
     border-radius: 6px; 
@@ -103,6 +106,10 @@
     background: rgba(170, 211, 227, 0.20);
 }
 
+.accordion-item .accordion-collapse .accordion-body {
+    padding: 0px 0px 62px;
+}
+
 .wave-variables-panel {
     color: var(--SPLASH---Primary-Blue, #2A5485);
     font-family: "Helvetica Neue";
@@ -110,7 +117,8 @@
     font-style: normal;
     font-weight: 700;
     line-height: 120%;
-    padding-top: 50px;
+    padding-top: 30px;
+    padding-left: 87px;
 }
 
 .atmospheric-variables-panel {
@@ -120,7 +128,7 @@
     font-style: normal;
     font-weight: 700;
     line-height: 120%;
-    padding-top: 73px;
+    padding: 38px 0px 0px 87px;
 }
 
 .adjusted-data-panel {
