@@ -1,4 +1,4 @@
-from dash import Dash, dcc, html, Input, Output, State
+from dash import Dash, dcc, html, Input, Output, State, ctx
 import plotly.express as px
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
@@ -21,11 +21,16 @@ dawlish_lon_seawall = os.environ.get('DAWLISH_LON_SEAWALL')
 penzance_lat_seawall = os.environ.get('PENZANCE_LAT_SEAWALL')
 penzance_lon_seawall = os.environ.get('PENZANCE_LON_SEAWALL')
 
+PERCENTAGE_MIN_VAL_SLIDER = -100
+DEGREE_MIN_VAL_SLIDER = 0
+PERCENTAGE_CHAR = '%'
+DEGREE_CHAR = '°'
+
 external_stylesheets = [dbc.themes.BOOTSTRAP, './assets/css/dashboard.css']
 app = Dash(__name__, external_stylesheets=external_stylesheets)
 
 
-# Convert lit to dataframe object
+# Convert list to dataframe object
 def convert_list_to_dataframe(data_list):
     """Converts a list of dictionaries to a Pandas DataFrame with a numerical index.
 
@@ -82,6 +87,7 @@ def get_dawlish_wave_overtopping(api_url):
     seawall_crest_overtopping_df = convert_list_to_dataframe(overtopping_data['seawall_crest_overtopping'])
     railway_line_overtopping_df = convert_list_to_dataframe(overtopping_data['railway_line_overtopping'])
     return seawall_crest_overtopping_df, railway_line_overtopping_df
+
 
 def get_penzance_wave_overtopping(api_url):        
     response = requests.get(api_url)
@@ -329,20 +335,49 @@ def render_penzance_seawall_crest_sheltered_graph(data_penzance_seawall_crest_sh
     return fig_penzance_seawall_crest_sheltered
 
 
-# Render Splash dashboard
-def render_dashboard():
-    # Search components
-    dropdown_container = html.Div([
-        'Site location',
-        dcc.Dropdown(
-        id='dd_site_location',
-        options=['Dawlish', 'Penzance', 'Dawlish Storm Bert - overtopping', 'Penzance Storm Bert - overtopping', 'Dawlish - no overtopping', 'Penzance - no overtopping'],
-        value='Dawlish',
-        clearable=False,
-        className='site-dropdown'
-    )
-    ], className='label-dropdown')
+def get_variable_slider(identifier, min_value, template_symbol, decrease_btn_id, increase_btn_id):
+    variable_slider =  html.Div(
+                        children = [
+                            html.Div(
+                                html.Button(
+                                    id=decrease_btn_id,
+                                    children = [
+                                        html.Img(src='./assets/imgs/minus-icon.png', className='action-button-img'),
+                                    ],
+                                    className='action-button'
+                                ),
+                                className='slider-button-panel'
+                            ),         
+                            html.Div(
+                                dcc.Slider(id=identifier, min=min_value, max=100, step=1, value=min_value, marks=None, 
+                                        tooltip={
+                                            'always_visible': True,
+                                            'template': '{value}' + template_symbol,
+                                            'placement': 'top', 
+                                            'style': {'color': '#2A5485', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
+                                        },
+                                ),
+                                style={'padding': '25px 25px 0px', 'width': '508px'}
+                            ),
+                            html.Div(
+                                html.Button(
+                                    id=increase_btn_id,
+                                    children = [
+                                        html.Img(src='./assets/imgs/plus-icon.png', className='action-button-img'),
+                                    ],
+                                    className='action-button'
+                                ),
+                                    className='slider-button-panel'
+                            ),
 
+                            
+                        ],
+                        className='slider-panel'
+                    )
+    return variable_slider
+
+
+def get_wave_variables_panels():
     # Wave variables and mean wave direction panels
     wave_variables_panels = dbc.Container(
         dbc.Row([
@@ -367,17 +402,7 @@ def render_dashboard():
                             className='variable-section',
                             style={'paddingTop': '32px'}
                         ),
-                        html.Div(
-                            dcc.Slider(id='sig-wave-height', min=-100, max=100, step=1, value=-100, marks=None, 
-                                        tooltip={
-                                            'always_visible': True,
-                                            'template': '{value}%',
-                                            'placement': 'top', 
-                                            'style': {'color': '#2A5485', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
-                                        },
-                            ),
-                            style={'paddingTop': '25px', 'paddingLeft': '73px', 'width': '581px'}
-                        ),
+                        get_variable_slider('sig-wave-height', PERCENTAGE_MIN_VAL_SLIDER, PERCENTAGE_CHAR, 'swh-decrease-btn', 'swh-increase-btn'),
                         # Freeboard
                         html.Div(
                             children=[
@@ -392,17 +417,7 @@ def render_dashboard():
                             ],
                             className='variable-section'
                         ),
-                        html.Div(
-                            dcc.Slider(id='freeboard', min=-100, max=100, step=1, value=-100, marks=None, 
-                                    tooltip={
-                                        'always_visible': True,
-                                        'template': '{value}%',
-                                        'placement': 'top',
-                                        'style': {'color': '#2A5485', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
-                                    },
-                            ),
-                            style={'paddingTop': '25px', 'paddingLeft': '73px', 'width': '581px'}
-                        ),
+                        get_variable_slider('freeboard', PERCENTAGE_MIN_VAL_SLIDER, PERCENTAGE_CHAR, 'fb-decrease-btn', 'fb-increase-btn'),
                         # Mean Wave Period
                         html.Div(
                             children=[
@@ -417,21 +432,11 @@ def render_dashboard():
                             ],
                             className='variable-section'
                         ),
-                        html.Div(
-                            dcc.Slider(id='mean-wave-period', min=-100, max=100, step=1, value=-100, marks=None, 
-                                    tooltip={
-                                        'always_visible': True,
-                                        'template': '{value}%',
-                                        'placement': 'top',
-                                        'style': {'color': '#2A5485', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
-                                    },
-                            ),
-                            style={'paddingTop': '25px', 'paddingLeft': '73px', 'width': '581px'}
-                        ),
+                        get_variable_slider('mean-wave-period', PERCENTAGE_MIN_VAL_SLIDER, PERCENTAGE_CHAR, 'mwp-decrease-btn', 'mwp-increase-btn'),
                     ])
 
                 ),
-                width=7,
+                md=7,
                 style={'padding': '38px 0px 0px 87px'}
             ),
             dbc.Col(
@@ -452,27 +457,19 @@ def render_dashboard():
                             ],
                             className='variable-section'
                         ),
-                        html.Div(
-                            dcc.Slider(id='mean-wave-direction', min=0, max=360, step=1, value=0, marks=None, 
-                                    tooltip={
-                                        'always_visible': True,
-                                        'template': '{value}°',
-                                        'placement': 'top',
-                                        'style': {'color': '#2A5485', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
-                                    },
-                            ),
-                            style={'paddingTop': '25px', 'paddingLeft': '73px', 'width': '581px'}
-                        ),
+                        get_variable_slider('mean-wave-direction', DEGREE_MIN_VAL_SLIDER, DEGREE_CHAR, 'mwd-decrease-btn', 'mwd-increase-btn'),
                     ]
                 )
                 ),
+                md=5,
                 style={'padding': '38px 67px 0px 16px'}
             )
         ]), fluid=True
     )
+    return wave_variables_panels
 
 
-    # Atmospheric variables and wind direction panels
+def get_atmospheric_variables_panels():
     atmospheric_variables_panels = dbc.Container(
         dbc.Row([
             dbc.Col(
@@ -495,21 +492,11 @@ def render_dashboard():
                             ],
                             className='variable-section'
                         ),
-                        html.Div(
-                            dcc.Slider(id='wind-speed', min=-100, max=100, step=1, value=-100, marks=None, 
-                                    tooltip={
-                                        'always_visible': True,
-                                        'template': '{value}%',
-                                        'placement': 'top',
-                                        'style': {'color': '#2A5485', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
-                                    },
-                            ),
-                            style={'paddingTop': '25px', 'paddingLeft': '73px', 'width': '581px'}
-                        ),
+                        get_variable_slider('wind-speed', PERCENTAGE_MIN_VAL_SLIDER, PERCENTAGE_CHAR, 'ws-decrease-btn', 'ws-increase-btn'),
                     ])
 
                 ),
-                width=7,
+                md=7,
                 style={'padding': '39px 0px 0px 87px'}
             ),
             dbc.Col(
@@ -530,25 +517,37 @@ def render_dashboard():
                             ],
                             className='variable-section'
                         ),
-                        html.Div(
-                            dcc.Slider(id='wind-direction', min=0, max=360, step=1, value=0, marks=None, 
-                                    tooltip={
-                                        'always_visible': True,
-                                        'template': '{value}°',
-                                        'placement': 'top',
-                                        'style': {'color': '#2A5485', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
-                                    },
-                            ),
-                            style={'paddingTop': '25px', 'paddingLeft': '73px', 'width': '581px'}
-                        ),
+                        get_variable_slider('wind-direction', DEGREE_MIN_VAL_SLIDER, DEGREE_CHAR, 'wd-decrease-btn', 'wd-increase-btn'),
                     ]
                 )
                 ),
+                md=5,
                 style={'padding': '39px 67px 0px 16px'}
             )
         ]), fluid=True
     )
+    return atmospheric_variables_panels
 
+
+# Render Splash dashboard
+def render_dashboard():
+    # Search components
+    dropdown_container = html.Div([
+        'Site location',
+        dcc.Dropdown(
+        id='dd_site_location',
+        options=['Dawlish', 'Penzance', 'Dawlish Storm Bert - overtopping', 'Penzance Storm Bert - overtopping', 'Dawlish - no overtopping', 'Penzance - no overtopping'],
+        value='Dawlish',
+        clearable=False,
+        className='site-dropdown'
+    )
+    ], className='label-dropdown')
+
+    # Wave variables and mean wave direction panels
+    wave_variables_panels = get_wave_variables_panels()
+
+    # Atmospheric variables and wind direction panels
+    atmospheric_variables_panels = get_atmospheric_variables_panels()
 
     # Buttons panel
     buttons_panel = dbc.Container(
@@ -560,7 +559,6 @@ def render_dashboard():
         ), fluid=True
     )
 
-    
     # App layout
     app.layout = dbc.Container([
         dbc.Row([
@@ -658,6 +656,7 @@ def render_dashboard():
         ], style={'paddingTop': '22px', 'paddingLeft': '72px', 'paddingRight': '72px'}),
     ], fluid=True, className='body-container')
 
+
 render_dashboard()
 
 
@@ -699,8 +698,155 @@ def submit_slider_values(n_clicks, site_location_val, sig_wave_height_val, freeb
     fig2 = fig_penzance_seawall_crest_sheltered if utils.find_words_with_suffix(site_location_val, 'Penzance') else fig_dawlish_railway_line
 
     return fig1, fig2
-        
-        
+
+
+# Callback for significant wave height slider
+@app.callback(
+    Output('sig-wave-height', 'value'),
+    Input('sig-wave-height', 'value'),
+    Input('swh-increase-btn', 'n_clicks'),
+    Input('swh-decrease-btn', 'n_clicks'),
+    State('sig-wave-height', 'step')
+)
+def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
+    if n_clicks_inc == 0 or n_clicks_dec == 0:
+        return PERCENTAGE_MIN_VAL_SLIDER
+
+    trigger_id =  ctx.triggered_id
+
+    if trigger_id == 'swh-increase-btn':
+        new_value = slider_value + current_step
+        return new_value
+    elif trigger_id == 'swh-decrease-btn':
+        new_value = slider_value - current_step
+        return new_value
+    else:  # Slider moved
+        return slider_value  
+
+
+# Callback for freeboard slider
+@app.callback(
+    Output('freeboard', 'value'),
+    Input('freeboard', 'value'),
+    Input('fb-increase-btn', 'n_clicks'),
+    Input('fb-decrease-btn', 'n_clicks'),
+    State('freeboard', 'step')
+)
+def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
+    if n_clicks_inc == 0 or n_clicks_dec == 0:
+        return PERCENTAGE_MIN_VAL_SLIDER
+
+    trigger_id =  ctx.triggered_id
+
+    if trigger_id == 'fb-increase-btn':
+        new_value = slider_value + current_step
+        return new_value
+    elif trigger_id == 'fb-decrease-btn':
+        new_value = slider_value - current_step
+        return new_value
+    else:  # Slider moved
+        return slider_value      
+
+
+# Callback for mean wave period slider
+@app.callback(
+    Output('mean-wave-period', 'value'),
+    Input('mean-wave-period', 'value'),
+    Input('mwp-increase-btn', 'n_clicks'),
+    Input('mwp-decrease-btn', 'n_clicks'),
+    State('mean-wave-period', 'step')
+)
+def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
+    if n_clicks_inc == 0 or n_clicks_dec == 0:
+        return PERCENTAGE_MIN_VAL_SLIDER
+
+    trigger_id =  ctx.triggered_id
+
+    if trigger_id == 'mwp-increase-btn':
+        new_value = slider_value + current_step
+        return new_value
+    elif trigger_id == 'mwp-decrease-btn':
+        new_value = slider_value - current_step
+        return new_value
+    else:  # Slider moved
+        return slider_value   
+
+
+# Callback for mean wave direction slider
+@app.callback(
+    Output('mean-wave-direction', 'value'),
+    Input('mean-wave-direction', 'value'),
+    Input('mwd-increase-btn', 'n_clicks'),
+    Input('mwd-decrease-btn', 'n_clicks'),
+    State('mean-wave-direction', 'step')
+)
+def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
+    
+    if n_clicks_inc == 0 or n_clicks_dec == 0:
+        return DEGREE_MIN_VAL_SLIDER
+
+    trigger_id =  ctx.triggered_id
+    
+    if trigger_id == 'mwd-increase-btn':     
+        new_value = slider_value + current_step
+        return new_value
+    elif trigger_id == 'mwd-decrease-btn':
+        new_value = slider_value - current_step
+        return new_value
+    else:  # Slider moved
+        return slider_value       
+
+
+# Callback for wind speed slider
+@app.callback(
+    Output('wind-speed', 'value'),
+    Input('wind-speed', 'value'),
+    Input('ws-increase-btn', 'n_clicks'),
+    Input('ws-decrease-btn', 'n_clicks'),
+    State('wind-speed', 'step')
+)
+def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
+    
+    if n_clicks_inc == 0 or n_clicks_dec == 0:
+        return PERCENTAGE_MIN_VAL_SLIDER
+
+    trigger_id =  ctx.triggered_id
+    
+    if trigger_id == 'ws-increase-btn':
+        new_value = slider_value + current_step
+        return new_value
+    elif trigger_id == 'ws-decrease-btn':
+        new_value = slider_value - current_step
+        return new_value
+    else:  # Slider moved
+        return slider_value     
+
+
+# Callback for wind speed slider
+@app.callback(
+    Output('wind-direction', 'value'),
+    Input('wind-direction', 'value'),
+    Input('wd-increase-btn', 'n_clicks'),
+    Input('wd-decrease-btn', 'n_clicks'),
+    State('wind-direction', 'step')
+)
+def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
+    
+    if n_clicks_inc == 0 or n_clicks_dec == 0:
+        return DEGREE_MIN_VAL_SLIDER
+
+    trigger_id =  ctx.triggered_id
+    
+    if trigger_id == 'wd-increase-btn':
+        new_value = slider_value + current_step
+        return new_value
+    elif trigger_id == 'wd-decrease-btn':
+        new_value = slider_value - current_step
+        return new_value
+    else:  # Slider moved
+        return slider_value     
+    
+
 # Run the app
 if __name__ == "__main__":
     app.run_server(debug=True)
