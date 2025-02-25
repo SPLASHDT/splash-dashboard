@@ -602,7 +602,9 @@ def render_dashboard():
                             title='Wave and atmospheric variables',
                             class_name='wave-atmospheric-variables-panel'
                         )
-                ]), style={'padding': '0px'}
+                ], 
+                start_collapsed=True), 
+                style={'padding': '0px'}
             )
         , style={'paddingTop': '25px', 'paddingLeft': '72px', 'paddingRight': '72px'}),
         dbc.Row(dbc.Col(
