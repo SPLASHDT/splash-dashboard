@@ -204,7 +204,7 @@ def get_wave_variables_panels():
                         html.Div(
                             children=[
                                 html.Div(
-                                    'Freeboard',
+                                    'Tidal level',
                                     className='variable-full-title'
                                 ),
                                 html.Div(
