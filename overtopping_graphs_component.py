@@ -80,20 +80,26 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
                 for c, o in zip(overtopping_data['confidence'], overtopping_data['overtopping_count'])
             ],
             color=[
-                'grey' if s == 'previous' else
-                'black' if o == 0 else
-                '#FF0004' if c > 0.80 and o > 0 else
-                '#2A5485' if c >= 0.50 and c <= 0.8 and o > 0 else
-                '#AAD3E3' if c < 0.50 and o > 0 else
+                '#808080' if o == 0 and s == 'previous' else
+                '#808080' if c > 0.80 and o > 0 and s == 'previous' else
+                '#585858' if c >= 0.50 and c <= 0.8 and o > 0 and s == 'previous' else
+                '#C7C7C7' if c < 0.50 and o > 0 and s == 'previous' else
+                '#000' if o == 0 and s == 'current' else
+                '#FF0004' if c > 0.80 and o > 0 and s == 'current' else
+                '#2A5485' if c >= 0.50 and c <= 0.8 and o > 0 and s == 'current' else
+                '#AAD3E3' if c < 0.50 and o > 0 and s == 'current' else
                 '#AAD3E3' 
                 for c, o, s in zip(overtopping_data['confidence'], overtopping_data['overtopping_count'], overtopping_data['stage'])
             ],
             line_color=[
-                'grey' if s == 'previous' else
-                'black' if o == 0 else
-                'red' if c > 0.80 and o > 0 else
-                '#2A5485' if c >= 0.50 and c <= 0.80 and o > 0 else
-                '#AAD3E3' if c < 0.50 and o > 0 else
+                '#808080' if o == 0 and s == 'previous' else
+                '#808080' if c > 0.80 and o > 0 and s == 'previous' else
+                '#585858' if c >= 0.50 and c <= 0.80 and o > 0 and s == 'previous' else
+                '#C7C7C7' if c < 0.50 and o > 0 and s == 'previous' else                          
+                '#000' if o == 0 and s == 'current' else
+                '#FF0004' if c > 0.80 and o > 0 and s == 'current' else
+                '#2A5485' if c >= 0.50 and c <= 0.80 and o > 0 and s == 'current' else
+                '#AAD3E3' if c < 0.50 and o > 0 and s == 'current' else
                 '#AAD3E3' 
                 for c, o, s in zip(overtopping_data['confidence'], overtopping_data['overtopping_count'], overtopping_data['stage']) # Corrected order
             ]
@@ -343,53 +349,106 @@ def get_buttons_panel():
 
 
 def get_legend_panel():
-    legend_component = dbc.Row(
-        dbc.Col(
-            html.Div(
-                children=[
-                    html.Div('Key', style={'color': 'black', 'fontSize': '14.40px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '700', 'lineHeight': '21.60px', 'marginTop': '5px', 'width': '65px'}),
-                    html.Div(
+    legend_component = html.Div([
+        dbc.Row([
+            dbc.Col(html.Div('Key'), md=1, class_name='key-subtitle-legend'),
+            dbc.Col(html.Div(
+                'Previous', 
+                className='stage-subtitle-legend'
+                ), 
+            md=1),
+            dbc.Col(html.Div(
                         children=[
-                            html.Div(style={'width': '26px', 'height': '26px', 'borderRadius': '9999px', 'border': '2px #FF0004 solid', 'marginLeft': '18px', 'marginTop': '3px'}),
-                            html.Div('High confidence > 80%', style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '88px'})
+                            html.Div(className='high-confidence-marker', style={'borderColor': '#808080'}),
+                            html.Div('High confidence > 80%', className='high-confidence-subtitle')
                         ],
-                        style={'display': 'flex', 'marginLeft': '37px'}
-                    ),
-                    html.Div(
+                        style={'display': 'flex', 'marginLeft': '11px'}
+            ),
+            md=2),
+            dbc.Col(html.Div(
                         children=[
-                            html.Div(style={'width': '26px', 'height': '26px', 'background': '#2A5485', 'borderRadius': '9999px', 'marginTop': '3px'}),
-                            html.Div('Medium confidence 50-80%', style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '107px'}),
+                            html.Div(className='medium-confidence-marker', style={'background': '#585858'}),
+                            html.Div('Medium confidence 50-80%', className='medium-confidence-subtitle'),
                         ],
-                        style={'display': 'flex', 'marginLeft': '37px'}
-                    ), 
-                    html.Div(
+                        style={'display': 'flex', 'marginLeft': '11px'}
+            ),
+            md=2),
+            dbc.Col(html.Div(
                         children=[
-                            html.Div(style={'width': '24px', 'height': '24px', 'background': '#AAD3E3', 'marginTop': '4px'}),
-                            html.Div('Low confidence < 50%', style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '86px'})
+                            html.Div(className='low-confidence-marker', style={'background': '#C7C7C7'}),
+                            html.Div('Low confidence < 50%', className='low-confidence-subtitle')
                         ],
-                        style={'display': 'flex', 'marginLeft': '37px'}
-                    ),
-                    html.Div(
+                        style={'display': 'flex', 'marginLeft': '11px'}
+            ),
+            md=2),
+            dbc.Col(html.Div(
                         children=[
-                            html.Img(src='./assets/imgs/no_overtopping_marker.png', style={'width': '20px', 'height': '20px', 'marginTop': '6px'}),  # Add the image here   
-                            html.Div('No overtopping', style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginTop': '8px', 'marginLeft': '11px', 'width': '84px'})
+                            html.Img(src='./assets/imgs/prev_no_overtopping_marker.png', className='no-overtopping-marker'), 
+                            html.Div('No overtopping', className='no-overtopping-subtitle')
                             ],
-                        style={'display': 'flex', 'marginLeft': '37px'}
-                    ),
-                    html.Div(
+                        style={'display': 'flex', 'marginLeft': '11px'}
+            ),
+            md=2),
+            dbc.Col(html.Div(
                         children=[
-                            html.Div(style={'width': '46px', 'height': '0px', 'border': '1px #8A8D90 dashed', 'marginTop': '16px'}),
-                            html.Div('Interquartile range (25th and 75th)', style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '101px'}),
+                            html.Div(className='interquartile-range-marker'),
+                            html.Div('Interquartile range (25th and 75th)', className='interquartile-range-subtitle'),
                         ],
-                        style={'display': 'flex', 'marginLeft': '37px'}
-                    )
-                ],
-                className='dawlish-legend'
-            ), 
-            md=9, lg=11, xl=9, style={'padding': '0px'}
-        ),
-        style={'paddingTop': '27px', 'paddingLeft': '72px'}
-    )
+                        style={'display': 'flex', 'marginLeft': '11px'}
+            ),
+            md=2)
+        ]),
+        dbc.Row([
+            dbc.Col(md=1, class_name='key-subtitle-legend'),
+            dbc.Col(html.Div(
+                'Updated', 
+                className='stage-subtitle-legend'
+                ), 
+            md=1),
+            dbc.Col(html.Div(
+                        children=[
+                            html.Div(className='high-confidence-marker'),
+                            html.Div('High confidence > 80%', className='high-confidence-subtitle')
+                        ],
+                        style={'display': 'flex', 'marginLeft': '11px'}
+            ),
+            md=2),
+            dbc.Col(html.Div(
+                        children=[
+                            html.Div(className='medium-confidence-marker'),
+                            html.Div('Medium confidence 50-80%', className='medium-confidence-subtitle'),
+                        ],
+                        style={'display': 'flex', 'marginLeft': '11px'}
+            ),
+            md=2),
+            dbc.Col(html.Div(
+                        children=[
+                            html.Div(className='low-confidence-marker'),
+                            html.Div('Low confidence < 50%', className='low-confidence-subtitle')
+                        ],
+                        style={'display': 'flex', 'marginLeft': '11px'}
+            ),
+            md=2),
+            dbc.Col(html.Div(
+                        children=[
+                            html.Img(src='./assets/imgs/no_overtopping_marker.png', className='no-overtopping-marker'), 
+                            html.Div('No overtopping', className='no-overtopping-subtitle')
+                            ],
+                        style={'display': 'flex', 'marginLeft': '11px'}
+            ),
+            md=2),
+            dbc.Col(html.Div(
+                        children=[
+                            html.Div(className='interquartile-range-marker'),
+                            html.Div('Interquartile range (25th and 75th)', className='interquartile-range-subtitle'),
+                        ],
+                        style={'display': 'flex', 'marginLeft': '11px'}
+            ),
+            md=2)
+        ],
+        style={'paddingTop': '7px'})
+    ],
+    className='overtopping-legend')
     
     return legend_component
 
