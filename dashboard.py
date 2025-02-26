@@ -171,20 +171,22 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
                 for c, o in zip(overtopping_data['confidence'], overtopping_data['overtopping_count'])
             ],
             color=[
+                'grey' if s == 'previous' else
                 'black' if o == 0 else
                 '#FF0004' if c > 0.80 and o > 0 else
                 '#2A5485' if c >= 0.50 and c <= 0.8 and o > 0 else
                 '#AAD3E3' if c < 0.50 and o > 0 else
                 '#AAD3E3' 
-                for c, o in zip(overtopping_data['confidence'], overtopping_data['overtopping_count'])
+                for c, o, s in zip(overtopping_data['confidence'], overtopping_data['overtopping_count'], overtopping_data['stage'])
             ],
             line_color=[
+                'grey' if s == 'previous' else
                 'black' if o == 0 else
                 'red' if c > 0.80 and o > 0 else
                 '#2A5485' if c >= 0.50 and c <= 0.80 and o > 0 else
                 '#AAD3E3' if c < 0.50 and o > 0 else
                 '#AAD3E3' 
-                for c, o in zip(overtopping_data['confidence'], overtopping_data['overtopping_count']) # Corrected order
+                for c, o, s in zip(overtopping_data['confidence'], overtopping_data['overtopping_count'], overtopping_data['stage']) # Corrected order
             ]
         )
     )
@@ -561,6 +563,10 @@ def render_dashboard():
 
     # App layout
     app.layout = dbc.Container([
+        dcc.Store(id='previous-dataframe-1'),
+        dcc.Store(id='previous-dataframe-2'),
+        dcc.Store(id='current-dataframe-1'),
+        dcc.Store(id='current-dataframe-2'),
         dbc.Row([
             html.Div(
             children=[
@@ -661,10 +667,31 @@ def render_dashboard():
 
 render_dashboard()
 
+def get_dataframes_to_save(n_clicks, generated_df_1, generated_df_2, stored_current_df_1, stored_current_df_2):
+    if n_clicks is None or n_clicks == 0:
+        tmp_previous_df_1 = pd.DataFrame()
+        tmp_previous_df_2 = pd.DataFrame()
+        tmp_current_df_1 = generated_df_1
+        tmp_current_df_2 = generated_df_2
+    else:
+        saved_current_df_1 = pd.DataFrame(stored_current_df_1)
+        saved_current_df_2 = pd.DataFrame(stored_current_df_2)
+        saved_current_df_1['stage'] = 'previous'
+        saved_current_df_2['stage'] = 'previous'
+        tmp_previous_df_1 = saved_current_df_1
+        tmp_previous_df_2 = saved_current_df_2
+        tmp_current_df_1 = generated_df_1
+        tmp_current_df_2 = generated_df_2
+    return tmp_previous_df_1, tmp_previous_df_2, tmp_current_df_1, tmp_current_df_2
 
 @app.callback(
-    [Output('scatter-plot-rig1', 'figure'),  # Output 1
-     Output('scatter-plot-rig2', 'figure')],  # Output 2
+    [Output('scatter-plot-rig1', 'figure'),
+     Output('scatter-plot-rig2', 'figure'),
+     Output('previous-dataframe-1', 'data'),
+     Output('previous-dataframe-2', 'data'),
+     Output('current-dataframe-1', 'data'),
+     Output('current-dataframe-2', 'data')
+    ],
     Input('submit-button', 'n_clicks'),
     Input('dd_site_location', 'value'),
     State('sig-wave-height', 'value'),
@@ -673,8 +700,12 @@ render_dashboard()
     State('mean-wave-direction', 'value'),
     State('wind-speed', 'value'),
     State('wind-direction', 'value'),
+    State('previous-dataframe-1', 'data'),
+    State('previous-dataframe-2', 'data'),
+    State('current-dataframe-1', 'data'),
+    State('current-dataframe-2', 'data'),
 )
-def submit_slider_values(n_clicks, site_location_val, sig_wave_height_val, freeboard_val, mean_wave_period_val, mean_wave_dir_val, wind_speed_val, wind_dir_val):
+def submit_slider_values(n_clicks, site_location_val, sig_wave_height_val, freeboard_val, mean_wave_period_val, mean_wave_dir_val, wind_speed_val, wind_dir_val, previous_df_1, previous_df_2, current_df_1, current_df_2):
 
     if n_clicks is None or n_clicks == 0:
         option, start_date = utils.get_dataset_params(site_location_val)
@@ -688,18 +719,29 @@ def submit_slider_values(n_clicks, site_location_val, sig_wave_height_val, freeb
     if utils.find_words_with_suffix(site_location_val, 'Dawlish'):
         api_url = utils.add_query_params(DAWLISH_API_ENDPOINT, params)
         data_dawlish_seawall_crest, data_dawlish_railway_line = get_dawlish_wave_overtopping(api_url)
-        fig_dawlish_seawall_crest = render_dawlish_seawall_crest_graph(data_dawlish_seawall_crest)
-        fig_dawlish_railway_line = render_dawlish_railway_line_graph(data_dawlish_railway_line)
+        data_dawlish_seawall_crest['stage'] = 'current'
+        data_dawlish_railway_line['stage'] = 'current'
+        tmp_previous_df_1, tmp_previous_df_2, tmp_current_df_1, tmp_current_df_2 = get_dataframes_to_save(n_clicks, data_dawlish_seawall_crest, data_dawlish_railway_line, current_df_1, current_df_2)
+        joined_dsc = pd.concat([tmp_previous_df_1, tmp_current_df_1], ignore_index=True)
+        joined_drl = pd.concat([tmp_previous_df_2, tmp_current_df_2], ignore_index=True)
+        fig_dawlish_seawall_crest = render_dawlish_seawall_crest_graph(joined_dsc)
+        fig_dawlish_railway_line = render_dawlish_railway_line_graph(joined_drl)
     else:
         api_url = utils.add_query_params(PENZANCE_API_ENDPOINT, params)
         data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered = get_penzance_wave_overtopping(api_url)
-        fig_penzance_seawall_crest = render_penzance_seawall_crest_graph(data_penzance_seawall_crest)
-        fig_penzance_seawall_crest_sheltered = render_penzance_seawall_crest_sheltered_graph(data_penzance_seawall_crest_sheltered)
+        data_penzance_seawall_crest['stage'] = 'current'
+        data_penzance_seawall_crest_sheltered['stage'] = 'current'
+        tmp_previous_df_1, tmp_previous_df_2, tmp_current_df_1, tmp_current_df_2 = get_dataframes_to_save(n_clicks, data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered, current_df_1, current_df_2)
+        joined_psc = pd.concat([tmp_previous_df_1, tmp_current_df_1], ignore_index=True)
+        joined_pscs = pd.concat([tmp_previous_df_2, tmp_current_df_2], ignore_index=True)
+        fig_penzance_seawall_crest = render_penzance_seawall_crest_graph(joined_psc)
+        fig_penzance_seawall_crest_sheltered = render_penzance_seawall_crest_sheltered_graph(joined_pscs)
 
+    
     fig1 = fig_dawlish_seawall_crest if utils.find_words_with_suffix(site_location_val, 'Dawlish') else fig_penzance_seawall_crest
     fig2 = fig_penzance_seawall_crest_sheltered if utils.find_words_with_suffix(site_location_val, 'Penzance') else fig_dawlish_railway_line
 
-    return fig1, fig2
+    return fig1, fig2, tmp_previous_df_1.to_dict('records'), tmp_previous_df_2.to_dict('records'), tmp_current_df_1.to_dict('records'), tmp_current_df_2.to_dict('records')
 
 
 # Callback for significant wave height slider
