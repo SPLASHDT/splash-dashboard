@@ -22,7 +22,9 @@ penzance_lat_seawall = os.environ.get('PENZANCE_LAT_SEAWALL')
 penzance_lon_seawall = os.environ.get('PENZANCE_LON_SEAWALL')
 
 PERCENTAGE_MIN_VAL_SLIDER = -100
-DEGREE_MIN_VAL_SLIDER = 0
+PERCENTAGE_MAX_VAL_SLIDER = 100
+DEGREE_MIN_VAL_SLIDER = -180
+DEGREE_MAX_VAL_SLIDER = 180
 PERCENTAGE_CHAR = '%'
 DEGREE_CHAR = '°'
 
@@ -337,7 +339,7 @@ def render_penzance_seawall_crest_sheltered_graph(data_penzance_seawall_crest_sh
     return fig_penzance_seawall_crest_sheltered
 
 
-def get_variable_slider(identifier, min_value, template_symbol, decrease_btn_id, increase_btn_id):
+def get_variable_slider(identifier, min_value, max_value, template_symbol, decrease_btn_id, increase_btn_id):
     variable_slider =  html.Div(
                         children = [
                             html.Div(
@@ -351,7 +353,7 @@ def get_variable_slider(identifier, min_value, template_symbol, decrease_btn_id,
                                 className='slider-button-panel'
                             ),         
                             html.Div(
-                                dcc.Slider(id=identifier, min=min_value, max=100, step=1, value=min_value, marks=None, 
+                                dcc.Slider(id=identifier, min=min_value, max=max_value, step=1, value=min_value, marks=None, 
                                         tooltip={
                                             'always_visible': True,
                                             'template': '{value}' + template_symbol,
@@ -404,7 +406,7 @@ def get_wave_variables_panels():
                             className='variable-section',
                             style={'paddingTop': '32px'}
                         ),
-                        get_variable_slider('sig-wave-height', PERCENTAGE_MIN_VAL_SLIDER, PERCENTAGE_CHAR, 'swh-decrease-btn', 'swh-increase-btn'),
+                        get_variable_slider('sig-wave-height', PERCENTAGE_MIN_VAL_SLIDER, PERCENTAGE_MAX_VAL_SLIDER, PERCENTAGE_CHAR, 'swh-decrease-btn', 'swh-increase-btn'),
                         # Freeboard
                         html.Div(
                             children=[
@@ -419,7 +421,7 @@ def get_wave_variables_panels():
                             ],
                             className='variable-section'
                         ),
-                        get_variable_slider('freeboard', PERCENTAGE_MIN_VAL_SLIDER, PERCENTAGE_CHAR, 'fb-decrease-btn', 'fb-increase-btn'),
+                        get_variable_slider('freeboard', PERCENTAGE_MIN_VAL_SLIDER, PERCENTAGE_MAX_VAL_SLIDER, PERCENTAGE_CHAR, 'fb-decrease-btn', 'fb-increase-btn'),
                         # Mean Wave Period
                         html.Div(
                             children=[
@@ -434,7 +436,7 @@ def get_wave_variables_panels():
                             ],
                             className='variable-section'
                         ),
-                        get_variable_slider('mean-wave-period', PERCENTAGE_MIN_VAL_SLIDER, PERCENTAGE_CHAR, 'mwp-decrease-btn', 'mwp-increase-btn'),
+                        get_variable_slider('mean-wave-period', PERCENTAGE_MIN_VAL_SLIDER, PERCENTAGE_MAX_VAL_SLIDER, PERCENTAGE_CHAR, 'mwp-decrease-btn', 'mwp-increase-btn'),
                     ])
 
                 ),
@@ -459,7 +461,7 @@ def get_wave_variables_panels():
                             ],
                             className='variable-section'
                         ),
-                        get_variable_slider('mean-wave-direction', DEGREE_MIN_VAL_SLIDER, DEGREE_CHAR, 'mwd-decrease-btn', 'mwd-increase-btn'),
+                        get_variable_slider('mean-wave-direction', DEGREE_MIN_VAL_SLIDER, DEGREE_MAX_VAL_SLIDER, DEGREE_CHAR, 'mwd-decrease-btn', 'mwd-increase-btn'),
                     ]
                 )
                 ),
@@ -494,7 +496,7 @@ def get_atmospheric_variables_panels():
                             ],
                             className='variable-section'
                         ),
-                        get_variable_slider('wind-speed', PERCENTAGE_MIN_VAL_SLIDER, PERCENTAGE_CHAR, 'ws-decrease-btn', 'ws-increase-btn'),
+                        get_variable_slider('wind-speed', PERCENTAGE_MIN_VAL_SLIDER, PERCENTAGE_MAX_VAL_SLIDER, PERCENTAGE_CHAR, 'ws-decrease-btn', 'ws-increase-btn'),
                     ])
 
                 ),
@@ -519,7 +521,7 @@ def get_atmospheric_variables_panels():
                             ],
                             className='variable-section'
                         ),
-                        get_variable_slider('wind-direction', DEGREE_MIN_VAL_SLIDER, DEGREE_CHAR, 'wd-decrease-btn', 'wd-increase-btn'),
+                        get_variable_slider('wind-direction', DEGREE_MIN_VAL_SLIDER, DEGREE_MAX_VAL_SLIDER, DEGREE_CHAR, 'wd-decrease-btn', 'wd-increase-btn'),
                     ]
                 )
                 ),
