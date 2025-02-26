@@ -136,43 +136,41 @@ def render_penzance_seawall_crest_sheltered_graph(data_penzance_seawall_crest_sh
 
 def get_variable_slider(identifier, min_value, max_value, template_symbol, decrease_btn_id, increase_btn_id):
     variable_slider =  html.Div(
-                        children = [
-                            html.Div(
-                                html.Button(
-                                    id=decrease_btn_id,
-                                    children = [
-                                        html.Img(src='./assets/imgs/minus-icon.png', className='action-button-img'),
-                                    ],
-                                    className='action-button'
-                                ),
-                                className='slider-button-panel'
-                            ),         
-                            html.Div(
-                                dcc.Slider(id=identifier, min=min_value, max=max_value, step=1, value=min_value, marks=None, 
-                                        tooltip={
-                                            'always_visible': True,
-                                            'template': '{value}' + template_symbol,
-                                            'placement': 'top', 
-                                            'style': {'color': '#2A5485', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
-                                        },
-                                ),
-                                style={'padding': '25px 25px 0px', 'width': '508px'}
-                            ),
-                            html.Div(
-                                html.Button(
-                                    id=increase_btn_id,
-                                    children = [
-                                        html.Img(src='./assets/imgs/plus-icon.png', className='action-button-img'),
-                                    ],
-                                    className='action-button'
-                                ),
-                                    className='slider-button-panel'
-                            ),
-
-                            
-                        ],
-                        className='slider-panel'
-                    )
+        children = [
+            html.Div(
+                html.Button(
+                    id=decrease_btn_id,
+                    children = [
+                        html.Img(src='./assets/imgs/minus-icon.png', className='action-button-img'),
+                    ],
+                    className='action-button'
+                ),
+                className='slider-button-panel'
+            ),         
+            html.Div(
+                dcc.Slider(id=identifier, min=min_value, max=max_value, step=1, value=min_value, marks=None, 
+                        tooltip={
+                            'always_visible': True,
+                            'template': '{value}' + template_symbol,
+                            'placement': 'top', 
+                            'style': {'color': '#2A5485', 'fontFamly': 'Helvetica Neue', 'fontSize': '18px', 'fontStyle': 'normal', 'fontWeight': '400', 'lineHeight': '160%'},
+                        },
+                ),
+                style={'padding': '25px 25px 0px', 'width': '508px'}
+            ),
+            html.Div(
+                html.Button(
+                    id=increase_btn_id,
+                    children = [
+                        html.Img(src='./assets/imgs/plus-icon.png', className='action-button-img'),
+                    ],
+                    className='action-button'
+                ),
+                    className='slider-button-panel'
+            ),
+        ],
+        className='slider-panel'
+    )
     return variable_slider
 
 
@@ -263,7 +261,8 @@ def get_wave_variables_panels():
                 md=5,
                 style={'padding': '38px 67px 0px 16px'}
             )
-        ]), fluid=True
+        ]), 
+        fluid=True
     )
     return wave_variables_panels
 
@@ -323,7 +322,8 @@ def get_atmospheric_variables_panels():
                 md=5,
                 style={'padding': '39px 67px 0px 16px'}
             )
-        ]), fluid=True
+        ]), 
+        fluid=True
     )
     return atmospheric_variables_panels
 
@@ -335,72 +335,77 @@ def get_buttons_panel():
                 dbc.Button('Submit', id='submit-button', style={'backgroundColor':'#2A5485', 'borderColor': '#2A5485', 'width': '230px', 'height': '48px'}),
             )],
             style={'padding': '38px 0px 0px 87px'}
-        ), fluid=True
+        ), 
+        fluid=True
     )
 
     return buttons_panel
 
 
 def get_legend_panel():
-    legend_component = dbc.Row(dbc.Col(
-                        html.Div(
-                            children=[
-                                html.Div('Key', style={'color': 'black', 'fontSize': '14.40px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '700', 'lineHeight': '21.60px', 'marginTop': '5px', 'width': '65px'}),
-                                html.Div(
-                                    children=[
-                                        html.Div(style={'width': '26px', 'height': '26px', 'borderRadius': '9999px', 'border': '2px #FF0004 solid', 'marginLeft': '18px', 'marginTop': '3px'}),
-                                        html.Div('High confidence > 80%', style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '88px'})
-                                    ],
-                                    style={'display': 'flex', 'marginLeft': '37px'}
-                                ),
-                                html.Div(
-                                    children=[
-                                        html.Div(style={'width': '26px', 'height': '26px', 'background': '#2A5485', 'borderRadius': '9999px', 'marginTop': '3px'}),
-                                        html.Div('Medium confidence 50-80%', style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '107px'}),
-                                    ],
-                                    style={'display': 'flex', 'marginLeft': '37px'}
-                                ), 
-                                html.Div(
-                                    children=[
-                                        html.Div(style={'width': '24px', 'height': '24px', 'background': '#AAD3E3', 'marginTop': '4px'}),
-                                        html.Div('Low confidence < 50%', style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '86px'})
-                                    ],
-                                    style={'display': 'flex', 'marginLeft': '37px'}
-                                ),
-                                html.Div(
-                                    children=[
-                                        html.Img(src='./assets/imgs/no_overtopping_marker.png', style={'width': '20px', 'height': '20px', 'marginTop': '6px'}),  # Add the image here   
-                                        html.Div('No overtopping', style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginTop': '8px', 'marginLeft': '11px', 'width': '84px'})
-                                        ],
-                                    style={'display': 'flex', 'marginLeft': '37px'}
-                                ),
-                                html.Div(
-                                    children=[
-                                        html.Div(style={'width': '46px', 'height': '0px', 'border': '1px #8A8D90 dashed', 'marginTop': '16px'}),
-                                        html.Div('Interquartile range (25th and 75th)', style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '101px'}),
-                                    ],
-                                    style={'display': 'flex', 'marginLeft': '37px'}
-                                ),
-
+    legend_component = dbc.Row(
+        dbc.Col(
+            html.Div(
+                children=[
+                    html.Div('Key', style={'color': 'black', 'fontSize': '14.40px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '700', 'lineHeight': '21.60px', 'marginTop': '5px', 'width': '65px'}),
+                    html.Div(
+                        children=[
+                            html.Div(style={'width': '26px', 'height': '26px', 'borderRadius': '9999px', 'border': '2px #FF0004 solid', 'marginLeft': '18px', 'marginTop': '3px'}),
+                            html.Div('High confidence > 80%', style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '88px'})
+                        ],
+                        style={'display': 'flex', 'marginLeft': '37px'}
+                    ),
+                    html.Div(
+                        children=[
+                            html.Div(style={'width': '26px', 'height': '26px', 'background': '#2A5485', 'borderRadius': '9999px', 'marginTop': '3px'}),
+                            html.Div('Medium confidence 50-80%', style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '107px'}),
+                        ],
+                        style={'display': 'flex', 'marginLeft': '37px'}
+                    ), 
+                    html.Div(
+                        children=[
+                            html.Div(style={'width': '24px', 'height': '24px', 'background': '#AAD3E3', 'marginTop': '4px'}),
+                            html.Div('Low confidence < 50%', style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '86px'})
+                        ],
+                        style={'display': 'flex', 'marginLeft': '37px'}
+                    ),
+                    html.Div(
+                        children=[
+                            html.Img(src='./assets/imgs/no_overtopping_marker.png', style={'width': '20px', 'height': '20px', 'marginTop': '6px'}),  # Add the image here   
+                            html.Div('No overtopping', style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginTop': '8px', 'marginLeft': '11px', 'width': '84px'})
                             ],
-                            className='dawlish-legend'
-                        )
-            , md=9, lg=11, xl=9, style={'padding': '0px'}),
-        style={'paddingTop': '27px', 'paddingLeft': '72px'})
+                        style={'display': 'flex', 'marginLeft': '37px'}
+                    ),
+                    html.Div(
+                        children=[
+                            html.Div(style={'width': '46px', 'height': '0px', 'border': '1px #8A8D90 dashed', 'marginTop': '16px'}),
+                            html.Div('Interquartile range (25th and 75th)', style={'color': 'black', 'fontSize': '12px', 'fontFamily': 'Helvetica Neue', 'fontWeight': '400', 'lineHeight': '16.80px', 'marginLeft': '11px', 'width': '101px'}),
+                        ],
+                        style={'display': 'flex', 'marginLeft': '37px'}
+                    )
+                ],
+                className='dawlish-legend'
+            ), 
+            md=9, lg=11, xl=9, style={'padding': '0px'}
+        ),
+        style={'paddingTop': '27px', 'paddingLeft': '72px'}
+    )
     
     return legend_component
 
 
 def get_dropdown_panel():
     dropdown_panel = html.Div([
-        'Site location',
-        dcc.Dropdown(
-        id='dd_site_location',
-        options=['Dawlish', 'Penzance', 'Dawlish Storm Bert - overtopping', 'Penzance Storm Bert - overtopping', 'Dawlish - no overtopping', 'Penzance - no overtopping'],
-        value='Dawlish',
-        clearable=False,
-        className='site-dropdown'
+            'Site location',
+            dcc.Dropdown(
+                id='dd_site_location',
+                options=['Dawlish', 'Penzance', 'Dawlish Storm Bert - overtopping', 'Penzance Storm Bert - overtopping', 'Dawlish - no overtopping', 'Penzance - no overtopping'],
+                value='Dawlish',
+                clearable=False,
+                className='site-dropdown'
+            )
+        ], 
+        className='label-dropdown'
     )
-    ], className='label-dropdown')
 
     return dropdown_panel
