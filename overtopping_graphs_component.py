@@ -80,11 +80,11 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
                 for c, o in zip(overtopping_data['confidence'], overtopping_data['overtopping_count'])
             ],
             color=[
-                '#808080' if o == 0 and s == 'previous' else
+                '#000' if o == 0 and s == 'previous' else
                 '#808080' if c > 0.80 and o > 0 and s == 'previous' else
                 '#585858' if c >= 0.50 and c <= 0.8 and o > 0 and s == 'previous' else
                 '#C7C7C7' if c < 0.50 and o > 0 and s == 'previous' else
-                '#000' if o == 0 and s == 'current' else
+                '#FF00CC' if o == 0 and s == 'current' else
                 '#FF0004' if c > 0.80 and o > 0 and s == 'current' else
                 '#2A5485' if c >= 0.50 and c <= 0.8 and o > 0 and s == 'current' else
                 '#AAD3E3' if c < 0.50 and o > 0 and s == 'current' else
@@ -92,11 +92,11 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
                 for c, o, s in zip(overtopping_data['confidence'], overtopping_data['overtopping_count'], overtopping_data['stage'])
             ],
             line_color=[
-                '#808080' if o == 0 and s == 'previous' else
+                '#000' if o == 0 and s == 'previous' else
                 '#808080' if c > 0.80 and o > 0 and s == 'previous' else
                 '#585858' if c >= 0.50 and c <= 0.80 and o > 0 and s == 'previous' else
                 '#C7C7C7' if c < 0.50 and o > 0 and s == 'previous' else                          
-                '#000' if o == 0 and s == 'current' else
+                '#FF00CC' if o == 0 and s == 'current' else
                 '#FF0004' if c > 0.80 and o > 0 and s == 'current' else
                 '#2A5485' if c >= 0.50 and c <= 0.80 and o > 0 and s == 'current' else
                 '#AAD3E3' if c < 0.50 and o > 0 and s == 'current' else
