@@ -334,10 +334,11 @@ def submit_slider_values(n_clicks, site_location_val, sig_wave_height_val, freeb
     Input('sig-wave-height', 'value'),
     Input('swh-increase-btn', 'n_clicks'),
     Input('swh-decrease-btn', 'n_clicks'),
+    Input('reset-button', 'n_clicks'),
     State('sig-wave-height', 'step')
 )
-def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
-    if n_clicks_inc == 0 or n_clicks_dec == 0:
+def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, current_step):
+    if n_clicks_inc == 0 or n_clicks_dec == 0 or n_clicks_reset == 0:
         return PERCENTAGE_MIN_VAL_SLIDER
 
     trigger_id =  ctx.triggered_id
@@ -348,6 +349,8 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
     elif trigger_id == 'swh-decrease-btn':
         new_value = slider_value - current_step
         return new_value
+    elif trigger_id == 'reset-button':
+        return PERCENTAGE_MIN_VAL_SLIDER
     else:  # Slider moved
         return slider_value  
 
@@ -358,10 +361,11 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
     Input('freeboard', 'value'),
     Input('fb-increase-btn', 'n_clicks'),
     Input('fb-decrease-btn', 'n_clicks'),
+    Input('reset-button', 'n_clicks'),
     State('freeboard', 'step')
 )
-def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
-    if n_clicks_inc == 0 or n_clicks_dec == 0:
+def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, current_step):
+    if n_clicks_inc == 0 or n_clicks_dec == 0 or n_clicks_reset == 0:
         return PERCENTAGE_MIN_VAL_SLIDER
 
     trigger_id =  ctx.triggered_id
@@ -372,6 +376,8 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
     elif trigger_id == 'fb-decrease-btn':
         new_value = slider_value - current_step
         return new_value
+    elif trigger_id == 'reset-button':
+        return PERCENTAGE_MIN_VAL_SLIDER
     else:  # Slider moved
         return slider_value      
 
@@ -382,10 +388,11 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
     Input('mean-wave-period', 'value'),
     Input('mwp-increase-btn', 'n_clicks'),
     Input('mwp-decrease-btn', 'n_clicks'),
+    Input('reset-button', 'n_clicks'),
     State('mean-wave-period', 'step')
 )
-def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
-    if n_clicks_inc == 0 or n_clicks_dec == 0:
+def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, current_step):
+    if n_clicks_inc == 0 or n_clicks_dec == 0 or n_clicks_reset == 0:
         return PERCENTAGE_MIN_VAL_SLIDER
 
     trigger_id =  ctx.triggered_id
@@ -396,6 +403,8 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
     elif trigger_id == 'mwp-decrease-btn':
         new_value = slider_value - current_step
         return new_value
+    elif trigger_id == 'reset-button':
+        return PERCENTAGE_MIN_VAL_SLIDER
     else:  # Slider moved
         return slider_value   
 
@@ -406,11 +415,12 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
     Input('mean-wave-direction', 'value'),
     Input('mwd-increase-btn', 'n_clicks'),
     Input('mwd-decrease-btn', 'n_clicks'),
+    Input('reset-button', 'n_clicks'),
     State('mean-wave-direction', 'step')
 )
-def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
+def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, current_step):
     
-    if n_clicks_inc == 0 or n_clicks_dec == 0:
+    if n_clicks_inc == 0 or n_clicks_dec == 0 or n_clicks_reset == 0:
         return DEGREE_MIN_VAL_SLIDER
 
     trigger_id =  ctx.triggered_id
@@ -421,6 +431,8 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
     elif trigger_id == 'mwd-decrease-btn':
         new_value = slider_value - current_step
         return new_value
+    elif trigger_id == 'reset-button':
+        return DEGREE_MIN_VAL_SLIDER
     else:  # Slider moved
         return slider_value       
 
@@ -431,11 +443,12 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
     Input('wind-speed', 'value'),
     Input('ws-increase-btn', 'n_clicks'),
     Input('ws-decrease-btn', 'n_clicks'),
+    Input('reset-button', 'n_clicks'),
     State('wind-speed', 'step')
 )
-def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
+def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, current_step):
     
-    if n_clicks_inc == 0 or n_clicks_dec == 0:
+    if n_clicks_inc == 0 or n_clicks_dec == 0 or n_clicks_reset == 0:
         return PERCENTAGE_MIN_VAL_SLIDER
 
     trigger_id =  ctx.triggered_id
@@ -446,6 +459,8 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
     elif trigger_id == 'ws-decrease-btn':
         new_value = slider_value - current_step
         return new_value
+    elif trigger_id == 'reset-button':
+        return PERCENTAGE_MIN_VAL_SLIDER
     else:  # Slider moved
         return slider_value     
 
@@ -456,11 +471,12 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
     Input('wind-direction', 'value'),
     Input('wd-increase-btn', 'n_clicks'),
     Input('wd-decrease-btn', 'n_clicks'),
+    Input('reset-button', 'n_clicks'),
     State('wind-direction', 'step')
 )
-def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
+def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, current_step):
     
-    if n_clicks_inc == 0 or n_clicks_dec == 0:
+    if n_clicks_inc == 0 or n_clicks_dec == 0 or n_clicks_reset == 0:
         return DEGREE_MIN_VAL_SLIDER
 
     trigger_id =  ctx.triggered_id
@@ -471,9 +487,11 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, current_step):
     elif trigger_id == 'wd-decrease-btn':
         new_value = slider_value - current_step
         return new_value
+    elif trigger_id == 'reset-button':
+        return DEGREE_MIN_VAL_SLIDER
     else:  # Slider moved
         return slider_value     
-    
+
 
 # Run the app
 if __name__ == "__main__":

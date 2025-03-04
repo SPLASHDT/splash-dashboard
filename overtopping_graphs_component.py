@@ -338,7 +338,13 @@ def get_buttons_panel():
     buttons_panel = dbc.Container(
         dbc.Row([
             dbc.Col(
-                dbc.Button('Submit', id='submit-button', style={'backgroundColor':'#2A5485', 'borderColor': '#2A5485', 'width': '230px', 'height': '48px'}),
+                dbc.Button('Submit', id='submit-button', style={'backgroundColor':'#2A5485', 'borderColor': '#2A5485', 'width': '180px', 'height': '48px'}),
+                md=4,
+            ),
+            dbc.Col(
+                dbc.Button('Reset all', id='reset-button', color='link'),
+                md=4
+
             )],
             style={'padding': '38px 0px 0px 87px'}
         ), 
