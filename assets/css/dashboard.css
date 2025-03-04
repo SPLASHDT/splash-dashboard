@@ -347,3 +347,8 @@
 .rc-slider-tooltip-placement-top{
     top: -15px !important;
 }
+
+.reset-var-button {
+    display: flex;
+    justify-content: flex-end;
+}

@@ -188,6 +188,10 @@ def get_wave_variables_panels():
                 dbc.Card(
                     dbc.CardBody([
                         html.Div(
+                            dbc.Button('Reset', id='wad-reset-button', color='link'),
+                            className='reset-var-button'
+                        ),
+                        html.Div(
                             'Adjusted data', className='adjusted-data-panel'
                         ),
                         # Significant wave height
@@ -248,6 +252,10 @@ def get_wave_variables_panels():
                     [
                         # Mean wave direction
                         html.Div(
+                            dbc.Button('Reset', id='mwd-reset-button', color='link'),
+                            className='reset-var-button'
+                        ),
+                        html.Div(
                             children=[
                                 html.Div(
                                     'Mean wave direction',
@@ -280,6 +288,10 @@ def get_atmospheric_variables_panels():
                 dbc.Card(
                     dbc.CardBody([
                         html.Div(
+                            dbc.Button('Reset', id='aad-reset-button', color='link'),
+                            className='reset-var-button'
+                        ),
+                        html.Div(
                             'Adjusted data', className='adjusted-data-panel'
                         ),
                         # Wind speed
@@ -294,7 +306,8 @@ def get_atmospheric_variables_panels():
                                     className='variable-short-title'
                                 )
                             ],
-                            className='variable-section'
+                            className='variable-section',
+                            style={'paddingTop': '32px'}
                         ),
                         get_variable_slider('wind-speed', PERCENTAGE_MIN_VAL_SLIDER, PERCENTAGE_MAX_VAL_SLIDER, PERCENTAGE_CHAR, 'ws-decrease-btn', 'ws-increase-btn'),
                     ])
@@ -308,6 +321,10 @@ def get_atmospheric_variables_panels():
                 dbc.CardBody(
                     [
                         # Wind direction
+                        html.Div(
+                            dbc.Button('Reset', id='wd-reset-button', color='link'),
+                            className='reset-var-button'
+                        ),
                         html.Div(
                             children=[
                                 html.Div(
