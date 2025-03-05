@@ -336,9 +336,10 @@ def submit_slider_values(n_clicks, site_location_val, sig_wave_height_val, freeb
     Input('swh-decrease-btn', 'n_clicks'),
     Input('reset-button', 'n_clicks'),
     Input('wad-reset-button', 'n_clicks'),
+    Input('dd_site_location', 'value'),
     State('sig-wave-height', 'step')
 )
-def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_clicks_reset_wad, current_step):
+def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_clicks_reset_wad, site_location_value, current_step):
 
     if n_clicks_inc == 0 or n_clicks_dec == 0 or n_clicks_reset == 0 or n_clicks_reset_wad == 0:
         return PERCENTAGE_MIN_VAL_SLIDER
@@ -351,7 +352,7 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
     elif trigger_id == 'swh-decrease-btn':
         new_value = slider_value - current_step
         return new_value
-    elif trigger_id == 'reset-button' or trigger_id == 'wad-reset-button':
+    elif trigger_id == 'reset-button' or trigger_id == 'wad-reset-button' or trigger_id == 'dd_site_location':
         return PERCENTAGE_MIN_VAL_SLIDER
     else:  # Slider moved
         return slider_value  
@@ -365,9 +366,10 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
     Input('fb-decrease-btn', 'n_clicks'),
     Input('reset-button', 'n_clicks'),
     Input('wad-reset-button', 'n_clicks'),
+    Input('dd_site_location', 'value'),
     State('freeboard', 'step')
 )
-def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_clicks_reset_wad, current_step):
+def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_clicks_reset_wad, site_location_value, current_step):
 
     if n_clicks_inc == 0 or n_clicks_dec == 0 or n_clicks_reset == 0 or n_clicks_reset_wad == 0:
         return PERCENTAGE_MIN_VAL_SLIDER
@@ -380,7 +382,7 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
     elif trigger_id == 'fb-decrease-btn':
         new_value = slider_value - current_step
         return new_value
-    elif trigger_id == 'reset-button' or trigger_id == 'wad-reset-button':
+    elif trigger_id == 'reset-button' or trigger_id == 'wad-reset-button' or trigger_id == 'dd_site_location':
         return PERCENTAGE_MIN_VAL_SLIDER
     else:  # Slider moved
         return slider_value      
@@ -394,10 +396,11 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
     Input('mwp-decrease-btn', 'n_clicks'),
     Input('reset-button', 'n_clicks'),
     Input('wad-reset-button', 'n_clicks'),
+    Input('dd_site_location', 'value'),
     State('mean-wave-period', 'step')
 )
-def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_clicks_reset_wad, current_step):
-    
+def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_clicks_reset_wad, site_location_value, current_step):
+
     if n_clicks_inc == 0 or n_clicks_dec == 0 or n_clicks_reset == 0 or n_clicks_reset_wad ==0:
         return PERCENTAGE_MIN_VAL_SLIDER
 
@@ -409,7 +412,7 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
     elif trigger_id == 'mwp-decrease-btn':
         new_value = slider_value - current_step
         return new_value
-    elif trigger_id == 'reset-button' or trigger_id == 'wad-reset-button':
+    elif trigger_id == 'reset-button' or trigger_id == 'wad-reset-button' or trigger_id == 'dd_site_location':
         return PERCENTAGE_MIN_VAL_SLIDER
     else:  # Slider moved
         return slider_value   
@@ -423,9 +426,10 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
     Input('mwd-decrease-btn', 'n_clicks'),
     Input('reset-button', 'n_clicks'),
     Input('mwd-reset-button', 'n_clicks'),
+    Input('dd_site_location', 'value'),
     State('mean-wave-direction', 'step')
 )
-def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_clicks_reset_mwd, current_step):
+def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_clicks_reset_mwd, site_location_value, current_step):
     
     if n_clicks_inc == 0 or n_clicks_dec == 0 or n_clicks_reset == 0 or n_clicks_reset_mwd == 0:
         return DEGREE_MIN_VAL_SLIDER
@@ -438,7 +442,7 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
     elif trigger_id == 'mwd-decrease-btn':
         new_value = slider_value - current_step
         return new_value
-    elif trigger_id == 'reset-button' or trigger_id == 'mwd-reset-button':
+    elif trigger_id == 'reset-button' or trigger_id == 'mwd-reset-button' or trigger_id == 'dd_site_location':
         return DEGREE_MIN_VAL_SLIDER
     else:  # Slider moved
         return slider_value       
@@ -452,9 +456,10 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
     Input('ws-decrease-btn', 'n_clicks'),
     Input('reset-button', 'n_clicks'),
     Input('aad-reset-button', 'n_clicks'),
+    Input('dd_site_location', 'value'),
     State('wind-speed', 'step')
 )
-def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_clicks_reset_aad, current_step):
+def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_clicks_reset_aad, site_location_value, current_step):
     
     if n_clicks_inc == 0 or n_clicks_dec == 0 or n_clicks_reset == 0 or n_clicks_reset_aad == 0:
         return PERCENTAGE_MIN_VAL_SLIDER
@@ -467,7 +472,7 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
     elif trigger_id == 'ws-decrease-btn':
         new_value = slider_value - current_step
         return new_value
-    elif trigger_id == 'reset-button' or trigger_id == 'aad-reset-button':
+    elif trigger_id == 'reset-button' or trigger_id == 'aad-reset-button' or trigger_id == 'dd_site_location':
         return PERCENTAGE_MIN_VAL_SLIDER
     else:  # Slider moved
         return slider_value     
@@ -481,9 +486,10 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
     Input('wd-decrease-btn', 'n_clicks'),
     Input('reset-button', 'n_clicks'),
     Input('wd-reset-button', 'n_clicks'),
+    Input('dd_site_location', 'value'),
     State('wind-direction', 'step')
 )
-def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_clicks_reset_wd, current_step):
+def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_clicks_reset_wd, site_location_value, current_step):
     
     if n_clicks_inc == 0 or n_clicks_dec == 0 or n_clicks_reset == 0 or n_clicks_reset_wd == 0:
         return DEGREE_MIN_VAL_SLIDER
@@ -496,7 +502,7 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
     elif trigger_id == 'wd-decrease-btn':
         new_value = slider_value - current_step
         return new_value
-    elif trigger_id == 'reset-button' or trigger_id == 'wd-reset-button':
+    elif trigger_id == 'reset-button' or trigger_id == 'wd-reset-button' or trigger_id == 'dd_site_location':
         return DEGREE_MIN_VAL_SLIDER
     else:  # Slider moved
         return slider_value     
