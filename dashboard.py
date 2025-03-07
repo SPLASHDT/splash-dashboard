@@ -510,4 +510,11 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
 
 # Run the app
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    environment = os.getenv("SPLASH_ENV")
+    if environment == "docker":
+        #docker requests from outside the container don't come from 127.0.0.1, so we need to bind to 0.0.0.0 to receive them
+        app.run_server(host='0.0.0.0', debug=True)
+    elif environment == "production":
+        app.run_server(debug=False)
+    else:
+        app.run_server(debug=True)
