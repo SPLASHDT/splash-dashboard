@@ -23,8 +23,10 @@ penzance_lon_seawall = os.environ.get('PENZANCE_LON_SEAWALL')
 
 PERCENTAGE_MIN_VAL_SLIDER = -100
 PERCENTAGE_MAX_VAL_SLIDER = 100
+PERCENTAGE_DEFAULT_VALUE = 0
 DEGREE_MIN_VAL_SLIDER = -180
 DEGREE_MAX_VAL_SLIDER = 180
+DEGREE_DEFAULT_VALUE = 0
 PERCENTAGE_CHAR = '%'
 DEGREE_CHAR = '°'
 
@@ -342,7 +344,7 @@ def submit_slider_values(n_clicks, site_location_val, sig_wave_height_val, freeb
 def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_clicks_reset_wad, site_location_value, current_step):
 
     if n_clicks_inc == 0 or n_clicks_dec == 0 or n_clicks_reset == 0 or n_clicks_reset_wad == 0:
-        return PERCENTAGE_MIN_VAL_SLIDER
+        return PERCENTAGE_DEFAULT_VALUE
 
     trigger_id =  ctx.triggered_id
 
@@ -353,7 +355,7 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
         new_value = slider_value - current_step
         return new_value
     elif trigger_id == 'reset-button' or trigger_id == 'wad-reset-button' or trigger_id == 'dd_site_location':
-        return PERCENTAGE_MIN_VAL_SLIDER
+        return PERCENTAGE_DEFAULT_VALUE
     else:  # Slider moved
         return slider_value  
 
@@ -372,7 +374,7 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
 def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_clicks_reset_wad, site_location_value, current_step):
 
     if n_clicks_inc == 0 or n_clicks_dec == 0 or n_clicks_reset == 0 or n_clicks_reset_wad == 0:
-        return PERCENTAGE_MIN_VAL_SLIDER
+        return PERCENTAGE_DEFAULT_VALUE
 
     trigger_id =  ctx.triggered_id
 
@@ -383,7 +385,7 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
         new_value = slider_value - current_step
         return new_value
     elif trigger_id == 'reset-button' or trigger_id == 'wad-reset-button' or trigger_id == 'dd_site_location':
-        return PERCENTAGE_MIN_VAL_SLIDER
+        return PERCENTAGE_DEFAULT_VALUE
     else:  # Slider moved
         return slider_value      
 
@@ -402,7 +404,7 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
 def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_clicks_reset_wad, site_location_value, current_step):
 
     if n_clicks_inc == 0 or n_clicks_dec == 0 or n_clicks_reset == 0 or n_clicks_reset_wad ==0:
-        return PERCENTAGE_MIN_VAL_SLIDER
+        return PERCENTAGE_DEFAULT_VALUE
 
     trigger_id =  ctx.triggered_id
 
@@ -413,7 +415,7 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
         new_value = slider_value - current_step
         return new_value
     elif trigger_id == 'reset-button' or trigger_id == 'wad-reset-button' or trigger_id == 'dd_site_location':
-        return PERCENTAGE_MIN_VAL_SLIDER
+        return PERCENTAGE_DEFAULT_VALUE
     else:  # Slider moved
         return slider_value   
 
@@ -432,7 +434,7 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
 def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_clicks_reset_mwd, site_location_value, current_step):
     
     if n_clicks_inc == 0 or n_clicks_dec == 0 or n_clicks_reset == 0 or n_clicks_reset_mwd == 0:
-        return DEGREE_MIN_VAL_SLIDER
+        return DEGREE_DEFAULT_VALUE
 
     trigger_id =  ctx.triggered_id
     
@@ -443,7 +445,7 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
         new_value = slider_value - current_step
         return new_value
     elif trigger_id == 'reset-button' or trigger_id == 'mwd-reset-button' or trigger_id == 'dd_site_location':
-        return DEGREE_MIN_VAL_SLIDER
+        return DEGREE_DEFAULT_VALUE
     else:  # Slider moved
         return slider_value       
 
@@ -462,7 +464,7 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
 def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_clicks_reset_aad, site_location_value, current_step):
     
     if n_clicks_inc == 0 or n_clicks_dec == 0 or n_clicks_reset == 0 or n_clicks_reset_aad == 0:
-        return PERCENTAGE_MIN_VAL_SLIDER
+        return PERCENTAGE_DEFAULT_VALUE
 
     trigger_id =  ctx.triggered_id
     
@@ -473,12 +475,12 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
         new_value = slider_value - current_step
         return new_value
     elif trigger_id == 'reset-button' or trigger_id == 'aad-reset-button' or trigger_id == 'dd_site_location':
-        return PERCENTAGE_MIN_VAL_SLIDER
+        return PERCENTAGE_DEFAULT_VALUE
     else:  # Slider moved
         return slider_value     
 
 
-# Callback for wind speed slider
+# Callback for wind direction slider
 @app.callback(
     Output('wind-direction', 'value'),
     Input('wind-direction', 'value'),
@@ -492,7 +494,7 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
 def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_clicks_reset_wd, site_location_value, current_step):
     
     if n_clicks_inc == 0 or n_clicks_dec == 0 or n_clicks_reset == 0 or n_clicks_reset_wd == 0:
-        return DEGREE_MIN_VAL_SLIDER
+        return DEGREE_DEFAULT_VALUE
 
     trigger_id =  ctx.triggered_id
     
@@ -503,7 +505,7 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
         new_value = slider_value - current_step
         return new_value
     elif trigger_id == 'reset-button' or trigger_id == 'wd-reset-button' or trigger_id == 'dd_site_location':
-        return DEGREE_MIN_VAL_SLIDER
+        return DEGREE_DEFAULT_VALUE
     else:  # Slider moved
         return slider_value     
 
