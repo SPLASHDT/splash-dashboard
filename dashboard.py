@@ -30,6 +30,13 @@ DEGREE_DEFAULT_VALUE = 0
 PERCENTAGE_CHAR = '%'
 DEGREE_CHAR = '°'
 
+DASHBOARD_NAME = 'SPLASH'
+DASHBOARD_BRIEF_DESCRIPTION = 'DIGITAL APPROACHES TO PREDICT WAVE OVERTOPPING HAZARDS'
+DASHBOARD_SUBTITLE = 'Advancing current understanding on wave-related coastal hazards'
+DASHBOARD_FULL_DESC_P1 = 'With sea level rise accelerating and weather extremes becoming increasingly stronger, tools to help climate adaptation of coastal communities are of paramount importance. SPLASH provides an overtopping tool that will act as forecast model directly helping coastal communities mitigate effects of this coastal hazard, and ultimately, guiding new climate adaptation strategies.'
+DASHBOARD_FULL_DESC_P2 = 'The model has been developed at the University of Plymouth Coastal Processes Research Group (CPRG) as part of the SPLASH project. The project was part of the Twinning Capability for the Natural Environment (TWINE) programme, designed to harness the potential of digital twinning technology to transform environmental science. '
+DASHBOARD_FULL_DESC_P3 = 'SPLASH digital twin is based on AI models trained using field measurements of wave overtopping. The model is updated once a day and uses Met Office wave and wind data as input, as well as predicted water level. This tool provides overtopping forecast 5 days ahead for Dawlish and Penzance, and allows the user to modify wind and wave input variables to test the sensitivity of wave overtopping.'
+
 external_stylesheets = [dbc.themes.BOOTSTRAP, './assets/css/dashboard.css']
 app = Dash(__name__, external_stylesheets=external_stylesheets)
 
@@ -202,8 +209,8 @@ def render_dashboard():
                         html.Img(src='./assets/imgs/splash_logo.png', className='splash-logo'),  # Add image here
                         html.Div(
                             children=[
-                                html.Div('SPLASH', className='dashboard-title'),
-                                html.Div('DIGITAL APPROACHES TO PREDICT WAVE OVERTOPPING HAZARDS', className='dashboard-sub-title')
+                                html.Div(DASHBOARD_NAME, className='dashboard-title'),
+                                html.Div(DASHBOARD_BRIEF_DESCRIPTION, className='dashboard-sub-title')
                             ],
                             className='title-sub-title-container'
                         )
@@ -214,14 +221,18 @@ def render_dashboard():
             style={'paddingLeft': '72px'}
         )]),
         dbc.Row(
-            html.Div('Advancing current understanding on wave-related coastal hazards', className='dashboard-description'),
+            html.Div(DASHBOARD_SUBTITLE, className='dashboard-description'),
             style={'paddingLeft': '72px', 'paddingTop': '60px', 'paddingBottom': '5px'}
         ),
-        dbc.Row(
-            html.Div('With sea level rise accelerating and weather extremes becoming increasingly stronger, tools to help climate adaptation of coastal communities are of paramount importance. SPLASH provides an overtopping tool that will act as forecast model directly helping coastal communities mitigate effects of this coastal hazard, and ultimately, guiding new climate adaptation strategies.', className='dashboard-summary'),
+        dbc.Row([
+            html.P(DASHBOARD_FULL_DESC_P1, className='dashboard-summary'),
+            html.P(DASHBOARD_FULL_DESC_P2, className='dashboard-summary'),
+            html.P(DASHBOARD_FULL_DESC_P3, className='dashboard-summary'),
+            html.Hr(id='horizontal-separator', className='horizontal-line'),
+            ],
             style={'paddingLeft': '72px'}
         ),
-        dbc.Row(dbc.Col(dropdown_panel, width='3', style={'padding': '0px'}), style={'paddingTop': '52px', 'paddingLeft': '72px'}),
+        dbc.Row(dbc.Col(dropdown_panel, width='3', style={'padding': '0px'}), style={'paddingTop': '19px', 'paddingLeft': '72px'}),
         dbc.Row(
             dbc.Col(dbc.Accordion([
                         dbc.AccordionItem(
