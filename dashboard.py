@@ -347,8 +347,8 @@ def submit_slider_values(submit_n_clicks, site_location_val, sig_wave_height_val
     if utils.find_words_with_suffix(site_location_val, 'Dawlish'):
         api_url = utils.add_query_params(DAWLISH_API_ENDPOINT, params)
         data_dawlish_seawall_crest, data_dawlish_railway_line, forecast_start_date, forecast_end_date = get_dawlish_wave_overtopping(api_url)
-        data_dawlish_seawall_crest['stage'] = 'forecast' if submit_n_clicks is None or submit_n_clicks == 0 else 'adjusted_forecast'
-        data_dawlish_railway_line['stage'] = 'forecast' if submit_n_clicks is None or submit_n_clicks == 0 else 'adjusted_forecast'
+        data_dawlish_seawall_crest['stage'] = 'forecast' if trigger_id is None or trigger_id == 'dd_site_location' else 'adjusted_forecast'
+        data_dawlish_railway_line['stage'] = 'forecast' if trigger_id is None or trigger_id == 'dd_site_location' else 'adjusted_forecast'
         tmp_previous_df_1, tmp_previous_df_2, tmp_current_df_1, tmp_current_df_2 = get_dataframes_to_save(submit_n_clicks, trigger_id, data_dawlish_seawall_crest, data_dawlish_railway_line, current_df_1, current_df_2)
         joined_dsc = pd.concat([tmp_previous_df_1, tmp_current_df_1], ignore_index=True)
         joined_drl = pd.concat([tmp_previous_df_2, tmp_current_df_2], ignore_index=True)
@@ -357,8 +357,8 @@ def submit_slider_values(submit_n_clicks, site_location_val, sig_wave_height_val
     else:
         api_url = utils.add_query_params(PENZANCE_API_ENDPOINT, params)
         data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered, forecast_start_date, forecast_end_date = get_penzance_wave_overtopping(api_url)
-        data_penzance_seawall_crest['stage'] = 'forecast' if submit_n_clicks is None or submit_n_clicks == 0 else 'adjusted_forecast'
-        data_penzance_seawall_crest_sheltered['stage'] = 'forecast' if submit_n_clicks is None or submit_n_clicks == 0 else 'adjusted_forecast'
+        data_penzance_seawall_crest['stage'] = 'forecast' if trigger_id is None or trigger_id == 'dd_site_location' else 'adjusted_forecast'
+        data_penzance_seawall_crest_sheltered['stage'] = 'forecast' if trigger_id is None or trigger_id == 'dd_site_location' else 'adjusted_forecast'
         tmp_previous_df_1, tmp_previous_df_2, tmp_current_df_1, tmp_current_df_2 = get_dataframes_to_save(submit_n_clicks, trigger_id, data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered, current_df_1, current_df_2)
         joined_psc = pd.concat([tmp_previous_df_1, tmp_current_df_1], ignore_index=True)
         joined_pscs = pd.concat([tmp_previous_df_2, tmp_current_df_2], ignore_index=True)
