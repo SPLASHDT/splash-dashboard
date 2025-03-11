@@ -17,7 +17,7 @@
 }
 
 .body-container {
-    background: var(--Background-pale-blue, #F4F8FB);
+    background: #F4F8FB;
 }
 
 .splash-logo {
@@ -57,7 +57,7 @@
     width: 1078px;
     height: 44px;
     flex-shrink: 0;
-    color: var(--SPLASH---Primary-Blue, #2A5485);
+    color: #2A5485;
     font-family: "Helvetica Neue";
     font-size: 27px;
     font-style: normal;
@@ -67,8 +67,6 @@
 }
 
 .dashboard-summary {
-    width: 1097px;
-    height: 87px;
     flex-shrink: 0;
     color: #000;
     font-family: "Helvetica Neue";
@@ -81,7 +79,6 @@
 }
 
 .horizontal-line {
-    width: 1097px;
     margin-top: 1px;
 }
 
@@ -213,7 +210,31 @@
 }
 
 .label-dropdown {
-    color: var(--SPLASH---Primary-Blue, #2A5485);
+    color: #2A5485;
+}
+
+.forecast-range {
+    color: #2A5485;
+
+    .DateInput {
+        width: 110px;
+    }
+    
+    .DateInput_input {
+        color: #2A5485;
+        font-family: "Helvetica Neue";
+        font-size: 16px;
+        font-style: normal;
+        font-weight: 400;
+        line-height: 140%;
+    }
+
+    .DateRangePickerInput_arrow_svg {
+        vertical-align: middle;
+        fill: #2A5485;
+        height: 24px;
+        width: 24px;
+    }
 }
 
 .wave-atmospheric-variables-panel {
@@ -226,7 +247,7 @@
 }
 
 .wave-variables-panel {
-    color: var(--SPLASH---Primary-Blue, #2A5485);
+    color: #2A5485;
     font-family: "Helvetica Neue";
     font-size: 27px;
     font-style: normal;
@@ -237,7 +258,7 @@
 }
 
 .atmospheric-variables-panel {
-    color: var(--SPLASH---Primary-Blue, #2A5485);
+    color: #2A5485;
     font-family: "Helvetica Neue";
     font-size: 27px;
     font-style: normal;
@@ -247,7 +268,7 @@
 }
 
 .adjusted-data-panel {
-    color: var(--SPLASH---Primary-Blue, #2A5485);
+    color: #2A5485;
     font-family: "Helvetica Neue";
     font-size: 22px;
     font-style: normal;
@@ -256,7 +277,7 @@
 }
 
 .variable-full-title {
-    color: var(--interface-black-800100, #040505);
+    color: #040505;
     font-family: "Helvetica Neue";
     font-size: 16px;
     font-style: normal;
@@ -266,7 +287,7 @@
 }
 
 .variable-short-title {
-    color: var(--SPLASH---Primary-Blue, #2A5485);
+    color: #2A5485;
     font-family: "Helvetica Neue";
     font-size: 14.4px;
     font-style: normal;
@@ -321,7 +342,7 @@
     gap: 10px;
     flex-shrink: 0;
     border-radius: 100px;
-    border: 1px solid var(--Secondary-Blue, #3279B7);
+    border: 1px solid #3279B7;
     background: #ECECEC;
     box-shadow: 0px 0px 4px 0px rgba(0, 0, 0, 0.18);
 }

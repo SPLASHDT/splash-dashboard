@@ -73,17 +73,23 @@ def add_query_params(base_url, params):
         return base_url + "?" + encoded_params
 
 
-# Get today's date in string format
-def get_formatted_today_date():
-    start_date = datetime.now().date()
-    return start_date.strftime("%d-%m-%Y")
+# Format date to specific format
+def format_date_to_str(param_date, format):
+    return param_date.strftime(format) 
+
+
+# Format range date to mm-dd-yyyy
+def format_range_date(param_date):
+    cur_param_date = datetime.strptime(param_date, "%Y-%m-%d %H:%M:%S")
+
+    return cur_param_date.strftime("%m-%d-%Y")
 
 
 # Get option and start date based on selected location
 def get_dataset_params(site_location_val):
     if site_location_val == "Dawlish":
         option = "dawlish"
-        start_date = get_formatted_today_date()
+        start_date = format_date_to_str(datetime.now().date(), "%d-%m-%Y")
     elif find_words_with_suffix(site_location_val, "Storm Bert"):
         option = "storm_bert"
         start_date = "21-11-2024"
@@ -92,7 +98,7 @@ def get_dataset_params(site_location_val):
         start_date = "10-12-2024"
     else: 
         option = "penzance"
-        start_date = get_formatted_today_date()
+        start_date = format_date_to_str(datetime.now().date(), "%d-%m-%Y")
     return option, start_date
 
 

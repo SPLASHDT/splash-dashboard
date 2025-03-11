@@ -493,3 +493,20 @@ def get_dropdown_panel():
     )
 
     return dropdown_panel
+
+
+def get_date_picker_range(f_start_date, f_end_date):
+    date_picker_range_panel = html.Div([
+        "Range: Forecast start date + 5 days",
+        dcc.DatePickerRange(
+            id = 'forecast-range',
+            display_format='DD/MM/YYYY',
+            start_date=f_start_date,
+            end_date=f_end_date,
+            disabled=True
+        )
+    ],
+    className='forecast-range'
+    )
+    
+    return date_picker_range_panel

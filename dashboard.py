@@ -10,6 +10,7 @@ import pandas as pd
 from matplotlib.colors import Normalize
 import utils
 import overtopping_graphs_component as ogc
+from datetime import datetime, timedelta
 
 utils.loadConfigFile()
 
@@ -43,13 +44,14 @@ app = Dash(__name__, external_stylesheets=external_stylesheets)
 
 # Get overtopping counts of Dawlish
 def get_dawlish_wave_overtopping(api_url):
-    # backend_api = DAWLISH_API_ENDPOINT + '?option='+ option + '&start_date='+ start_date if start_date != "" else DAWLISH_API_ENDPOINT + '?option='+ option
     response = requests.get(api_url)
     response.raise_for_status()
     overtopping_data = response.json()
     seawall_crest_overtopping_df = utils.convert_list_to_dataframe(overtopping_data['seawall_crest_overtopping'])
     railway_line_overtopping_df = utils.convert_list_to_dataframe(overtopping_data['railway_line_overtopping'])
-    return seawall_crest_overtopping_df, railway_line_overtopping_df
+    start_date = utils.format_range_date(seawall_crest_overtopping_df['time'].min())
+    end_date = utils.format_range_date(seawall_crest_overtopping_df['time'].max())
+    return seawall_crest_overtopping_df, railway_line_overtopping_df, start_date, end_date
 
 
 def get_penzance_wave_overtopping(api_url):        
@@ -58,7 +60,10 @@ def get_penzance_wave_overtopping(api_url):
     overtopping_data = response.json()
     seawall_crest_overtopping_df = utils.convert_list_to_dataframe(overtopping_data['seawall_crest_overtopping'])
     seawall_crest_sheltered_overtopping_df = utils.convert_list_to_dataframe(overtopping_data['seawall_crest_sheltered_overtopping'])
-    return seawall_crest_overtopping_df, seawall_crest_sheltered_overtopping_df
+    start_date = utils.format_range_date(seawall_crest_overtopping_df['time'].min())
+    end_date = utils.format_range_date(seawall_crest_overtopping_df['time'].max())
+
+    return seawall_crest_overtopping_df, seawall_crest_sheltered_overtopping_df, start_date, end_date
 
 
 # def get_significant_wave_height_data():
@@ -177,11 +182,24 @@ def render_contour_wave_height(longitudes, latitudes, z_data, U, V, lon_grid, la
     print(f"Saved plot for time {time_label} to {output_file}")
 
 
+def get_default_forecast_dates():
+    str_start_date = utils.format_date_to_str(datetime.now().date(), '%m-%d-%Y')
+    end_date = datetime.now().date() + timedelta(days=5) 
+    str_end_date = utils.format_date_to_str(end_date, '%m-%d-%Y')
+    return str_start_date, str_end_date
+
+
+
 # Render Splash dashboard
 def render_dashboard():
 
     # Search components
     dropdown_panel = ogc.get_dropdown_panel()
+
+    start_date, end_date = get_default_forecast_dates()
+
+    # Forecast range
+    forecast_range = ogc.get_date_picker_range(start_date, end_date)
 
     # Legend
     legend_panel = ogc.get_legend_panel()
@@ -224,15 +242,26 @@ def render_dashboard():
             html.Div(DASHBOARD_SUBTITLE, className='dashboard-description'),
             style={'paddingLeft': '72px', 'paddingTop': '60px', 'paddingBottom': '5px'}
         ),
-        dbc.Row([
-            html.P(DASHBOARD_FULL_DESC_P1, className='dashboard-summary'),
-            html.P(DASHBOARD_FULL_DESC_P2, className='dashboard-summary'),
-            html.P(DASHBOARD_FULL_DESC_P3, className='dashboard-summary'),
-            html.Hr(id='horizontal-separator', className='horizontal-line'),
-            ],
-            style={'paddingLeft': '72px'}
+        dbc.Row(
+            dbc.Col([
+                html.P(DASHBOARD_FULL_DESC_P1, className='dashboard-summary'),
+                html.P(DASHBOARD_FULL_DESC_P2, className='dashboard-summary'),
+                html.P(DASHBOARD_FULL_DESC_P3, className='dashboard-summary'),
+            ], md=9, style={'paddingLeft': '0', 'paddingRight': '0'}),
+            style={'paddingLeft': '72px', 'paddingRight': '72px'}
         ),
-        dbc.Row(dbc.Col(dropdown_panel, width='3', style={'padding': '0px'}), style={'paddingTop': '19px', 'paddingLeft': '72px'}),
+        dbc.Row(
+            dbc.Col(
+                 html.Hr(id='horizontal-separator', className='horizontal-line'), md=12, style={'paddingLeft': '0', 'paddingRight': '0'}
+            ),
+            style={'paddingLeft': '72px', 'paddingRight': '72px'}
+        ),
+        dbc.Row([
+                dbc.Col(dropdown_panel, md='9', style={'padding': '0px'}),
+                dbc.Col(forecast_range, md='3')
+            ], 
+            style={'paddingTop': '19px', 'paddingLeft': '72px', 'paddingRight': '72px'}
+            ),
         dbc.Row(
             dbc.Col(dbc.Accordion([
                         dbc.AccordionItem(
@@ -287,7 +316,9 @@ def get_dataframes_to_save(n_clicks, trigger_id, generated_df_1, generated_df_2,
      Output('previous-dataframe-1', 'data'),
      Output('previous-dataframe-2', 'data'),
      Output('current-dataframe-1', 'data'),
-     Output('current-dataframe-2', 'data')
+     Output('current-dataframe-2', 'data'),
+     Output('forecast-range', 'start_date'),
+     Output('forecast-range', 'end_date'),
     ],
     Input('submit-button', 'n_clicks'),
     Input('dd_site_location', 'value'),
@@ -315,7 +346,7 @@ def submit_slider_values(n_clicks, site_location_val, sig_wave_height_val, freeb
 
     if utils.find_words_with_suffix(site_location_val, 'Dawlish'):
         api_url = utils.add_query_params(DAWLISH_API_ENDPOINT, params)
-        data_dawlish_seawall_crest, data_dawlish_railway_line = get_dawlish_wave_overtopping(api_url)
+        data_dawlish_seawall_crest, data_dawlish_railway_line, forecast_start_date, forecast_end_date = get_dawlish_wave_overtopping(api_url)
         data_dawlish_seawall_crest['stage'] = 'current'
         data_dawlish_railway_line['stage'] = 'current'
         tmp_previous_df_1, tmp_previous_df_2, tmp_current_df_1, tmp_current_df_2 = get_dataframes_to_save(n_clicks, trigger_id, data_dawlish_seawall_crest, data_dawlish_railway_line, current_df_1, current_df_2)
@@ -325,7 +356,7 @@ def submit_slider_values(n_clicks, site_location_val, sig_wave_height_val, freeb
         fig_dawlish_railway_line = ogc.render_dawlish_railway_line_graph(joined_drl)
     else:
         api_url = utils.add_query_params(PENZANCE_API_ENDPOINT, params)
-        data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered = get_penzance_wave_overtopping(api_url)
+        data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered, forecast_start_date, forecast_end_date = get_penzance_wave_overtopping(api_url)
         data_penzance_seawall_crest['stage'] = 'current'
         data_penzance_seawall_crest_sheltered['stage'] = 'current'
         tmp_previous_df_1, tmp_previous_df_2, tmp_current_df_1, tmp_current_df_2 = get_dataframes_to_save(n_clicks, trigger_id, data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered, current_df_1, current_df_2)
@@ -338,7 +369,7 @@ def submit_slider_values(n_clicks, site_location_val, sig_wave_height_val, freeb
     fig1 = fig_dawlish_seawall_crest if utils.find_words_with_suffix(site_location_val, 'Dawlish') else fig_penzance_seawall_crest
     fig2 = fig_penzance_seawall_crest_sheltered if utils.find_words_with_suffix(site_location_val, 'Penzance') else fig_dawlish_railway_line
 
-    return fig1, fig2, tmp_previous_df_1.to_dict('records'), tmp_previous_df_2.to_dict('records'), tmp_current_df_1.to_dict('records'), tmp_current_df_2.to_dict('records')
+    return fig1, fig2, tmp_previous_df_1.to_dict('records'), tmp_previous_df_2.to_dict('records'), tmp_current_df_1.to_dict('records'), tmp_current_df_2.to_dict('records'), forecast_start_date, forecast_end_date
 
 
 # Callback for significant wave height slider
