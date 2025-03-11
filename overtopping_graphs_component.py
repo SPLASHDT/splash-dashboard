@@ -377,100 +377,107 @@ def get_legend_panel():
     legend_component = html.Div([
         dbc.Row([
             dbc.Col(html.Div('Key'), md=1, class_name='key-subtitle-legend'),
-            dbc.Col(html.Div(
-                'Forecast', 
-                className='stage-subtitle-legend'
-                ), 
-            md=1),
-            dbc.Col(html.Div(
-                        children=[
-                            html.Div(className='high-confidence-marker'),
-                            html.Div('High confidence > 80%', className='high-confidence-subtitle')
-                        ],
-                        style={'display': 'flex', 'marginLeft': '11px'}
-            ),
-            md=2),
-            dbc.Col(html.Div(
-                        children=[
-                            html.Div(className='medium-confidence-marker'),
-                            html.Div('Medium confidence 50-80%', className='medium-confidence-subtitle'),
-                        ],
-                        style={'display': 'flex', 'marginLeft': '11px'}
-            ),
-            md=2),
-            dbc.Col(html.Div(
-                        children=[
-                            html.Div(className='low-confidence-marker'),
-                            html.Div('Low confidence < 50%', className='low-confidence-subtitle')
-                        ],
-                        style={'display': 'flex', 'marginLeft': '11px'}
-            ),
-            md=2),
-            dbc.Col(html.Div(
-                        children=[
-                            html.Img(src='./assets/imgs/no_overtopping_marker.png', className='no-overtopping-marker'), 
-                            html.Div('No overtopping', className='no-overtopping-subtitle')
-                            ],
-                        style={'display': 'flex', 'marginLeft': '11px'}
-            ),
-            md=2),
-            dbc.Col(html.Div(
-                        children=[
-                            html.Div(className='interquartile-range-marker'),
-                            html.Div('Interquartile range (25th and 75th)', className='interquartile-range-subtitle'),
-                        ],
-                        style={'display': 'flex', 'marginLeft': '11px'}
-            ),
-            md=2)           
+            dbc.Col(
+                dbc.Row([
+                    dbc.Col(html.Div(
+                        'Forecast', 
+                        className='stage-subtitle-legend'
+                        ), 
+                    md=1),
+                    dbc.Col(html.Div(
+                                children=[
+                                    html.Div(className='high-confidence-marker'),
+                                    html.Div('High confidence > 80%', className='high-confidence-subtitle')
+                                ],
+                                style={'display': 'flex', 'marginLeft': '11px'}
+                    ),
+                    md=2),
+                    dbc.Col(html.Div(
+                                children=[
+                                    html.Div(className='medium-confidence-marker'),
+                                    html.Div('Medium confidence 50-80%', className='medium-confidence-subtitle'),
+                                ],
+                                style={'display': 'flex', 'marginLeft': '11px'}
+                    ),
+                    md=2),
+                    dbc.Col(html.Div(
+                                children=[
+                                    html.Div(className='low-confidence-marker'),
+                                    html.Div('Low confidence < 50%', className='low-confidence-subtitle')
+                                ],
+                                style={'display': 'flex', 'marginLeft': '11px'}
+                    ),
+                    md=2),
+                    dbc.Col(html.Div(
+                                children=[
+                                    html.Img(src='./assets/imgs/no_overtopping_marker.png', className='no-overtopping-marker'), 
+                                    html.Div('No overtopping', className='no-overtopping-subtitle')
+                                    ],
+                                style={'display': 'flex', 'marginLeft': '11px'}
+                    ),
+                    md=2),
+                    dbc.Col(html.Div(
+                                children=[
+                                    html.Div(className='interquartile-range-marker'),
+                                    html.Div('Interquartile range (25th and 75th)', className='interquartile-range-subtitle'),
+                                ],
+                                style={'display': 'flex', 'marginLeft': '11px'}
+                    ),
+                    md=3)], class_name='forecast-sub-legend'), 
+                md=11)
         ]),
         dbc.Row([
             dbc.Col(md=1, class_name='key-subtitle-legend'),
+            dbc.Col(
+                dbc.Row([
+                    dbc.Col(html.Div(
+                        'Adjusted Forecast', 
+                        className='stage-subtitle-legend'
+                        ), 
+                    md=1),
+                    dbc.Col(html.Div(
+                                children=[
+                                    html.Div(className='high-confidence-marker', style={'borderColor': '#808080'}),
+                                    html.Div('High confidence > 80%', className='high-confidence-subtitle')
+                                ],
+                                style={'display': 'flex', 'marginLeft': '11px'}
+                    ),
+                    md=2),
+                    dbc.Col(html.Div(
+                                children=[
+                                    html.Div(className='medium-confidence-marker', style={'background': '#C5C5C5', 'border': '1px solid #000'}),
+                                    html.Div('Medium confidence 50-80%', className='medium-confidence-subtitle'),
+                                ],
+                                style={'display': 'flex', 'marginLeft': '11px'}
+                    ),
+                    md=2),
+                    dbc.Col(html.Div(
+                                children=[
+                                    html.Div(className='low-confidence-marker', style={'background': '#C7C7C7'}),
+                                    html.Div('Low confidence < 50%', className='low-confidence-subtitle')
+                                ],
+                                style={'display': 'flex', 'marginLeft': '11px'}
+                    ),
+                    md=2),
+                    dbc.Col(html.Div(
+                                children=[
+                                    html.Img(src='./assets/imgs/adj_no_overtopping_marker.png', className='no-overtopping-marker'), 
+                                    html.Div('No overtopping', className='no-overtopping-subtitle')
+                                    ],
+                                style={'display': 'flex', 'marginLeft': '11px'}
+                    ),
+                    md=2),
+                    dbc.Col(html.Div(
+                                children=[
+                                    html.Div(className='interquartile-range-marker'),
+                                    html.Div('Interquartile range (25th and 75th)', className='interquartile-range-subtitle'),
+                                ],
+                                style={'display': 'flex', 'marginLeft': '11px'}
+                    ),
+                    md=3)], class_name='adjusted-forecast-sub-legend'), md=11
+            )
 
-            dbc.Col(html.Div(
-                'Adjusted Forecast', 
-                className='stage-subtitle-legend'
-                ), 
-            md=1),
-            dbc.Col(html.Div(
-                        children=[
-                            html.Div(className='high-confidence-marker', style={'borderColor': '#808080'}),
-                            html.Div('High confidence > 80%', className='high-confidence-subtitle')
-                        ],
-                        style={'display': 'flex', 'marginLeft': '11px'}
-            ),
-            md=2),
-            dbc.Col(html.Div(
-                        children=[
-                            html.Div(className='medium-confidence-marker', style={'background': '#C5C5C5', 'border': '1px solid #000'}),
-                            html.Div('Medium confidence 50-80%', className='medium-confidence-subtitle'),
-                        ],
-                        style={'display': 'flex', 'marginLeft': '11px'}
-            ),
-            md=2),
-            dbc.Col(html.Div(
-                        children=[
-                            html.Div(className='low-confidence-marker', style={'background': '#C7C7C7'}),
-                            html.Div('Low confidence < 50%', className='low-confidence-subtitle')
-                        ],
-                        style={'display': 'flex', 'marginLeft': '11px'}
-            ),
-            md=2),
-            dbc.Col(html.Div(
-                        children=[
-                            html.Img(src='./assets/imgs/adj_no_overtopping_marker.png', className='no-overtopping-marker'), 
-                            html.Div('No overtopping', className='no-overtopping-subtitle')
-                            ],
-                        style={'display': 'flex', 'marginLeft': '11px'}
-            ),
-            md=2),
-            dbc.Col(html.Div(
-                        children=[
-                            html.Div(className='interquartile-range-marker'),
-                            html.Div('Interquartile range (25th and 75th)', className='interquartile-range-subtitle'),
-                        ],
-                        style={'display': 'flex', 'marginLeft': '11px'}
-            ),
-            md=2)
+
         ],
         style={'paddingTop': '7px'})
     ],
