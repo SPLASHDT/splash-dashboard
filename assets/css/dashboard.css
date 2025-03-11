@@ -85,13 +85,10 @@
 .overtopping-legend {
     min-width: 950px;
     max-width: 1200px;
-    height: 197px; 
     background: white; 
     border-radius: 6px; 
     border: 0.5px #8A8D90 solid;
-    padding-left: 40px;
-    padding-right: 40px;
-    padding-top: 15px;
+    padding: 15px 40px 15px 40px;
     margin-left: 63px;
     margin-top: 33px;
 }

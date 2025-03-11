@@ -202,7 +202,7 @@ def render_dashboard():
     forecast_range = ogc.get_date_picker_range(start_date, end_date)
 
     # Legend
-    legend_panel = ogc.get_legend_panel()
+    full_legend = ogc.get_full_legend(False)
 
     # Wave variables and mean wave direction panels
     wave_variables_panels = ogc.get_wave_variables_panels()
@@ -280,7 +280,7 @@ def render_dashboard():
                 style={'padding': '0px'}
             )
         , style={'paddingTop': '25px', 'paddingLeft': '72px', 'paddingRight': '72px'}),
-        legend_panel,
+        html.Div(full_legend, id='overtopping-graph-legend', className='overtopping-legend'),
         dbc.Row([
             dbc.Col(dcc.Graph(id='scatter-plot-rig1', style={'border': '1.011px solid #8A8D90'}), md=6, style={'padding': '0px'}),
             dbc.Col(dcc.Graph(id='scatter-plot-rig2', style={'border': '1.011px solid #8A8D90'}), md=6, style={'paddingLeft': '16px', 'paddingRight': '0px'})
@@ -319,6 +319,7 @@ def get_dataframes_to_save(n_clicks, trigger_id, generated_df_1, generated_df_2,
      Output('current-dataframe-2', 'data'),
      Output('forecast-range', 'start_date'),
      Output('forecast-range', 'end_date'),
+     Output('overtopping-graph-legend', 'children'),
     ],
     Input('submit-button', 'n_clicks'),
     Input('dd_site_location', 'value'),
@@ -344,9 +345,11 @@ def submit_slider_values(submit_n_clicks, site_location_val, sig_wave_height_val
         params['start_date'] = start_date
         params['option'] = option
 
+    show_full_legend = False if trigger_id is None or trigger_id == 'dd_site_location' else True
+    full_legend = ogc.get_full_legend(show_full_legend)
     if utils.find_words_with_suffix(site_location_val, 'Dawlish'):
         api_url = utils.add_query_params(DAWLISH_API_ENDPOINT, params)
-        data_dawlish_seawall_crest, data_dawlish_railway_line, forecast_start_date, forecast_end_date = get_dawlish_wave_overtopping(api_url)
+        data_dawlish_seawall_crest, data_dawlish_railway_line, forecast_start_date, forecast_end_date = get_dawlish_wave_overtopping(api_url)       
         data_dawlish_seawall_crest['stage'] = 'forecast' if trigger_id is None or trigger_id == 'dd_site_location' else 'adjusted_forecast'
         data_dawlish_railway_line['stage'] = 'forecast' if trigger_id is None or trigger_id == 'dd_site_location' else 'adjusted_forecast'
         tmp_previous_df_1, tmp_previous_df_2, tmp_current_df_1, tmp_current_df_2 = get_dataframes_to_save(submit_n_clicks, trigger_id, data_dawlish_seawall_crest, data_dawlish_railway_line, current_df_1, current_df_2)
@@ -369,7 +372,7 @@ def submit_slider_values(submit_n_clicks, site_location_val, sig_wave_height_val
     fig1 = fig_dawlish_seawall_crest if utils.find_words_with_suffix(site_location_val, 'Dawlish') else fig_penzance_seawall_crest
     fig2 = fig_penzance_seawall_crest_sheltered if utils.find_words_with_suffix(site_location_val, 'Penzance') else fig_dawlish_railway_line
 
-    return fig1, fig2, tmp_previous_df_1.to_dict('records'), tmp_previous_df_2.to_dict('records'), tmp_current_df_1.to_dict('records'), tmp_current_df_2.to_dict('records'), forecast_start_date, forecast_end_date
+    return fig1, fig2, tmp_previous_df_1.to_dict('records'), tmp_previous_df_2.to_dict('records'), tmp_current_df_1.to_dict('records'), tmp_current_df_2.to_dict('records'), forecast_start_date, forecast_end_date, full_legend
 
 
 # Callback for significant wave height slider

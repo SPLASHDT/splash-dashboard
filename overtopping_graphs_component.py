@@ -373,9 +373,8 @@ def get_buttons_panel():
     return buttons_panel
 
 
-def get_legend_panel():
-    legend_component = html.Div([
-        dbc.Row([
+def get_forecast_legend():
+    forecast_legend = dbc.Row([
             dbc.Col(html.Div('Key'), md=1, class_name='key-subtitle-legend'),
             dbc.Col(
                 dbc.Row([
@@ -425,8 +424,12 @@ def get_legend_panel():
                     ),
                     md=3)], class_name='forecast-sub-legend'), 
                 md=11)
-        ]),
-        dbc.Row([
+    ])
+    return forecast_legend
+
+
+def get_adjusted_forecast_legend():
+    adjusted_forecast_legend = dbc.Row([
             dbc.Col(md=1, class_name='key-subtitle-legend'),
             dbc.Col(
                 dbc.Row([
@@ -475,15 +478,17 @@ def get_legend_panel():
                                 style={'display': 'flex', 'marginLeft': '11px'}
                     ),
                     md=3)], class_name='adjusted-forecast-sub-legend'), md=11
-            )
+            )], style={'paddingTop': '7px'}
+    )
+    return adjusted_forecast_legend
 
 
-        ],
-        style={'paddingTop': '7px'})
-    ],
-    className='overtopping-legend')
+def get_full_legend(show_full_legend):
+    forecast_legend = get_forecast_legend()
+    adjusted_forecast_legend = get_adjusted_forecast_legend()
+    full_legend = [ forecast_legend, adjusted_forecast_legend ] if show_full_legend else forecast_legend
     
-    return legend_component
+    return full_legend
 
 
 def get_dropdown_panel():
