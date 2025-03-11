@@ -300,8 +300,8 @@ def get_dataframes_to_save(n_clicks, trigger_id, generated_df_1, generated_df_2,
     else:
         saved_current_df_1 = pd.DataFrame(stored_current_df_1)
         saved_current_df_2 = pd.DataFrame(stored_current_df_2)
-        saved_current_df_1['stage'] = 'previous'
-        saved_current_df_2['stage'] = 'previous'
+        saved_current_df_1['stage'] = 'forecast'
+        saved_current_df_2['stage'] = 'forecast'
         tmp_previous_df_1 = saved_current_df_1
         tmp_previous_df_2 = saved_current_df_2
         tmp_current_df_1 = generated_df_1
@@ -333,9 +333,9 @@ def get_dataframes_to_save(n_clicks, trigger_id, generated_df_1, generated_df_2,
     State('current-dataframe-1', 'data'),
     State('current-dataframe-2', 'data'),
 )
-def submit_slider_values(n_clicks, site_location_val, sig_wave_height_val, freeboard_val, mean_wave_period_val, mean_wave_dir_val, wind_speed_val, wind_dir_val, previous_df_1, previous_df_2, current_df_1, current_df_2):
+def submit_slider_values(submit_n_clicks, site_location_val, sig_wave_height_val, freeboard_val, mean_wave_period_val, mean_wave_dir_val, wind_speed_val, wind_dir_val, previous_df_1, previous_df_2, current_df_1, current_df_2):
     trigger_id =  ctx.triggered_id
-    if n_clicks is None or n_clicks == 0 or trigger_id is not None and trigger_id != 'submit-button':
+    if submit_n_clicks is None or submit_n_clicks == 0 or trigger_id is not None and trigger_id != 'submit-button':
         option, start_date = utils.get_dataset_params(site_location_val)
         params = {'start_date': start_date, 'option': option}
     else:
@@ -347,9 +347,9 @@ def submit_slider_values(n_clicks, site_location_val, sig_wave_height_val, freeb
     if utils.find_words_with_suffix(site_location_val, 'Dawlish'):
         api_url = utils.add_query_params(DAWLISH_API_ENDPOINT, params)
         data_dawlish_seawall_crest, data_dawlish_railway_line, forecast_start_date, forecast_end_date = get_dawlish_wave_overtopping(api_url)
-        data_dawlish_seawall_crest['stage'] = 'current'
-        data_dawlish_railway_line['stage'] = 'current'
-        tmp_previous_df_1, tmp_previous_df_2, tmp_current_df_1, tmp_current_df_2 = get_dataframes_to_save(n_clicks, trigger_id, data_dawlish_seawall_crest, data_dawlish_railway_line, current_df_1, current_df_2)
+        data_dawlish_seawall_crest['stage'] = 'forecast' if submit_n_clicks is None or submit_n_clicks == 0 else 'adjusted_forecast'
+        data_dawlish_railway_line['stage'] = 'forecast' if submit_n_clicks is None or submit_n_clicks == 0 else 'adjusted_forecast'
+        tmp_previous_df_1, tmp_previous_df_2, tmp_current_df_1, tmp_current_df_2 = get_dataframes_to_save(submit_n_clicks, trigger_id, data_dawlish_seawall_crest, data_dawlish_railway_line, current_df_1, current_df_2)
         joined_dsc = pd.concat([tmp_previous_df_1, tmp_current_df_1], ignore_index=True)
         joined_drl = pd.concat([tmp_previous_df_2, tmp_current_df_2], ignore_index=True)
         fig_dawlish_seawall_crest = ogc.render_dawlish_seawall_crest_graph(joined_dsc)
@@ -357,9 +357,9 @@ def submit_slider_values(n_clicks, site_location_val, sig_wave_height_val, freeb
     else:
         api_url = utils.add_query_params(PENZANCE_API_ENDPOINT, params)
         data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered, forecast_start_date, forecast_end_date = get_penzance_wave_overtopping(api_url)
-        data_penzance_seawall_crest['stage'] = 'current'
-        data_penzance_seawall_crest_sheltered['stage'] = 'current'
-        tmp_previous_df_1, tmp_previous_df_2, tmp_current_df_1, tmp_current_df_2 = get_dataframes_to_save(n_clicks, trigger_id, data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered, current_df_1, current_df_2)
+        data_penzance_seawall_crest['stage'] = 'forecast' if submit_n_clicks is None or submit_n_clicks == 0 else 'adjusted_forecast'
+        data_penzance_seawall_crest_sheltered['stage'] = 'forecast' if submit_n_clicks is None or submit_n_clicks == 0 else 'adjusted_forecast'
+        tmp_previous_df_1, tmp_previous_df_2, tmp_current_df_1, tmp_current_df_2 = get_dataframes_to_save(submit_n_clicks, trigger_id, data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered, current_df_1, current_df_2)
         joined_psc = pd.concat([tmp_previous_df_1, tmp_current_df_1], ignore_index=True)
         joined_pscs = pd.concat([tmp_previous_df_2, tmp_current_df_2], ignore_index=True)
         fig_penzance_seawall_crest = ogc.render_penzance_seawall_crest_graph(joined_psc)

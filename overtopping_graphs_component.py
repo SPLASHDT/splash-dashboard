@@ -82,28 +82,28 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
                 for c, o in zip(overtopping_data['confidence'], overtopping_data['overtopping_count'])
             ],
             color=[
-                '#000' if o == 0 and s == 'previous' else
-                '#808080' if c > 0.80 and o > 0 and s == 'previous' else
-                '#585858' if c >= 0.50 and c <= 0.8 and o > 0 and s == 'previous' else
-                '#C7C7C7' if c < 0.50 and o > 0 and s == 'previous' else
-                '#FF00CC' if o == 0 and s == 'current' else
-                '#FF0004' if c > 0.80 and o > 0 and s == 'current' else
-                '#2A5485' if c >= 0.50 and c <= 0.8 and o > 0 and s == 'current' else
-                '#AAD3E3' if c < 0.50 and o > 0 and s == 'current' else
+                '#2A5485' if o == 0 and s == 'forecast' else
+                '#000' if c > 0.80 and o > 0 and s == 'forecast' else
+                '#2A5485' if c >= 0.50 and c <= 0.8 and o > 0 and s == 'forecast' else
+                '#AAD3E3' if c < 0.50 and o > 0 and s == 'forecast' else
+                '#C5C5C5' if o == 0 and s == 'adjusted_forecast' else
+                '#808080' if c > 0.80 and o > 0 and s == 'adjusted_forecast' else
+                '#C5C5C5' if c >= 0.50 and c <= 0.8 and o > 0 and s == 'adjusted_forecast' else
+                '#C7C7C7' if c < 0.50 and o > 0 and s == 'adjusted_forecast' else
                 '#AAD3E3' 
                 for c, o, s in zip(overtopping_data['confidence'], overtopping_data['overtopping_count'], overtopping_data['stage'])
             ],
             line_color=[
-                '#000' if o == 0 and s == 'previous' else
-                '#808080' if c > 0.80 and o > 0 and s == 'previous' else
-                '#585858' if c >= 0.50 and c <= 0.80 and o > 0 and s == 'previous' else
-                '#C7C7C7' if c < 0.50 and o > 0 and s == 'previous' else                          
-                '#FF00CC' if o == 0 and s == 'current' else
-                '#FF0004' if c > 0.80 and o > 0 and s == 'current' else
-                '#2A5485' if c >= 0.50 and c <= 0.80 and o > 0 and s == 'current' else
-                '#AAD3E3' if c < 0.50 and o > 0 and s == 'current' else
+                '#2A5485' if o == 0 and s == 'forecast' else
+                '#000' if c > 0.80 and o > 0 and s == 'forecast' else
+                '#2A5485' if c >= 0.50 and c <= 0.80 and o > 0 and s == 'forecast' else
+                '#AAD3E3' if c < 0.50 and o > 0 and s == 'forecast' else                          
+                '#C5C5C5' if o == 0 and s == 'adjusted_forecast' else
+                '#808080' if c > 0.80 and o > 0 and s == 'adjusted_forecast' else
+                '#000' if c >= 0.50 and c <= 0.80 and o > 0 and s == 'adjusted_forecast' else
+                '#C7C7C7' if c < 0.50 and o > 0 and s == 'adjusted_forecast' else
                 '#AAD3E3' 
-                for c, o, s in zip(overtopping_data['confidence'], overtopping_data['overtopping_count'], overtopping_data['stage']) # Corrected order
+                for c, o, s in zip(overtopping_data['confidence'], overtopping_data['overtopping_count'], overtopping_data['stage'])
             ]
         )
     )
@@ -378,55 +378,7 @@ def get_legend_panel():
         dbc.Row([
             dbc.Col(html.Div('Key'), md=1, class_name='key-subtitle-legend'),
             dbc.Col(html.Div(
-                'Previous', 
-                className='stage-subtitle-legend'
-                ), 
-            md=1),
-            dbc.Col(html.Div(
-                        children=[
-                            html.Div(className='high-confidence-marker', style={'borderColor': '#808080'}),
-                            html.Div('High confidence > 80%', className='high-confidence-subtitle')
-                        ],
-                        style={'display': 'flex', 'marginLeft': '11px'}
-            ),
-            md=2),
-            dbc.Col(html.Div(
-                        children=[
-                            html.Div(className='medium-confidence-marker', style={'background': '#585858'}),
-                            html.Div('Medium confidence 50-80%', className='medium-confidence-subtitle'),
-                        ],
-                        style={'display': 'flex', 'marginLeft': '11px'}
-            ),
-            md=2),
-            dbc.Col(html.Div(
-                        children=[
-                            html.Div(className='low-confidence-marker', style={'background': '#C7C7C7'}),
-                            html.Div('Low confidence < 50%', className='low-confidence-subtitle')
-                        ],
-                        style={'display': 'flex', 'marginLeft': '11px'}
-            ),
-            md=2),
-            dbc.Col(html.Div(
-                        children=[
-                            html.Img(src='./assets/imgs/prev_no_overtopping_marker.png', className='no-overtopping-marker'), 
-                            html.Div('No overtopping', className='no-overtopping-subtitle')
-                            ],
-                        style={'display': 'flex', 'marginLeft': '11px'}
-            ),
-            md=2),
-            dbc.Col(html.Div(
-                        children=[
-                            html.Div(className='interquartile-range-marker'),
-                            html.Div('Interquartile range (25th and 75th)', className='interquartile-range-subtitle'),
-                        ],
-                        style={'display': 'flex', 'marginLeft': '11px'}
-            ),
-            md=2)
-        ]),
-        dbc.Row([
-            dbc.Col(md=1, class_name='key-subtitle-legend'),
-            dbc.Col(html.Div(
-                'Updated', 
+                'Forecast', 
                 className='stage-subtitle-legend'
                 ), 
             md=1),
@@ -457,6 +409,55 @@ def get_legend_panel():
             dbc.Col(html.Div(
                         children=[
                             html.Img(src='./assets/imgs/no_overtopping_marker.png', className='no-overtopping-marker'), 
+                            html.Div('No overtopping', className='no-overtopping-subtitle')
+                            ],
+                        style={'display': 'flex', 'marginLeft': '11px'}
+            ),
+            md=2),
+            dbc.Col(html.Div(
+                        children=[
+                            html.Div(className='interquartile-range-marker'),
+                            html.Div('Interquartile range (25th and 75th)', className='interquartile-range-subtitle'),
+                        ],
+                        style={'display': 'flex', 'marginLeft': '11px'}
+            ),
+            md=2)           
+        ]),
+        dbc.Row([
+            dbc.Col(md=1, class_name='key-subtitle-legend'),
+
+            dbc.Col(html.Div(
+                'Adjusted Forecast', 
+                className='stage-subtitle-legend'
+                ), 
+            md=1),
+            dbc.Col(html.Div(
+                        children=[
+                            html.Div(className='high-confidence-marker', style={'borderColor': '#808080'}),
+                            html.Div('High confidence > 80%', className='high-confidence-subtitle')
+                        ],
+                        style={'display': 'flex', 'marginLeft': '11px'}
+            ),
+            md=2),
+            dbc.Col(html.Div(
+                        children=[
+                            html.Div(className='medium-confidence-marker', style={'background': '#C5C5C5', 'border': '1px solid #000'}),
+                            html.Div('Medium confidence 50-80%', className='medium-confidence-subtitle'),
+                        ],
+                        style={'display': 'flex', 'marginLeft': '11px'}
+            ),
+            md=2),
+            dbc.Col(html.Div(
+                        children=[
+                            html.Div(className='low-confidence-marker', style={'background': '#C7C7C7'}),
+                            html.Div('Low confidence < 50%', className='low-confidence-subtitle')
+                        ],
+                        style={'display': 'flex', 'marginLeft': '11px'}
+            ),
+            md=2),
+            dbc.Col(html.Div(
+                        children=[
+                            html.Img(src='./assets/imgs/adj_no_overtopping_marker.png', className='no-overtopping-marker'), 
                             html.Div('No overtopping', className='no-overtopping-subtitle')
                             ],
                         style={'display': 'flex', 'marginLeft': '11px'}
