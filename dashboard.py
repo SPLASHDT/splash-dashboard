@@ -20,6 +20,7 @@ dawlish_lat_seawall = os.environ.get('DAWLISH_LAT_SEAWALL')
 dawlish_lon_seawall = os.environ.get('DAWLISH_LON_SEAWALL')
 penzance_lat_seawall = os.environ.get('PENZANCE_LAT_SEAWALL')
 penzance_lon_seawall = os.environ.get('PENZANCE_LON_SEAWALL')
+DEBUG = eval(capitalize(os.environ.get('DEBUG'))) #DEBUG must by True or False with first letter in caps and rest in lower case
 
 PERCENTAGE_MIN_VAL_SLIDER = -100
 PERCENTAGE_MAX_VAL_SLIDER = 100
@@ -511,10 +512,13 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
 # Run the app
 if __name__ == "__main__":
     environment = os.getenv("SPLASH_ENV")
+
+    if DEBUG == True:
+        print("DAWLISH_API_ENDPOINT=", DAWLISH_API_ENDPOINT)
+        print("PENZANCE_API_ENDPOINT=", PENZANCE_API_ENDPOINT)
+
     if environment == "docker":
         #docker requests from outside the container don't come from 127.0.0.1, so we need to bind to 0.0.0.0 to receive them
-        app.run_server(host='0.0.0.0', debug=True)
-    elif environment == "production":
-        app.run_server(debug=False)
+        app.run_server(host='0.0.0.0', debug=DEBUG)
     else:
-        app.run_server(debug=True)
+        app.run_server(debug=DEBUG)
