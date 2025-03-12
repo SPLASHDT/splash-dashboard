@@ -5,5 +5,5 @@ RUN mkdir /splash-dashboard
 COPY . /splash-dashboard
 RUN cd /splash-dashboard && pip install -r requirements.txt
 ENV SPLASH_ENV=docker
-ENTRYPOINT python /splash-dashboard/dashboard.py
+ENTRYPOINT cd /splash-dashboard && python dashboard.py
 EXPOSE 8050
