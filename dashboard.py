@@ -20,7 +20,7 @@ dawlish_lat_seawall = os.environ.get('DAWLISH_LAT_SEAWALL')
 dawlish_lon_seawall = os.environ.get('DAWLISH_LON_SEAWALL')
 penzance_lat_seawall = os.environ.get('PENZANCE_LAT_SEAWALL')
 penzance_lon_seawall = os.environ.get('PENZANCE_LON_SEAWALL')
-DEBUG = eval(capitalize(os.environ.get('DEBUG'))) #DEBUG must by True or False with first letter in caps and rest in lower case
+DEBUG = eval(os.environ.get('DEBUG').capitalize()) #DEBUG must by True or False with first letter in caps and rest in lower case
 
 PERCENTAGE_MIN_VAL_SLIDER = -100
 PERCENTAGE_MAX_VAL_SLIDER = 100
