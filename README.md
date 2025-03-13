@@ -15,7 +15,7 @@ SPLASH digital twin is based on AI models trained using field measurements of wa
 
 # Documentation
 
-Details about Splash project can be found in the following link: [Link text] (https://www.plymouth.ac.uk/research/coastal-processes/splash-project) 
+More details about Splash project can be found in the following link: https://www.plymouth.ac.uk/research/coastal-processes/splash-project 
 
 # Installation
 ## Run dashboard on any environment
