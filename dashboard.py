@@ -9,7 +9,7 @@ import requests
 import pandas as pd
 from matplotlib.colors import Normalize
 import utils
-import overtopping_graphs_component as ogc
+import overtopping_graphs_components as ogc
 from datetime import datetime, timedelta
 
 utils.loadConfigFile()
@@ -196,6 +196,7 @@ def render_dashboard():
     # Search components
     dropdown_panel = ogc.get_dropdown_panel()
 
+    # Forecast dates 
     start_date, end_date = get_default_forecast_dates()
 
     # Forecast range
