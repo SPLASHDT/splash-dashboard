@@ -12,6 +12,8 @@ def loadConfigFile():
 
     if environment == 'local':
         config_file_path = "config/.env"
+    elif environment == 'docker':
+        config_file_path = "config/.env.docker"
     elif environment == 'staging':
         config_file_path = "config/.env.staging"
     else: 
