@@ -47,6 +47,12 @@ def find_words_with_suffix(text, suffix):
     return bool(matches)
 
 
+def add_resource(base_url, resource):
+    if not resource:
+        return base_url
+    
+    return base_url + resource
+
 # Add query parameters to a base URL
 def add_query_params(base_url, params):
     """
@@ -102,8 +108,66 @@ def get_dataset_params(site_location_val):
     return option, start_date
 
 
-# Convert list to dataframe object
-def convert_list_to_dataframe(data_list):
+def convert_feature_list_to_df(data_list, feature_name):
+    if not isinstance(data_list, list):
+        return None
+
+    if not data_list:
+        return pd.DataFrame(columns=['time', feature_name])
+
+    try:
+        df_data = []
+        for item in data_list:
+            try:
+                time_obj = datetime.strptime(item['time'], "%a, %d %b %Y %H:%M:%S GMT")
+                time_str = time_obj.strftime("%Y-%m-%d %H:%M:%S")
+            except ValueError:
+                print(f"Warning: Invalid time format: {item['time']}")
+                time_str = None
+
+            df_data.append({
+                'time': time_str,
+                feature_name: item[feature_name]
+            })
+
+        df = pd.DataFrame(df_data)
+
+        # The key change: Reset the index to a numerical one starting from 0
+        df = df.reset_index(drop=True)  # drop=True discards the old index
+
+        return df
+    except (KeyError, TypeError) as e:
+        print(f'Error converting list to DataFrame: {e}')
+        return None
+    
+
+def convert_list_to_dataframe(json_data, list_key):
+    """
+    Converts a JSON list to a pandas DataFrame.
+
+    Args:
+        json_data (dict): The JSON data as a dictionary.
+        list_key (str): The key of the list within the JSON data.
+
+    Returns:
+        pandas.DataFrame: A DataFrame containing the list data, or None if an error occurs.
+    """
+    try:
+        # print(' json list: ', json_data)
+        data_list = json_data[list_key]
+        df = pd.DataFrame({list_key: data_list})
+        return df
+    except KeyError:
+        print(f"Error: Key '{list_key}' not found in JSON data.")
+        return None
+    except Exception as e:
+        print(f"An unexpected error occured: {e}")
+        return None
+  
+
+
+# Convert overtopping json data to dataframe object
+def convert_overtopping_data_to_df(data_list):
     """Converts a list of dictionaries to a Pandas DataFrame with a numerical index.
 
     Args:
