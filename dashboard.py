@@ -39,7 +39,9 @@ DASHBOARD_FULL_DESC_P1 = 'With sea level rise accelerating and weather extremes 
 DASHBOARD_FULL_DESC_P2 = 'The model has been developed at the University of Plymouth Coastal Processes Research Group (CPRG) as part of the SPLASH project. The project was part of the Twinning Capability for the Natural Environment (TWINE) programme, designed to harness the potential of digital twinning technology to transform environmental science. '
 DASHBOARD_FULL_DESC_P3 = 'SPLASH digital twin is based on AI models trained using field measurements of wave overtopping. The model is updated once a day and uses Met Office wave and wind data as input, as well as predicted water level. This tool provides overtopping forecast 5 days ahead for Dawlish and Penzance, and allows the user to modify wind and wave input variables to test the sensitivity of wave overtopping.'
 
-external_stylesheets = [dbc.themes.BOOTSTRAP, './assets/css/dashboard.css']
+external_stylesheets = [dbc.themes.BOOTSTRAP, 
+                        "https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&family=Viga&display=swap",
+                        "./assets/css/dashboard.css"]
 app = Dash(__name__, external_stylesheets=external_stylesheets)
 
 
