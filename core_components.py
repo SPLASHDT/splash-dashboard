@@ -3,6 +3,8 @@ import dash_bootstrap_components as dbc
 
 DASHBOARD_NAME = 'SPLASH'
 DASHBOARD_BRIEF_DESCRIPTION = 'DIGITAL APPROACHES TO PREDICT WAVE OVERTOPPING HAZARDS'
+ABOUT_SPLASH_LINK = 'https://www.plymouth.ac.uk/research/coastal-processes/splash-project'
+GITHUB_REPO_LINK = 'https://github.com/orgs/SPLASHDT/repositories'
 
 def get_header_components():
     header_components = [ 
@@ -18,8 +20,8 @@ def get_header_components():
         dbc.Col(
             html.Div(
                 children = [
-                    dbc.Button('About SPLASH', id='about-splash', href='https://www.plymouth.ac.uk/research/coastal-processes/splash-project', n_clicks=0, class_name='header-button'),
-                    html.Div(dbc.Button('Github repository', id='github-repo', href='https://github.com/orgs/SPLASHDT/repositories', n_clicks=0, class_name='header-button'), style={'paddingTop': '14px'}),
+                    dbc.Button('About SPLASH', id='about-splash', href=ABOUT_SPLASH_LINK, n_clicks=0, class_name='header-button'),
+                    html.Div(dbc.Button('Github repository', id='github-repo', href=GITHUB_REPO_LINK, n_clicks=0, class_name='header-button'), style={'paddingTop': '14px'}),
                 ], className='header-buttons-panel'
             ), md=4
         )
