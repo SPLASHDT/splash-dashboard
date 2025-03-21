@@ -12,13 +12,14 @@
 .splash-logo {
     width: 120.77px; 
     height: 102.19px;
-    margin-top: 15.61px
+}
+
+.splash-logo-panel {
+    margin-top: 79px
 }
 
 .title-sub-title-container {
-    width: 784.23px;
-    height: 121.31px; 
-    margin-left: 34.92px;
+    margin-left: 37px;
 }
 
 .dashboard-title {
@@ -29,6 +30,9 @@
     line-height: 104.66px; 
     letter-spacing: 2.62px; 
     word-wrap: break-word;
+    width: 340px;
+    height: 90px;
+    margin-top: 64px;
 }
 
 .dashboard-sub-title {
@@ -38,8 +42,8 @@
     font-weight: 600; 
     line-height: 31.31px; 
     letter-spacing: 0.83px; 
-    margin-top: 10px;
     word-wrap: break-word;
+    text-overflow: ellipsis;
 }
 
 .dashboard-description {
@@ -65,6 +69,32 @@
     line-height: 160%;
     padding: 0px;
     text-align: justify;
+}
+
+.header-buttons-panel {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    padding-top: 75px;
+}
+
+.header-button {
+    border-color: #2A5485;
+    background-color: white;
+    color: #2A5485;
+    text-align: center;
+    font-family: "Helvetica Neue";
+    font-size: 16px;
+    font-style: normal;
+    font-weight: 400;
+    line-height: 140%;
+    width: 228px;
+    height: 48px;
+    padding-top: 12px;
+    &.btn:hover {
+        background-color: #2A5485;
+        color: white;
+    }
 }
 
 .horizontal-line {

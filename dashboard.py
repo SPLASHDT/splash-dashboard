@@ -11,6 +11,7 @@ from matplotlib.colors import Normalize
 import utils
 import overtopping_graphs_components as ogc
 import feature_components as fc
+import core_components as cc
 from datetime import datetime, timedelta
 
 utils.loadConfigFile()
@@ -68,6 +69,7 @@ def get_penzance_wave_overtopping(api_url):
 
     return seawall_crest_overtopping_df, seawall_crest_sheltered_overtopping_df, start_date, end_date
 
+
 def get_features_data(root_endpoint, resource_name, params, feature_list_name, feature_name):
     resource_url = utils.add_resource(root_endpoint, resource_name)
     full_url = utils.add_query_params(resource_url, params)
@@ -77,7 +79,6 @@ def get_features_data(root_endpoint, resource_name, params, feature_list_name, f
     feature_df = utils.convert_feature_list_to_df(feature_overtopping_data[feature_list_name], feature_name)
     overtopping_times_df = utils.convert_feature_list_to_df(feature_overtopping_data['overtopping_times'], feature_name)
     return feature_df, overtopping_times_df
-   
 
 
 def get_all_features_data(root_endpoint, params):
@@ -213,6 +214,9 @@ def get_default_forecast_dates():
 # Render Splash dashboard
 def render_dashboard():
 
+    # Header components
+    header_panel = cc.get_header_components()
+
     # Search components
     dropdown_panel = ogc.get_dropdown_panel()
 
@@ -240,28 +244,10 @@ def render_dashboard():
         dcc.Store(id='previous-dataframe-2'),
         dcc.Store(id='current-dataframe-1'),
         dcc.Store(id='current-dataframe-2'),
-        dbc.Row([
-            html.Div(
-            children=[
-                html.Div(
-                    children=[
-                        html.Img(src='./assets/imgs/splash_logo.png', className='splash-logo'),  # Add image here
-                        html.Div(
-                            children=[
-                                html.Div(DASHBOARD_NAME, className='dashboard-title'),
-                                html.Div(DASHBOARD_BRIEF_DESCRIPTION, className='dashboard-sub-title')
-                            ],
-                            className='title-sub-title-container'
-                        )
-                    ],
-                    className='head-container'
-                )
-            ],
-            style={'paddingLeft': '72px'}
-        )]),
+        dbc.Row(header_panel, style={'paddingLeft': '72px', 'paddingRight': '62px'}),
         dbc.Row(
             html.Div(DASHBOARD_SUBTITLE, className='dashboard-description'),
-            style={'paddingLeft': '72px', 'paddingTop': '60px', 'paddingBottom': '5px'}
+            style={'paddingLeft': '72px', 'paddingTop': '51px', 'paddingBottom': '5px'}
         ),
         dbc.Row(
             dbc.Col([
