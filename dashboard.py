@@ -35,10 +35,16 @@ DEGREE_CHAR = '°'
 
 DASHBOARD_NAME = 'SPLASH'
 DASHBOARD_BRIEF_DESCRIPTION = 'DIGITAL APPROACHES TO PREDICT WAVE OVERTOPPING HAZARDS'
+CPRG_LINK = 'https://www.plymouth.ac.uk/research/coastal-processes'
+WIREWALL_LINK = 'https://coastalmonitoring.org/ccoresources/wirewall/'
+AI_MODELS_LINK = 'https://www.sciencedirect.com/science/article/pii/S1463500325000137'
 DASHBOARD_SUBTITLE = 'Advancing current understanding on wave-related coastal hazards'
 DASHBOARD_FULL_DESC_P1 = 'With sea level rise accelerating and weather extremes becoming increasingly stronger, tools to help climate adaptation of coastal communities are of paramount importance. SPLASH provides an overtopping tool that will act as forecast model directly helping coastal communities mitigate effects of this coastal hazard, and ultimately, guiding new climate adaptation strategies.'
-DASHBOARD_FULL_DESC_P2 = 'The model has been developed at the University of Plymouth Coastal Processes Research Group (CPRG) as part of the SPLASH project. The project was part of the Twinning Capability for the Natural Environment (TWINE) programme, designed to harness the potential of digital twinning technology to transform environmental science. '
-DASHBOARD_FULL_DESC_P3 = 'SPLASH digital twin is based on AI models trained using field measurements of wave overtopping. The model is updated once a day and uses Met Office wave and wind data as input, as well as predicted water level. This tool provides overtopping forecast 5 days ahead for Dawlish and Penzance, and allows the user to modify wind and wave input variables to test the sensitivity of wave overtopping.'
+DASHBOARD_FULL_DESC_P2_1 = 'The model has been developed at the University of Plymouth Coastal Processes Research Group ('
+DASHBOARD_FULL_DESC_P2_2 = ') as part of the SPLASH project. The project was part of the Twinning Capability for the Natural Environment (TWINE) programme, designed to harness the potential of digital twinning technology to transform environmental science. '
+DASHBOARD_FULL_DESC_P3_1 = 'SPLASH digital twin is based on '
+DASHBOARD_FULL_DESC_P3_2 = ' trained '
+DASHBOARD_FULL_DESC_P3_3 = '. The model is updated once a day and uses Met Office wave and wind data as input, as well as predicted water level. This tool provides overtopping forecast 5 days ahead for Dawlish and Penzance, and allows the user to modify wind and wave input variables to test the sensitivity of wave overtopping.'
 
 external_stylesheets = [dbc.themes.BOOTSTRAP, 
                         "https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&family=Viga&display=swap",
@@ -252,8 +258,8 @@ def render_dashboard():
         dbc.Row(
             dbc.Col([
                 html.P(DASHBOARD_FULL_DESC_P1, className='dashboard-summary'),
-                html.P(DASHBOARD_FULL_DESC_P2, className='dashboard-summary'),
-                html.P(DASHBOARD_FULL_DESC_P3, className='dashboard-summary'),
+                html.P([DASHBOARD_FULL_DESC_P2_1, html.A('CPRG', href=CPRG_LINK), DASHBOARD_FULL_DESC_P2_2], className='dashboard-summary'),
+                html.P([DASHBOARD_FULL_DESC_P3_1, html.A('AI models', href=AI_MODELS_LINK), DASHBOARD_FULL_DESC_P3_2, html.A('using field measurements of wave overtopping', href=WIREWALL_LINK), DASHBOARD_FULL_DESC_P3_3], className='dashboard-summary'),
             ], md=9, style={'paddingLeft': '0', 'paddingRight': '0'}),
             style={'paddingLeft': '72px', 'paddingRight': '72px'}
         ),
