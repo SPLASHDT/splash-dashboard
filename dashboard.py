@@ -1,4 +1,4 @@
-from dash import Dash, dcc, html, Input, Output, State, ctx
+from dash import Dash, dcc, html, Input, Output, State, ctx, DiskcacheManager, CeleryManager, callback
 import plotly.express as px
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
@@ -216,7 +216,6 @@ def get_default_forecast_dates():
     return str_start_date, str_end_date
 
 
-
 # Render Splash dashboard
 def render_dashboard():
 
@@ -313,6 +312,13 @@ def render_dashboard():
 render_dashboard()
 
 
+def render_feature_line_plots(location_name, swh_df, swh_overtopping_times_df, tidal_level_df, tl_overtopping_times_df, wind_speed_df, ws_overtopping_times_df):
+    swh_fig = fc.render_feature_plot(location_name + ' - Significant wave height', swh_df, 'significant_wave_height', 'Significant Wave Height (Hm)', 0, 5, swh_overtopping_times_df)
+    tidal_level_fig = fc.render_feature_plot(location_name + ' - Tidal Level ', tidal_level_df, 'tidal_level', 'Tidal Level (m)', 0, 6, tl_overtopping_times_df)
+    wind_speed_fig = fc.render_feature_plot(location_name + ' - Wind Speed ', wind_speed_df, 'wind_speed', 'Wind Speed (m/s)', 0, 25, ws_overtopping_times_df)
+    return swh_fig, tidal_level_fig, wind_speed_fig
+
+
 def get_dataframes_to_save(n_clicks, trigger_id, generated_df_1, generated_df_2, stored_current_df_1, stored_current_df_2):
     if n_clicks is None or n_clicks == 0 or trigger_id is not None and trigger_id != 'submit-button':
         tmp_previous_df_1 = pd.DataFrame()
@@ -329,6 +335,10 @@ def get_dataframes_to_save(n_clicks, trigger_id, generated_df_1, generated_df_2,
         tmp_current_df_1 = generated_df_1
         tmp_current_df_2 = generated_df_2
     return tmp_previous_df_1, tmp_previous_df_2, tmp_current_df_1, tmp_current_df_2
+
+
+def get_overtopping_data_stage(trigger_id):
+    return 'forecast' if trigger_id is None or trigger_id == 'dd_site_location' else 'adjusted_forecast'
 
 
 # Callback to render overtopping graphs when picking a location or submitting any variable
@@ -376,14 +386,12 @@ def submit_slider_values(submit_n_clicks, site_location_val, sig_wave_height_val
         api_url = utils.add_resource(DAWLISH_API_ROOT_ENDPOINT, 'wave-overtopping')
         api_url = utils.add_query_params(api_url, params)
         data_dawlish_seawall_crest, data_dawlish_railway_line, forecast_start_date, forecast_end_date = get_dawlish_wave_overtopping(api_url)       
-        
-        swh_df, swh_overtopping_times_df, tidal_level_df, tl_overtopping_times_df, wind_speed_df, ws_overtopping_times_df = get_all_features_data(DAWLISH_API_ROOT_ENDPOINT, params)
-        swh_fig = fc.render_feature_plot('Dawlish - Significant wave height', swh_df, 'significant_wave_height', 'Significant Wave Height (Hm)', 0, 5, swh_overtopping_times_df)
-        tidal_level_fig = fc.render_feature_plot('Dawlish - Tidal Level ', tidal_level_df, 'tidal_level', 'Tidal Level (m)', 0, 6, tl_overtopping_times_df)
-        wind_speed_fig = fc.render_feature_plot('Dawlish - Wind Speed ', wind_speed_df, 'wind_speed', 'Wind Speed (m/s)', 0, 25, ws_overtopping_times_df)
 
-        data_dawlish_seawall_crest['stage'] = 'forecast' if trigger_id is None or trigger_id == 'dd_site_location' else 'adjusted_forecast'
-        data_dawlish_railway_line['stage'] = 'forecast' if trigger_id is None or trigger_id == 'dd_site_location' else 'adjusted_forecast'
+        swh_df, swh_overtopping_times_df, tidal_level_df, tl_overtopping_times_df, wind_speed_df, ws_overtopping_times_df = get_all_features_data(DAWLISH_API_ROOT_ENDPOINT, params)
+        swh_fig, tidal_level_fig, wind_speed_fig = render_feature_line_plots('Dawlish', swh_df, swh_overtopping_times_df, tidal_level_df, tl_overtopping_times_df, wind_speed_df, ws_overtopping_times_df)
+
+        data_dawlish_seawall_crest['stage'] = get_overtopping_data_stage(trigger_id)
+        data_dawlish_railway_line['stage'] = get_overtopping_data_stage(trigger_id)
         tmp_previous_df_1, tmp_previous_df_2, tmp_current_df_1, tmp_current_df_2 = get_dataframes_to_save(submit_n_clicks, trigger_id, data_dawlish_seawall_crest, data_dawlish_railway_line, current_df_1, current_df_2)
         joined_dsc = pd.concat([tmp_previous_df_1, tmp_current_df_1], ignore_index=True)
         joined_drl = pd.concat([tmp_previous_df_2, tmp_current_df_2], ignore_index=True)
@@ -395,12 +403,10 @@ def submit_slider_values(submit_n_clicks, site_location_val, sig_wave_height_val
         data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered, forecast_start_date, forecast_end_date = get_penzance_wave_overtopping(api_url)
 
         swh_df, swh_overtopping_times_df, tidal_level_df, tl_overtopping_times_df, wind_speed_df, ws_overtopping_times_df = get_all_features_data(PENZANCE_API_ROOT_ENDPOINT, params)
-        swh_fig = fc.render_feature_plot('Penzance - Significant wave height', swh_df, 'significant_wave_height', 'Significant Wave Height (Hm)', 0, 5, swh_overtopping_times_df)
-        tidal_level_fig = fc.render_feature_plot('Penzance - Tidal Level ', tidal_level_df, 'tidal_level', 'Tidal Level (m)', 0, 6, tl_overtopping_times_df)
-        wind_speed_fig = fc.render_feature_plot('Penzance - Wind Speed ', wind_speed_df, 'wind_speed', 'Wind Speed (m/s)', 0, 25, ws_overtopping_times_df)
+        swh_fig, tidal_level_fig, wind_speed_fig = render_feature_line_plots('Penzance', swh_df, swh_overtopping_times_df, tidal_level_df, tl_overtopping_times_df, wind_speed_df, ws_overtopping_times_df)
 
-        data_penzance_seawall_crest['stage'] = 'forecast' if trigger_id is None or trigger_id == 'dd_site_location' else 'adjusted_forecast'
-        data_penzance_seawall_crest_sheltered['stage'] = 'forecast' if trigger_id is None or trigger_id == 'dd_site_location' else 'adjusted_forecast'
+        data_penzance_seawall_crest['stage'] = get_overtopping_data_stage(trigger_id)
+        data_penzance_seawall_crest_sheltered['stage'] = get_overtopping_data_stage(trigger_id)
         tmp_previous_df_1, tmp_previous_df_2, tmp_current_df_1, tmp_current_df_2 = get_dataframes_to_save(submit_n_clicks, trigger_id, data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered, current_df_1, current_df_2)
         joined_psc = pd.concat([tmp_previous_df_1, tmp_current_df_1], ignore_index=True)
         joined_pscs = pd.concat([tmp_previous_df_2, tmp_current_df_2], ignore_index=True)
