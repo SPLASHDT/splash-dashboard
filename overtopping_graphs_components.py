@@ -499,7 +499,8 @@ def get_dropdown_panel():
                 options=['Dawlish', 'Penzance', 'Dawlish Storm Bert - overtopping', 'Penzance Storm Bert - overtopping', 'Dawlish - no overtopping', 'Penzance - no overtopping'],
                 value='Dawlish',
                 clearable=False,
-                className='site-dropdown'
+                className='site-dropdown',
+                optionHeight=44.39
             )
         ], 
         className='label-dropdown'

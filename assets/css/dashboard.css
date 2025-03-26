@@ -238,6 +238,12 @@
 .site-dropdown {
     color: var(--Black, #222);
     width: 349px;
+    .Select-control{
+      height: 44.39px;  
+      .Select-value {
+            top: 4px;
+      }
+    }
 }
 
 .label-dropdown {
