@@ -603,4 +603,4 @@ def update_slider(slider_value, n_clicks_inc, n_clicks_dec, n_clicks_reset, n_cl
 
 # Run the app
 if __name__ == "__main__":
-    app.run(debug=True, port=8060)
+    app.run(debug=True)
