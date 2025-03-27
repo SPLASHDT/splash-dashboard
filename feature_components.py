@@ -28,14 +28,21 @@ def render_feature_plot(plot_title, prev_feature_data, cur_feature_data, feature
     forecast_feature_desc, adjusted_feature_desc = features_description
     forecast_overtopping_evt_desc, adjusted_overtopping_evt_desc = overtopping_evts_desc
 
-    render_feature_scatter_plot(feature_fig, cur_feature_data, feature_name, forecast_feature_desc, '#000', True)
-    render_overtopping_events_plot(feature_fig, cur_overtopping_times_df, feature_name, forecast_overtopping_evt_desc, '#000')
-
     if not prev_feature_data.empty:
-        render_feature_scatter_plot(feature_fig, prev_feature_data, feature_name, adjusted_feature_desc, '#808080')
+        is_forecast_data = False
+        forecast_marker_color = '#808080'
+        render_feature_scatter_plot(feature_fig, prev_feature_data, feature_name, forecast_feature_desc, '#000')
+    else:
+        is_forecast_data = True
+        forecast_marker_color = '#000'
+        adjusted_feature_desc = forecast_feature_desc
+        adjusted_overtopping_evt_desc = forecast_overtopping_evt_desc
 
     if not prev_overtopping_times_df.empty:
-        render_overtopping_events_plot(feature_fig, prev_overtopping_times_df, feature_name, adjusted_overtopping_evt_desc, '#808080')
+        render_overtopping_events_plot(feature_fig, prev_overtopping_times_df, feature_name, forecast_overtopping_evt_desc, '#000')
+
+    render_feature_scatter_plot(feature_fig, cur_feature_data, feature_name, adjusted_feature_desc, forecast_marker_color, is_forecast_data)
+    render_overtopping_events_plot(feature_fig, cur_overtopping_times_df, feature_name, adjusted_overtopping_evt_desc, forecast_marker_color)
 
     if show_dynamic_y_axis:
         y_axis_dict = dict(
