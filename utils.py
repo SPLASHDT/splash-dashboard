@@ -153,7 +153,6 @@ def convert_list_to_dataframe(json_data, list_key):
         pandas.DataFrame: A DataFrame containing the list data, or None if an error occurs.
     """
     try:
-        # print(' json list: ', json_data)
         data_list = json_data[list_key]
         df = pd.DataFrame({list_key: data_list})
         return df
@@ -209,4 +208,39 @@ def convert_overtopping_data_to_df(data_list):
     except (KeyError, TypeError) as e:
         print(f'Error converting list to DataFrame: {e}')
         return None
+
+
+def get_dataframes_to_save(n_clicks, trigger_id, dfs_to_store):
+    """
+    Function to retrieve and organize DataFrames.
+
+    Args:
+        n_clicks: Click count.
+        trigger_id: Trigger ID.
+        dfs_to_store: List of DataFrames to process (should have an even length).
+
+    Returns:
+        Tuple of DataFrames (previous and current).
+    """
+    if len(dfs_to_store) % 2 != 0:
+        raise ValueError("dfs_to_store must have an even number of elements.")
+
+    results = []
+    for i in range(0, len(dfs_to_store), 2):
+        previous_df, current_df = get_dataframe_to_save(n_clicks, trigger_id, dfs_to_store[i], dfs_to_store[i + 1])
+        results.extend([previous_df, current_df])
+    return tuple(results)
+
+
+def get_dataframe_to_save(n_clicks, trigger_id, generated_df, stored_current_df):
+    if n_clicks is None or n_clicks == 0 or trigger_id is not None and trigger_id != 'submit-button':
+        tmp_previous_df = pd.DataFrame()
+        tmp_current_df = generated_df
+    else:
+        saved_current_df = pd.DataFrame(stored_current_df)
+        saved_current_df['stage'] = 'forecast'
+        tmp_previous_df = saved_current_df
+        tmp_current_df = generated_df
+
+    return tmp_previous_df, tmp_current_df
 

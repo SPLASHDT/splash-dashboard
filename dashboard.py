@@ -251,6 +251,18 @@ def render_dashboard():
         dcc.Store(id='previous-dataframe-2'),
         dcc.Store(id='current-dataframe-1'),
         dcc.Store(id='current-dataframe-2'),
+        dcc.Store(id='previous-swh'),
+        dcc.Store(id='current-swh'),
+        dcc.Store(id='previous-swh-ot'),
+        dcc.Store(id='current-swh-ot'),
+        dcc.Store(id='previous-tidal-level'),
+        dcc.Store(id='current-tidal-level'),
+        dcc.Store(id='previous-tidal-level-ot'),
+        dcc.Store(id='current-tidal-level-ot'),
+        dcc.Store(id='previous-wind-speed'),
+        dcc.Store(id='current-wind-speed'),
+        dcc.Store(id='previous-wind-speed-ot'),
+        dcc.Store(id='current-wind-speed-ot'),
         dbc.Row(header_panel, style={'paddingLeft': '72px', 'paddingRight': '62px'}),
         dbc.Row(
             html.Div(DASHBOARD_SUBTITLE, className='dashboard-description'),
@@ -314,33 +326,43 @@ def render_dashboard():
 render_dashboard()
 
 
-def render_feature_line_plots(location_name, swh_df, swh_overtopping_times_df, tidal_level_df, tl_overtopping_times_df, wind_speed_df, ws_overtopping_times_df):
-    swh_fig = fc.render_feature_plot(location_name + ' - Significant wave height', swh_df, 'significant_wave_height', 'Significant Wave Height (Hm)', 0, 5, swh_overtopping_times_df)
-    tidal_level_fig = fc.render_feature_plot(location_name + ' - Tidal Level ', tidal_level_df, 'tidal_level', 'Tidal Level (m)', 0, 6, tl_overtopping_times_df)
-    wind_speed_fig = fc.render_feature_plot(location_name + ' - Wind Speed ', wind_speed_df, 'wind_speed', 'Wind Speed (m/s)', 0, 30, ws_overtopping_times_df)
+def render_feature_line_plots(location_name, variables_ot_dfs, show_dynamic_y_axis):
+    prev_swh_df, cur_swh_df, prev_swh_ot_df, cur_swh_overtopping_times_df, prev_tl_df, cur_tidal_level_df, prev_tl_ot_df, cur_tl_overtopping_times_df, prev_ws_df, cur_wind_speed_df, prev_ws_ot_df, cur_ws_overtopping_times_df = variables_ot_dfs
+    features_description = tuple(['Significant wave height (Hm)', 'Adjusted significant wave height (Hm)'])
+    overtopping_evts_desc = tuple(['Overtopping event', 'Adjusted overtopping event'])
+    swh_fig = fc.render_feature_plot(location_name + ' - Significant wave height', prev_swh_df, cur_swh_df, 'significant_wave_height', features_description, overtopping_evts_desc, 0, 5, prev_swh_ot_df, cur_swh_overtopping_times_df, show_dynamic_y_axis)
+    features_description = tuple(['Tidal level (m)', 'Adjusted tidal level (m)'])
+    tidal_level_fig = fc.render_feature_plot(location_name + ' - Tidal Level ', prev_tl_df, cur_tidal_level_df, 'tidal_level', features_description, overtopping_evts_desc, 0, 6, prev_tl_ot_df, cur_tl_overtopping_times_df, show_dynamic_y_axis)
+    features_description = tuple(['Wind speed (m/s)', 'Adjusted wind speed (m/s)'])
+    wind_speed_fig = fc.render_feature_plot(location_name + ' - Wind Speed ', prev_ws_df, cur_wind_speed_df, 'wind_speed', features_description, overtopping_evts_desc, 0, 25, prev_ws_ot_df, cur_ws_overtopping_times_df, show_dynamic_y_axis)
     return swh_fig, tidal_level_fig, wind_speed_fig
-
-
-def get_dataframes_to_save(n_clicks, trigger_id, generated_df_1, generated_df_2, stored_current_df_1, stored_current_df_2):
-    if n_clicks is None or n_clicks == 0 or trigger_id is not None and trigger_id != 'submit-button':
-        tmp_previous_df_1 = pd.DataFrame()
-        tmp_previous_df_2 = pd.DataFrame()
-        tmp_current_df_1 = generated_df_1
-        tmp_current_df_2 = generated_df_2
-    else:
-        saved_current_df_1 = pd.DataFrame(stored_current_df_1)
-        saved_current_df_2 = pd.DataFrame(stored_current_df_2)
-        saved_current_df_1['stage'] = 'forecast'
-        saved_current_df_2['stage'] = 'forecast'
-        tmp_previous_df_1 = saved_current_df_1
-        tmp_previous_df_2 = saved_current_df_2
-        tmp_current_df_1 = generated_df_1
-        tmp_current_df_2 = generated_df_2
-    return tmp_previous_df_1, tmp_previous_df_2, tmp_current_df_1, tmp_current_df_2
 
 
 def get_overtopping_data_stage(trigger_id):
     return 'forecast' if trigger_id is None or trigger_id == 'dd_site_location' else 'adjusted_forecast'
+
+
+def get_final_overtopping_dfs(dawlish_first_loc_data, current_df_1, dawlish_second_loc_data, current_df_2, trigger_id, submit_n_clicks):
+    dawlish_first_loc_data['stage'] = get_overtopping_data_stage(trigger_id)
+    dawlish_second_loc_data['stage'] = get_overtopping_data_stage(trigger_id)
+
+    dfs_to_store = [dawlish_first_loc_data, current_df_1, dawlish_second_loc_data, current_df_2]
+    tmp_previous_df_1, tmp_current_df_1, tmp_previous_df_2, tmp_current_df_2 = utils.get_dataframes_to_save(submit_n_clicks, trigger_id, dfs_to_store)
+    joined_dsc = pd.concat([tmp_previous_df_1, tmp_current_df_1], ignore_index=True)
+    joined_drl = pd.concat([tmp_previous_df_2, tmp_current_df_2], ignore_index=True)
+    return joined_dsc, joined_drl, tmp_previous_df_1, tmp_current_df_1, tmp_previous_df_2, tmp_current_df_2
+
+
+def get_final_variables_dfs(swh_df, current_swh_df, swh_overtopping_times_df, current_swh_ot_df, tidal_level_df, curren_tl_df, tl_overtopping_times_df, current_tl_ot_df, wind_speed_df, current_ws_df, ws_overtopping_times_df, current_ws_ot_df, trigger_id, submit_n_clicks):
+    swh_df['stage'] = get_overtopping_data_stage(trigger_id)
+    tidal_level_df['stage'] = get_overtopping_data_stage(trigger_id)
+    wind_speed_df['stage'] = get_overtopping_data_stage(trigger_id)
+
+    dfs_to_store = [swh_df, current_swh_df, swh_overtopping_times_df, current_swh_ot_df, tidal_level_df, curren_tl_df, tl_overtopping_times_df, current_tl_ot_df, wind_speed_df, current_ws_df, ws_overtopping_times_df, current_ws_ot_df]
+    final_prev_swh_df, final_cur_swh_df, final_prev_swh_ot_df, final_cur_swh_ot_df, final_prev_tl_df, final_cur_tl_df, final_prev_tl_ot_df, final_cur_tl_ot_df, final_prev_ws_df, final_cur_ws_df, final_prev_ws_ot_df, final_cur_ws_ot_df = utils.get_dataframes_to_save(submit_n_clicks, trigger_id, dfs_to_store)
+
+    dfs_to_store = tuple([final_prev_swh_df, final_cur_swh_df, final_prev_swh_ot_df, final_cur_swh_ot_df, final_prev_tl_df, final_cur_tl_df, final_prev_tl_ot_df, final_cur_tl_ot_df, final_prev_ws_df, final_cur_ws_df, final_prev_ws_ot_df, final_cur_ws_ot_df])
+    return dfs_to_store, final_prev_swh_df, final_cur_swh_df, final_prev_swh_ot_df, final_cur_swh_ot_df, final_prev_tl_df, final_cur_tl_df, final_prev_tl_ot_df, final_cur_tl_ot_df, final_prev_ws_df, final_cur_ws_df, final_prev_ws_ot_df, final_cur_ws_ot_df
 
 
 # Callback to render overtopping graphs when picking a location or submitting any variable
@@ -357,6 +379,18 @@ def get_overtopping_data_stage(trigger_id):
      Output('line-plot-swh', 'figure'),
      Output('line-plot-tidal-level', 'figure'),
      Output('line-plot-wind-speed', 'figure'),
+     Output('previous-swh', 'data'),
+     Output('current-swh', 'data'),
+     Output('previous-swh-ot', 'data'),
+     Output('current-swh-ot', 'data'),
+     Output('previous-tidal-level', 'data'),
+     Output('current-tidal-level', 'data'),
+     Output('previous-tidal-level-ot', 'data'),
+     Output('current-tidal-level-ot', 'data'),
+     Output('previous-wind-speed', 'data'),
+     Output('current-wind-speed', 'data'),
+     Output('previous-wind-speed-ot', 'data'),
+     Output('current-wind-speed-ot', 'data'),
     ],
     Input('submit-button', 'n_clicks'),
     Input('dd_site_location', 'value'),
@@ -370,9 +404,16 @@ def get_overtopping_data_stage(trigger_id):
     State('previous-dataframe-2', 'data'),
     State('current-dataframe-1', 'data'),
     State('current-dataframe-2', 'data'),
+    State('current-swh', 'data'),
+    State('current-swh-ot', 'data'),
+    State('current-tidal-level', 'data'),
+    State('current-tidal-level-ot', 'data'),
+    State('current-wind-speed', 'data'),
+    State('current-wind-speed-ot', 'data'),
 )
-def submit_slider_values(submit_n_clicks, site_location_val, sig_wave_height_val, freeboard_val, mean_wave_period_val, mean_wave_dir_val, wind_speed_val, wind_dir_val, previous_df_1, previous_df_2, current_df_1, current_df_2):
+def submit_slider_values(submit_n_clicks, site_location_val, sig_wave_height_val, freeboard_val, mean_wave_period_val, mean_wave_dir_val, wind_speed_val, wind_dir_val, previous_df_1, previous_df_2, current_df_1, current_df_2, current_swh_df, current_swh_ot_df, curren_tl_df, current_tl_ot_df, current_ws_df, current_ws_ot_df):
     trigger_id =  ctx.triggered_id
+    dfs_to_store = []
     if submit_n_clicks is None or submit_n_clicks == 0 or trigger_id is not None and trigger_id != 'submit-button':
         option, start_date = utils.get_dataset_params(site_location_val)
         params = {'start_date': start_date, 'option': option}
@@ -387,38 +428,37 @@ def submit_slider_values(submit_n_clicks, site_location_val, sig_wave_height_val
     if utils.find_words_with_suffix(site_location_val, 'Dawlish'):
         api_url = utils.add_resource(DAWLISH_API_ROOT_ENDPOINT, 'wave-overtopping')
         api_url = utils.add_query_params(api_url, params)
-        data_dawlish_seawall_crest, data_dawlish_railway_line, forecast_start_date, forecast_end_date = get_dawlish_wave_overtopping(api_url)       
-
+        dawlish_seawall_crest_data, dawlish_railway_line_data, forecast_start_date, forecast_end_date = get_dawlish_wave_overtopping(api_url)       
         swh_df, swh_overtopping_times_df, tidal_level_df, tl_overtopping_times_df, wind_speed_df, ws_overtopping_times_df = get_all_features_data(DAWLISH_API_ROOT_ENDPOINT, params)
-        swh_fig, tidal_level_fig, wind_speed_fig = render_feature_line_plots('Dawlish', swh_df, swh_overtopping_times_df, tidal_level_df, tl_overtopping_times_df, wind_speed_df, ws_overtopping_times_df)
 
-        data_dawlish_seawall_crest['stage'] = get_overtopping_data_stage(trigger_id)
-        data_dawlish_railway_line['stage'] = get_overtopping_data_stage(trigger_id)
-        tmp_previous_df_1, tmp_previous_df_2, tmp_current_df_1, tmp_current_df_2 = get_dataframes_to_save(submit_n_clicks, trigger_id, data_dawlish_seawall_crest, data_dawlish_railway_line, current_df_1, current_df_2)
-        joined_dsc = pd.concat([tmp_previous_df_1, tmp_current_df_1], ignore_index=True)
-        joined_drl = pd.concat([tmp_previous_df_2, tmp_current_df_2], ignore_index=True)
+        joined_dsc, joined_drl, tmp_previous_df_1, tmp_current_df_1, tmp_previous_df_2, tmp_current_df_2= get_final_overtopping_dfs(dawlish_seawall_crest_data, current_df_1, dawlish_railway_line_data, current_df_2, trigger_id, submit_n_clicks)
         fig_dawlish_seawall_crest = ogc.render_dawlish_seawall_crest_graph(joined_dsc)
         fig_dawlish_railway_line = ogc.render_dawlish_railway_line_graph(joined_drl)
+
+        show_dynamic_y_axis = trigger_id == 'submit-button'
+        dfs_to_store, final_prev_swh_df, final_cur_swh_df, final_prev_swh_ot_df, final_cur_swh_ot_df, final_prev_tl_df, final_cur_tl_df, final_prev_tl_ot_df, final_cur_tl_ot_df, final_prev_ws_df, final_cur_ws_df, final_prev_ws_ot_df, final_cur_ws_ot_df = get_final_variables_dfs(swh_df, current_swh_df, swh_overtopping_times_df, current_swh_ot_df, tidal_level_df, curren_tl_df, tl_overtopping_times_df, current_tl_ot_df, wind_speed_df, current_ws_df, ws_overtopping_times_df, current_ws_ot_df, trigger_id, submit_n_clicks)
+        swh_fig, tidal_level_fig, wind_speed_fig = render_feature_line_plots('Dawlish', dfs_to_store, show_dynamic_y_axis)
+
     else:
         api_url = utils.add_resource(PENZANCE_API_ROOT_ENDPOINT, 'wave-overtopping')
         api_url = utils.add_query_params(api_url, params)
         data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered, forecast_start_date, forecast_end_date = get_penzance_wave_overtopping(api_url)
 
         swh_df, swh_overtopping_times_df, tidal_level_df, tl_overtopping_times_df, wind_speed_df, ws_overtopping_times_df = get_all_features_data(PENZANCE_API_ROOT_ENDPOINT, params)
-        swh_fig, tidal_level_fig, wind_speed_fig = render_feature_line_plots('Penzance', swh_df, swh_overtopping_times_df, tidal_level_df, tl_overtopping_times_df, wind_speed_df, ws_overtopping_times_df)
 
-        data_penzance_seawall_crest['stage'] = get_overtopping_data_stage(trigger_id)
-        data_penzance_seawall_crest_sheltered['stage'] = get_overtopping_data_stage(trigger_id)
-        tmp_previous_df_1, tmp_previous_df_2, tmp_current_df_1, tmp_current_df_2 = get_dataframes_to_save(submit_n_clicks, trigger_id, data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered, current_df_1, current_df_2)
-        joined_psc = pd.concat([tmp_previous_df_1, tmp_current_df_1], ignore_index=True)
-        joined_pscs = pd.concat([tmp_previous_df_2, tmp_current_df_2], ignore_index=True)
+        joined_psc, joined_pscs, tmp_previous_df_1, tmp_current_df_1, tmp_previous_df_2, tmp_current_df_2= get_final_overtopping_dfs(data_penzance_seawall_crest, current_df_1, data_penzance_seawall_crest_sheltered, current_df_2, trigger_id, submit_n_clicks)
         fig_penzance_seawall_crest = ogc.render_penzance_seawall_crest_graph(joined_psc)
         fig_penzance_seawall_crest_sheltered = ogc.render_penzance_seawall_crest_sheltered_graph(joined_pscs)
+
+        show_dynamic_y_axis = trigger_id == 'submit-button'
+        dfs_to_store, final_prev_swh_df, final_cur_swh_df, final_prev_swh_ot_df, final_cur_swh_ot_df, final_prev_tl_df, final_cur_tl_df, final_prev_tl_ot_df, final_cur_tl_ot_df, final_prev_ws_df, final_cur_ws_df, final_prev_ws_ot_df, final_cur_ws_ot_df = get_final_variables_dfs(swh_df, current_swh_df, swh_overtopping_times_df, current_swh_ot_df, tidal_level_df, curren_tl_df, tl_overtopping_times_df, current_tl_ot_df, wind_speed_df, current_ws_df, ws_overtopping_times_df, current_ws_ot_df, trigger_id, submit_n_clicks)
+        swh_fig, tidal_level_fig, wind_speed_fig = render_feature_line_plots('Penzance', dfs_to_store, show_dynamic_y_axis)
+
     
     fig1 = fig_dawlish_seawall_crest if utils.find_words_with_suffix(site_location_val, 'Dawlish') else fig_penzance_seawall_crest
     fig2 = fig_penzance_seawall_crest_sheltered if utils.find_words_with_suffix(site_location_val, 'Penzance') else fig_dawlish_railway_line
     
-    return fig1, fig2, tmp_previous_df_1.to_dict('records'), tmp_previous_df_2.to_dict('records'), tmp_current_df_1.to_dict('records'), tmp_current_df_2.to_dict('records'), forecast_start_date, forecast_end_date, full_legend, swh_fig, tidal_level_fig, wind_speed_fig
+    return fig1, fig2, tmp_previous_df_1.to_dict('records'), tmp_previous_df_2.to_dict('records'), tmp_current_df_1.to_dict('records'), tmp_current_df_2.to_dict('records'), forecast_start_date, forecast_end_date, full_legend, swh_fig, tidal_level_fig, wind_speed_fig, final_prev_swh_df.to_dict('records'), final_cur_swh_df.to_dict('records'), final_prev_swh_ot_df.to_dict('records'), final_cur_swh_ot_df.to_dict('records'), final_prev_tl_df.to_dict('records'), final_cur_tl_df.to_dict('records'), final_prev_tl_ot_df.to_dict('records'), final_cur_tl_ot_df.to_dict('records'), final_prev_ws_df.to_dict('records'), final_cur_ws_df.to_dict('records'), final_prev_ws_ot_df.to_dict('records'), final_cur_ws_ot_df.to_dict('records')
 
 
 # Callback for significant wave height slider
