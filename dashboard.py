@@ -425,6 +425,8 @@ def submit_slider_values(submit_n_clicks, site_location_val, sig_wave_height_val
 
     show_full_legend = False if trigger_id is None or trigger_id == 'dd_site_location' else True
     full_legend = ogc.get_full_legend(show_full_legend)
+    show_dynamic_y_axis = trigger_id == 'submit-button'
+
     if utils.find_words_with_suffix(site_location_val, 'Dawlish'):
         api_url = utils.add_resource(DAWLISH_API_ROOT_ENDPOINT, 'wave-overtopping')
         api_url = utils.add_query_params(api_url, params)
@@ -435,7 +437,6 @@ def submit_slider_values(submit_n_clicks, site_location_val, sig_wave_height_val
         fig_dawlish_seawall_crest = ogc.render_dawlish_seawall_crest_graph(joined_dsc)
         fig_dawlish_railway_line = ogc.render_dawlish_railway_line_graph(joined_drl)
 
-        show_dynamic_y_axis = trigger_id == 'submit-button'
         dfs_to_store, final_prev_swh_df, final_cur_swh_df, final_prev_swh_ot_df, final_cur_swh_ot_df, final_prev_tl_df, final_cur_tl_df, final_prev_tl_ot_df, final_cur_tl_ot_df, final_prev_ws_df, final_cur_ws_df, final_prev_ws_ot_df, final_cur_ws_ot_df = get_final_variables_dfs(swh_df, current_swh_df, swh_overtopping_times_df, current_swh_ot_df, tidal_level_df, curren_tl_df, tl_overtopping_times_df, current_tl_ot_df, wind_speed_df, current_ws_df, ws_overtopping_times_df, current_ws_ot_df, trigger_id, submit_n_clicks)
         swh_fig, tidal_level_fig, wind_speed_fig = render_feature_line_plots('Dawlish', dfs_to_store, show_dynamic_y_axis)
 
@@ -450,7 +451,6 @@ def submit_slider_values(submit_n_clicks, site_location_val, sig_wave_height_val
         fig_penzance_seawall_crest = ogc.render_penzance_seawall_crest_graph(joined_psc)
         fig_penzance_seawall_crest_sheltered = ogc.render_penzance_seawall_crest_sheltered_graph(joined_pscs)
 
-        show_dynamic_y_axis = trigger_id == 'submit-button'
         dfs_to_store, final_prev_swh_df, final_cur_swh_df, final_prev_swh_ot_df, final_cur_swh_ot_df, final_prev_tl_df, final_cur_tl_df, final_prev_tl_ot_df, final_cur_tl_ot_df, final_prev_ws_df, final_cur_ws_df, final_prev_ws_ot_df, final_cur_ws_ot_df = get_final_variables_dfs(swh_df, current_swh_df, swh_overtopping_times_df, current_swh_ot_df, tidal_level_df, curren_tl_df, tl_overtopping_times_df, current_tl_ot_df, wind_speed_df, current_ws_df, ws_overtopping_times_df, current_ws_ot_df, trigger_id, submit_n_clicks)
         swh_fig, tidal_level_fig, wind_speed_fig = render_feature_line_plots('Penzance', dfs_to_store, show_dynamic_y_axis)
 
