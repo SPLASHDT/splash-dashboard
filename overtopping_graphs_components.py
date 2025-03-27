@@ -34,7 +34,7 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
         dict(
             source="./assets/imgs/" + plot_logo,
             xref="paper", yref="paper",
-            x=0.25, y=1,  # Adjust position as needed
+            x=0.22, y=1,  # Adjust position as needed
             sizex=0.06, sizey=0.06,  # Adjust size as needed
             xanchor="left", yanchor="bottom"
         )
@@ -149,7 +149,7 @@ def get_variable_slider(identifier, min_value, max_value, default_value, templat
                 html.Button(
                     id=decrease_btn_id,
                     children = [
-                        html.Img(src='./assets/imgs/minus-icon.png', className='action-button-img'),
+                        html.Img(src='./assets/imgs/minus-icon.svg', className='action-button-img'),
                     ],
                     className='action-button'
                 ),
@@ -170,7 +170,7 @@ def get_variable_slider(identifier, min_value, max_value, default_value, templat
                 html.Button(
                     id=increase_btn_id,
                     children = [
-                        html.Img(src='./assets/imgs/plus-icon.png', className='action-button-img'),
+                        html.Img(src='./assets/imgs/plus-icon.svg', className='action-button-img'),
                     ],
                     className='action-button'
                 ),
@@ -190,7 +190,7 @@ def get_wave_variables_panels():
                 dbc.Card(
                     dbc.CardBody([
                         html.Div(
-                            dbc.Button('Reset', id='wad-reset-button', color='link'),
+                            dbc.Button('Reset', id='wad-reset-button', color='link', class_name='button-link'),
                             className='reset-var-button'
                         ),
                         html.Div(
@@ -242,37 +242,36 @@ def get_wave_variables_panels():
                             className='variable-section'
                         ),
                         get_variable_slider('mean-wave-period', PERCENTAGE_MIN_VAL_SLIDER, PERCENTAGE_MAX_VAL_SLIDER, PERCENTAGE_DEFAULT_VALUE, PERCENTAGE_CHAR, 'mwp-decrease-btn', 'mwp-increase-btn'),
-                    ])
-
+                    ]), style={'borderStyle': 'None', 'borderRadius': '15px'}
                 ),
                 md=7,
                 style={'padding': '38px 0px 0px 87px'}
             ),
             dbc.Col(
                 dbc.Card(
-                dbc.CardBody(
-                    [
-                        # Mean wave direction
-                        html.Div(
-                            dbc.Button('Reset', id='mwd-reset-button', color='link'),
-                            className='reset-var-button'
-                        ),
-                        html.Div(
-                            children=[
-                                html.Div(
-                                    'Mean wave direction',
-                                    className='variable-full-title'
-                                ),
-                                html.Div(
-                                    'Dir [degrees]',
-                                    className='variable-short-title'
-                                )
-                            ],
-                            className='variable-section'
-                        ),
-                        get_variable_slider('mean-wave-direction', DEGREE_MIN_VAL_SLIDER, DEGREE_MAX_VAL_SLIDER, DEGREE_DEFAULT_VALUE, DEGREE_CHAR, 'mwd-decrease-btn', 'mwd-increase-btn'),
-                    ]
-                )
+                    dbc.CardBody(
+                        [
+                            # Mean wave direction
+                            html.Div(
+                                dbc.Button('Reset', id='mwd-reset-button', color='link', class_name='button-link'),
+                                className='reset-var-button'
+                            ),
+                            html.Div(
+                                children=[
+                                    html.Div(
+                                        'Mean wave direction',
+                                        className='variable-full-title'
+                                    ),
+                                    html.Div(
+                                        'Dir [degrees]',
+                                        className='variable-short-title'
+                                    )
+                                ],
+                                className='variable-section'
+                            ),
+                            get_variable_slider('mean-wave-direction', DEGREE_MIN_VAL_SLIDER, DEGREE_MAX_VAL_SLIDER, DEGREE_DEFAULT_VALUE, DEGREE_CHAR, 'mwd-decrease-btn', 'mwd-increase-btn'),
+                        ]
+                    ), style={'borderStyle': 'None', 'borderRadius': '15px'}
                 ),
                 md=5,
                 style={'padding': '38px 67px 0px 16px'}
@@ -290,7 +289,7 @@ def get_atmospheric_variables_panels():
                 dbc.Card(
                     dbc.CardBody([
                         html.Div(
-                            dbc.Button('Reset', id='aad-reset-button', color='link'),
+                            dbc.Button('Reset', id='aad-reset-button', color='link', class_name='button-link'),
                             className='reset-var-button'
                         ),
                         html.Div(
@@ -312,37 +311,36 @@ def get_atmospheric_variables_panels():
                             style={'paddingTop': '32px'}
                         ),
                         get_variable_slider('wind-speed', PERCENTAGE_MIN_VAL_SLIDER, PERCENTAGE_MAX_VAL_SLIDER, PERCENTAGE_DEFAULT_VALUE, PERCENTAGE_CHAR, 'ws-decrease-btn', 'ws-increase-btn'),
-                    ])
-
+                    ]), style={'borderStyle': 'None', 'borderRadius': '15px'}
                 ),
                 md=7,
                 style={'padding': '39px 0px 0px 87px'}
             ),
             dbc.Col(
                 dbc.Card(
-                dbc.CardBody(
-                    [
-                        # Wind direction
-                        html.Div(
-                            dbc.Button('Reset', id='wd-reset-button', color='link'),
-                            className='reset-var-button'
-                        ),
-                        html.Div(
-                            children=[
-                                html.Div(
-                                    'Wind direction',
-                                    className='variable-full-title'
-                                ),
-                                html.Div(
-                                    'U10 Dir [degrees]',
-                                    className='variable-short-title'
-                                )
-                            ],
-                            className='variable-section'
-                        ),
-                        get_variable_slider('wind-direction', DEGREE_MIN_VAL_SLIDER, DEGREE_MAX_VAL_SLIDER, DEGREE_DEFAULT_VALUE, DEGREE_CHAR, 'wd-decrease-btn', 'wd-increase-btn'),
-                    ]
-                )
+                    dbc.CardBody(
+                        [
+                            # Wind direction
+                            html.Div(
+                                dbc.Button('Reset', id='wd-reset-button', color='link', class_name='button-link'),
+                                className='reset-var-button'
+                            ),
+                            html.Div(
+                                children=[
+                                    html.Div(
+                                        'Wind direction',
+                                        className='variable-full-title'
+                                    ),
+                                    html.Div(
+                                        'U10 Dir [degrees]',
+                                        className='variable-short-title'
+                                    )
+                                ],
+                                className='variable-section'
+                            ),
+                            get_variable_slider('wind-direction', DEGREE_MIN_VAL_SLIDER, DEGREE_MAX_VAL_SLIDER, DEGREE_DEFAULT_VALUE, DEGREE_CHAR, 'wd-decrease-btn', 'wd-increase-btn'),
+                        ]
+                    ),  style={'borderStyle': 'None', 'borderRadius': '15px'}
                 ),
                 md=5,
                 style={'padding': '39px 67px 0px 16px'}

@@ -121,7 +121,7 @@
 
 .adjusted-forecast-sub-legend {
     border-radius: 6px;
-    background: #F4F8FB;
+    background: rgba(170, 211, 227, 0.2);
     padding-top: 18px;
     padding-bottom: 19px;
 }
@@ -415,4 +415,8 @@
 .reset-var-button {
     display: flex;
     justify-content: flex-end;
+}
+
+.info-link, .button-link{
+    color: #2A5485;
 }

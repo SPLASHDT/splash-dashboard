@@ -271,8 +271,8 @@ def render_dashboard():
         dbc.Row(
             dbc.Col([
                 html.P(DASHBOARD_FULL_DESC_P1, className='dashboard-summary'),
-                html.P([DASHBOARD_FULL_DESC_P2_1, html.A('CPRG', href=CPRG_LINK), DASHBOARD_FULL_DESC_P2_2, html.A('NOC', href=NOC_LINK), DASHBOARD_FULL_DESC_P2_3], className='dashboard-summary'),
-                html.P([DASHBOARD_FULL_DESC_P3_1, html.A('AI models', href=AI_MODELS_LINK), DASHBOARD_FULL_DESC_P3_2, html.A('using field measurements of wave overtopping', href=WIREWALL_LINK), DASHBOARD_FULL_DESC_P3_3], className='dashboard-summary'),
+                html.P([DASHBOARD_FULL_DESC_P2_1, html.A('CPRG', href=CPRG_LINK, className='info-link'), DASHBOARD_FULL_DESC_P2_2, html.A('NOC', href=NOC_LINK, className='info-link'), DASHBOARD_FULL_DESC_P2_3], className='dashboard-summary'),
+                html.P([DASHBOARD_FULL_DESC_P3_1, html.A('AI models', href=AI_MODELS_LINK, className='info-link'), DASHBOARD_FULL_DESC_P3_2, html.A('using field measurements of wave overtopping', href=WIREWALL_LINK, className='info-link'), DASHBOARD_FULL_DESC_P3_3], className='dashboard-summary'),
             ], md=9, style={'paddingLeft': '0', 'paddingRight': '0'}),
             style={'paddingLeft': '72px', 'paddingRight': '72px'}
         ),
