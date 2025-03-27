@@ -417,6 +417,9 @@
     justify-content: flex-end;
 }
 
-.info-link, .button-link{
+.info-link, .button-link, .btn:hover{
     color: #2A5485;
+    :active{
+        color: #2A5485;
+    }
 }

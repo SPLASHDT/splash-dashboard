@@ -359,7 +359,7 @@ def get_buttons_panel():
                 md=4,
             ),
             dbc.Col(
-                dbc.Button('Reset all', id='reset-button', color='link'),
+                dbc.Button('Reset all', id='reset-button', color='link', class_name='button-link'),
                 md=4
 
             )],
