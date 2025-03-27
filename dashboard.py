@@ -317,7 +317,7 @@ render_dashboard()
 def render_feature_line_plots(location_name, swh_df, swh_overtopping_times_df, tidal_level_df, tl_overtopping_times_df, wind_speed_df, ws_overtopping_times_df):
     swh_fig = fc.render_feature_plot(location_name + ' - Significant wave height', swh_df, 'significant_wave_height', 'Significant Wave Height (Hm)', 0, 5, swh_overtopping_times_df)
     tidal_level_fig = fc.render_feature_plot(location_name + ' - Tidal Level ', tidal_level_df, 'tidal_level', 'Tidal Level (m)', 0, 6, tl_overtopping_times_df)
-    wind_speed_fig = fc.render_feature_plot(location_name + ' - Wind Speed ', wind_speed_df, 'wind_speed', 'Wind Speed (m/s)', 0, 25, ws_overtopping_times_df)
+    wind_speed_fig = fc.render_feature_plot(location_name + ' - Wind Speed ', wind_speed_df, 'wind_speed', 'Wind Speed (m/s)', 0, 30, ws_overtopping_times_df)
     return swh_fig, tidal_level_fig, wind_speed_fig
 
 
