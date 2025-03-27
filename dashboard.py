@@ -1,4 +1,4 @@
-from dash import Dash, dcc, html, Input, Output, State, ctx
+from dash import Dash, dcc, html, Input, Output, State, ctx, DiskcacheManager
 import plotly.express as px
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
@@ -13,6 +13,10 @@ import overtopping_graphs_components as ogc
 import feature_components as fc
 import core_components as cc
 from datetime import datetime, timedelta
+import diskcache
+import multiprocessing
+import aiohttp
+import asyncio
 
 utils.loadConfigFile()
 
@@ -48,17 +52,40 @@ DASHBOARD_FULL_DESC_P3_1 = 'SPLASH digital twin is a demonstrator based on '
 DASHBOARD_FULL_DESC_P3_2 = ' trained '
 DASHBOARD_FULL_DESC_P3_3 = '. The model is updated once a day and uses Met Office wave and wind data as input, as well as predicted water level. This tool provides overtopping forecast 5 days ahead for Dawlish and Penzance, and allows the user to modify wind and wave input variables to test the sensitivity of wave overtopping.'
 
+
+multiprocessing.set_start_method("forkserver")
+
+cache = diskcache.Cache("./cache")
+background_callback_manager = DiskcacheManager(cache)
+
+
+
 external_stylesheets = [dbc.themes.BOOTSTRAP, 
                         "https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&family=Viga&display=swap",
                         "./assets/css/dashboard.css"]
-app = Dash(__name__, external_stylesheets=external_stylesheets)
+app = Dash(__name__, external_stylesheets=external_stylesheets, background_callback_manager=background_callback_manager)
 
+
+async def fetch_data(api_url):
+    try:
+        async with aiohttp.ClientSession() as session:
+            async with session.get(api_url) as response:
+                response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
+                data = await response.json()  # or response.json() if you are expecting json.
+                return data
+    except aiohttp.ClientError as e:
+        return f"Error: {e}"
+    except Exception as e:
+        return f"Unexpected Error: {e}"
+    
 
 # Get overtopping counts of Dawlish
 def get_dawlish_wave_overtopping(api_url):
-    response = requests.get(api_url)
-    response.raise_for_status()
-    overtopping_data = response.json()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    overtopping_data = loop.run_until_complete(fetch_data(api_url))
+    loop.close()
+    
     seawall_crest_overtopping_df = utils.convert_overtopping_data_to_df(overtopping_data['seawall_crest_overtopping'])
     railway_line_overtopping_df = utils.convert_overtopping_data_to_df(overtopping_data['railway_line_overtopping'])
     start_date = utils.format_range_date(seawall_crest_overtopping_df['time'].min())
@@ -67,9 +94,10 @@ def get_dawlish_wave_overtopping(api_url):
 
 
 def get_penzance_wave_overtopping(api_url):        
-    response = requests.get(api_url)
-    response.raise_for_status()
-    overtopping_data = response.json()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    overtopping_data = loop.run_until_complete(fetch_data(api_url))
+    loop.close()
     seawall_crest_overtopping_df = utils.convert_overtopping_data_to_df(overtopping_data['seawall_crest_overtopping'])
     seawall_crest_sheltered_overtopping_df = utils.convert_overtopping_data_to_df(overtopping_data['seawall_crest_sheltered_overtopping'])
     start_date = utils.format_range_date(seawall_crest_overtopping_df['time'].min())
@@ -81,9 +109,10 @@ def get_penzance_wave_overtopping(api_url):
 def get_features_data(root_endpoint, resource_name, params, feature_list_name, feature_name):
     resource_url = utils.add_resource(root_endpoint, resource_name)
     full_url = utils.add_query_params(resource_url, params)
-    response = requests.get(full_url)
-    response.raise_for_status()
-    feature_overtopping_data = response.json()
+    loop = asyncio.new_event_loop()
+    asyncio.set_event_loop(loop)
+    feature_overtopping_data = loop.run_until_complete(fetch_data(full_url))
+    loop.close()
     feature_df = utils.convert_feature_list_to_df(feature_overtopping_data[feature_list_name], feature_name)
     overtopping_times_df = utils.convert_feature_list_to_df(feature_overtopping_data['overtopping_times'], feature_name)
     return feature_df, overtopping_times_df
@@ -306,6 +335,7 @@ def render_dashboard():
                 style={'padding': '0px'}
             )
         , style={'paddingTop': '25px', 'paddingLeft': '72px', 'paddingRight': '72px'}),
+        html.Div(dcc.Loading(id='loading', children=[html.Div(id='output')])),
         html.Div(full_legend, id='overtopping-graph-legend', className='overtopping-legend'),
         dbc.Row([
             dbc.Col(dcc.Graph(id='scatter-plot-rig1', style={'border': '1.011px solid #8A8D90'}), md=6, style={'padding': '0px'}),
@@ -391,6 +421,7 @@ def get_final_variables_dfs(swh_df, current_swh_df, swh_overtopping_times_df, cu
      Output('current-wind-speed', 'data'),
      Output('previous-wind-speed-ot', 'data'),
      Output('current-wind-speed-ot', 'data'),
+     Output("output", "children"),
     ],
     Input('submit-button', 'n_clicks'),
     Input('dd_site_location', 'value'),
@@ -410,6 +441,11 @@ def get_final_variables_dfs(swh_df, current_swh_df, swh_overtopping_times_df, cu
     State('current-tidal-level-ot', 'data'),
     State('current-wind-speed', 'data'),
     State('current-wind-speed-ot', 'data'),
+    background=True,
+    running=[
+        (Output("submit-button", "disabled"), True, False),
+        (Output("output", "children"), "Loading...", None)
+    ],
 )
 def submit_slider_values(submit_n_clicks, site_location_val, sig_wave_height_val, freeboard_val, mean_wave_period_val, mean_wave_dir_val, wind_speed_val, wind_dir_val, previous_df_1, previous_df_2, current_df_1, current_df_2, current_swh_df, current_swh_ot_df, curren_tl_df, current_tl_ot_df, current_ws_df, current_ws_ot_df):
     trigger_id =  ctx.triggered_id
@@ -458,7 +494,28 @@ def submit_slider_values(submit_n_clicks, site_location_val, sig_wave_height_val
     fig1 = fig_dawlish_seawall_crest if utils.find_words_with_suffix(site_location_val, 'Dawlish') else fig_penzance_seawall_crest
     fig2 = fig_penzance_seawall_crest_sheltered if utils.find_words_with_suffix(site_location_val, 'Penzance') else fig_dawlish_railway_line
     
-    return fig1, fig2, tmp_previous_df_1.to_dict('records'), tmp_previous_df_2.to_dict('records'), tmp_current_df_1.to_dict('records'), tmp_current_df_2.to_dict('records'), forecast_start_date, forecast_end_date, full_legend, swh_fig, tidal_level_fig, wind_speed_fig, final_prev_swh_df.to_dict('records'), final_cur_swh_df.to_dict('records'), final_prev_swh_ot_df.to_dict('records'), final_cur_swh_ot_df.to_dict('records'), final_prev_tl_df.to_dict('records'), final_cur_tl_df.to_dict('records'), final_prev_tl_ot_df.to_dict('records'), final_cur_tl_ot_df.to_dict('records'), final_prev_ws_df.to_dict('records'), final_cur_ws_df.to_dict('records'), final_prev_ws_ot_df.to_dict('records'), final_cur_ws_ot_df.to_dict('records')
+    return (fig1, 
+            fig2, 
+            tmp_previous_df_1.to_dict('records'), 
+            tmp_previous_df_2.to_dict('records'), 
+            tmp_current_df_1.to_dict('records'), 
+            tmp_current_df_2.to_dict('records'), 
+            forecast_start_date, forecast_end_date, 
+            full_legend, swh_fig, tidal_level_fig, 
+            wind_speed_fig, final_prev_swh_df.to_dict('records'), 
+            final_cur_swh_df.to_dict('records'), 
+            final_prev_swh_ot_df.to_dict('records'), 
+            final_cur_swh_ot_df.to_dict('records'), 
+            final_prev_tl_df.to_dict('records'), 
+            final_cur_tl_df.to_dict('records'), 
+            final_prev_tl_ot_df.to_dict('records'), 
+            final_cur_tl_ot_df.to_dict('records'), 
+            final_prev_ws_df.to_dict('records'), 
+            final_cur_ws_df.to_dict('records'), 
+            final_prev_ws_ot_df.to_dict('records'), 
+            final_cur_ws_ot_df.to_dict('records'), 
+            '')
+
 
 
 # Callback for significant wave height slider
