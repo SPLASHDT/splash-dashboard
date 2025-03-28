@@ -1,7 +1,7 @@
 import plotly.express as px
 import plotly.graph_objects as go
 
-def render_feature_scatter_plot(feature_fig, feature_data, feature_name, trace_name, trace_color, is_forecast_data = False):
+def render_feature_scatter_plot(feature_fig, feature_data, feature_name, trace_name, trace_color, is_forecast_data):
     if is_forecast_data:
         line_size={'width': 2}
     else:
@@ -31,7 +31,7 @@ def render_feature_plot(plot_title, prev_feature_data, cur_feature_data, feature
     if not prev_feature_data.empty:
         is_forecast_data = False
         forecast_marker_color = '#808080'
-        render_feature_scatter_plot(feature_fig, prev_feature_data, feature_name, forecast_feature_desc, '#000')
+        render_feature_scatter_plot(feature_fig, prev_feature_data, feature_name, forecast_feature_desc, '#000', True)
     else:
         is_forecast_data = True
         forecast_marker_color = '#000'

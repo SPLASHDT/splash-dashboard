@@ -534,6 +534,7 @@ def get_date_picker_range_button():
                     )
     return info_button
 
+
 def get_date_picker_range_popover():
     info_popover = dbc.Popover(
                     [
