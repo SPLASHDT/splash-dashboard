@@ -1,4 +1,4 @@
-from dash import Dash, dcc, html, Input, Output, State, ctx, DiskcacheManager
+from dash import Dash, dcc, html, Input, Output, State, ctx, DiskcacheManager, no_update
 import plotly.express as px
 import plotly.graph_objects as go
 import dash_bootstrap_components as dbc
@@ -262,6 +262,12 @@ def render_dashboard():
     # Forecast range
     forecast_range = ogc.get_date_picker_range(start_date, end_date)
 
+    # Forecast range date button
+    info_button = ogc.get_date_picker_range_button()
+
+    # Forecast range date info
+    date_picker_range_popover = ogc.get_date_picker_range_popover()
+
     # Legend
     full_legend = ogc.get_full_legend(False)
 
@@ -315,8 +321,9 @@ def render_dashboard():
             style={'paddingLeft': '72px', 'paddingRight': '72px'}
         ),
         dbc.Row([
-                dbc.Col(dropdown_panel, md='9', style={'padding': '0px'}),
-                dbc.Col(forecast_range, md='3')
+                dbc.Col(dropdown_panel, md='8', style={'padding': '0px'}),
+                dbc.Col([forecast_range, date_picker_range_popover], md='3', style={'paddingLeft': '80px'}),
+                dbc.Col(info_button, md=1, style={'paddingTop': '27px'})
             ], 
             style={'paddingTop': '19px', 'paddingLeft': '72px', 'paddingRight': '72px'}
             ),

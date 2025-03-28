@@ -522,3 +522,27 @@ def get_date_picker_range(f_start_date, f_end_date):
     )
     
     return date_picker_range_panel
+
+
+def get_date_picker_range_button():
+    info_button = dbc.Button(
+                    'i',
+                    id='forecast-range-date-info-btn',
+                    color='primary',
+                    className='mb-3 info-button',
+                    n_clicks=0,
+                    )
+    return info_button
+
+def get_date_picker_range_popover():
+    info_popover = dbc.Popover(
+                    [
+                        dbc.PopoverHeader('Why can I only see data for today and five days ahead?'),
+                        dbc.PopoverBody("SPLASH provides forecast of wave overtopping up to 5 days ahead. This model uses Met Office wave and wind data as input that is limited to a 5-day forecast. The model is updated once a day using Met Office wave and wind data as input, as well as predicted water level."),
+                    ],
+                    id='forecast-range-date-info',
+                    target='forecast-range-date-info-btn',
+                    trigger='legacy',
+                    hide_arrow= True
+                )
+    return info_popover
