@@ -274,6 +274,9 @@ def render_dashboard():
     # Buttons panel
     buttons_panel = ogc.get_buttons_panel()
 
+    # Footer panel
+    footer_panel = cc.get_footer_components()
+
     # App layout
     app.layout = dbc.Container([
         dcc.Store(id='previous-dataframe-1'),
@@ -350,6 +353,7 @@ def render_dashboard():
         dbc.Row(
             dbc.Col(dcc.Graph(id='line-plot-wind-speed', style={'border': '1.011px solid #8A8D90'}), md=12, style={'padding': '24px 72px'})
         ),
+        dbc.Row(footer_panel, style={'backgroundColor': '#2A5485', 'height': '141px'}),
     ], fluid=True, className='body-container')
 
 

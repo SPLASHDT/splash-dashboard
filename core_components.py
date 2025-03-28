@@ -27,3 +27,12 @@ def get_header_components():
         )
     ]
     return header_components
+
+
+def get_footer_components():
+    footer_components = [
+        dbc.Col(html.Div(html.Img(src='./assets/imgs/uni_plymouth_logo.png', className='uni-plymouth-logo')), md=5, className='uni-plymouth-logo-panel'),
+        dbc.Col(html.Div(html.Img(src='./assets/imgs/noc_logo.png', className='noc-logo')), md=1, className='noc-logo-panel'),
+        dbc.Col(html.Div(html.Img(src='./assets/imgs/ukri_met_office_logos.png', className='ukri-met-office-logos')), md=4, className='ukri-met-office-logos-panel'),
+    ]
+    return footer_components

@@ -423,3 +423,31 @@
         color: #2A5485;
     }
 }
+
+.uni-plymouth-logo {
+    width: 200px;
+    height: 40px;
+}
+
+.uni-plymouth-logo-panel {
+    padding-top: 50px;
+    padding-left: 416px;
+}
+
+.noc-logo {
+    width: 60px;
+    height: 60px;
+}
+
+.noc-logo-panel {
+    padding-top: 40px;
+}
+
+.ukri-met-office-logos {
+    width: 373px;
+    height: 69px;
+}
+
+.ukri-met-office-logos-panel {
+    padding-top: 35px;
+}
