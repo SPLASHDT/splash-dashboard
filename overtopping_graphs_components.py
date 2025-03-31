@@ -34,7 +34,7 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
         dict(
             source="./assets/imgs/" + plot_logo,
             xref="paper", yref="paper",
-            x=0.22, y=1,  # Adjust position as needed
+            x=0.30, y=1.03,  # Adjust position as needed
             sizex=0.06, sizey=0.06,  # Adjust size as needed
             xanchor="left", yanchor="bottom"
         )
@@ -49,8 +49,8 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
                 color='#3279B7',
                 weight=500
             ),
-            xref="paper", yref="paper",
-            x=0.3, y=1,  # Adjust title position if necessary
+            xref="container", yref="container",
+            x=0.4, y=0.91,  # Adjust title position if necessary
             xanchor='left', yanchor='bottom'
         ),
         plot_bgcolor='white',  # Set the plot background color to white
