@@ -40,7 +40,7 @@ DASHBOARD_FULL_DESC_P2 = 'The model has been developed at the University of Plym
 DASHBOARD_FULL_DESC_P3 = 'SPLASH digital twin is based on AI models trained using field measurements of wave overtopping. The model is updated once a day and uses Met Office wave and wind data as input, as well as predicted water level. This tool provides overtopping forecast 5 days ahead for Dawlish and Penzance, and allows the user to modify wind and wave input variables to test the sensitivity of wave overtopping.'
 
 external_stylesheets = [dbc.themes.BOOTSTRAP, './assets/css/dashboard.css']
-app = Dash(__name__, external_stylesheets=external_stylesheets)
+app = Dash(__name__, external_stylesheets=external_stylesheets, url_base_pathname='/ccoresources/SPLASHDT/')
 
 
 # Get overtopping counts of Dawlish
@@ -55,7 +55,7 @@ def get_dawlish_wave_overtopping(api_url):
     return seawall_crest_overtopping_df, railway_line_overtopping_df, start_date, end_date
 
 
-def get_penzance_wave_overtopping(api_url):        
+def get_penzance_wave_overtopping(api_url):
     response = requests.get(api_url)
     response.raise_for_status()
     overtopping_data = response.json()
@@ -567,6 +567,8 @@ if __name__ == "__main__":
 
     if environment == "docker":
         #docker requests from outside the container don't come from 127.0.0.1, so we need to bind to 0.0.0.0 to receive them
-        app.run_server(host='0.0.0.0', debug=DEBUG)
+        app.run(host='0.0.0.0', debug=False)
+    elif environment == "production":
+        app.run(debug=False)
     else:
-        app.run_server(debug=DEBUG)
+        app.run(debug=True)
