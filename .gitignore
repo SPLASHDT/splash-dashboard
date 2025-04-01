@@ -6,3 +6,4 @@ other_assets/
 *.ipynb
 *.code-workspace
 *.txt
+cache/
