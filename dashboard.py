@@ -10,13 +10,15 @@ import pandas as pd
 from matplotlib.colors import Normalize
 import utils
 import overtopping_graphs_components as ogc
+import feature_components as fc
+import core_components as cc
 from datetime import datetime, timedelta
 
 utils.loadConfigFile()
 
 # Create the app
-DAWLISH_API_ENDPOINT = os.environ.get('DAWLISH_API_ENDPOINT')
-PENZANCE_API_ENDPOINT = os.environ.get('PENZANCE_API_ENDPOINT')
+DAWLISH_API_ROOT_ENDPOINT = os.environ.get('DAWLISH_API_ROOT_ENDPOINT')
+PENZANCE_API_ROOT_ENDPOINT = os.environ.get('PENZANCE_API_ROOT_ENDPOINT')
 dawlish_lat_seawall = os.environ.get('DAWLISH_LAT_SEAWALL')
 dawlish_lon_seawall = os.environ.get('DAWLISH_LON_SEAWALL')
 penzance_lat_seawall = os.environ.get('PENZANCE_LAT_SEAWALL')
@@ -34,12 +36,20 @@ DEGREE_CHAR = '°'
 
 DASHBOARD_NAME = 'SPLASH'
 DASHBOARD_BRIEF_DESCRIPTION = 'DIGITAL APPROACHES TO PREDICT WAVE OVERTOPPING HAZARDS'
+CPRG_LINK = 'https://www.plymouth.ac.uk/research/coastal-processes'
+WIREWALL_LINK = 'https://coastalmonitoring.org/ccoresources/wirewall/'
+AI_MODELS_LINK = 'https://www.sciencedirect.com/science/article/pii/S1463500325000137'
 DASHBOARD_SUBTITLE = 'Advancing current understanding on wave-related coastal hazards'
 DASHBOARD_FULL_DESC_P1 = 'With sea level rise accelerating and weather extremes becoming increasingly stronger, tools to help climate adaptation of coastal communities are of paramount importance. SPLASH provides an overtopping tool that will act as forecast model directly helping coastal communities mitigate effects of this coastal hazard, and ultimately, guiding new climate adaptation strategies.'
-DASHBOARD_FULL_DESC_P2 = 'The model has been developed at the University of Plymouth Coastal Processes Research Group (CPRG) as part of the SPLASH project. The project was part of the Twinning Capability for the Natural Environment (TWINE) programme, designed to harness the potential of digital twinning technology to transform environmental science. '
-DASHBOARD_FULL_DESC_P3 = 'SPLASH digital twin is based on AI models trained using field measurements of wave overtopping. The model is updated once a day and uses Met Office wave and wind data as input, as well as predicted water level. This tool provides overtopping forecast 5 days ahead for Dawlish and Penzance, and allows the user to modify wind and wave input variables to test the sensitivity of wave overtopping.'
+DASHBOARD_FULL_DESC_P2_1 = 'The model has been developed at the University of Plymouth Coastal Processes Research Group ('
+DASHBOARD_FULL_DESC_P2_2 = ') as part of the SPLASH project. The project was part of the Twinning Capability for the Natural Environment (TWINE) programme, designed to harness the potential of digital twinning technology to transform environmental science. '
+DASHBOARD_FULL_DESC_P3_1 = 'SPLASH digital twin is based on '
+DASHBOARD_FULL_DESC_P3_2 = ' trained '
+DASHBOARD_FULL_DESC_P3_3 = '. The model is updated once a day and uses Met Office wave and wind data as input, as well as predicted water level. This tool provides overtopping forecast 5 days ahead for Dawlish and Penzance, and allows the user to modify wind and wave input variables to test the sensitivity of wave overtopping.'
 
-external_stylesheets = [dbc.themes.BOOTSTRAP, './assets/css/dashboard.css']
+external_stylesheets = [dbc.themes.BOOTSTRAP, 
+                        "https://fonts.googleapis.com/css2?family=Urbanist:ital,wght@0,100..900;1,100..900&family=Viga&display=swap",
+                        "./assets/css/dashboard.css"]
 app = Dash(__name__, external_stylesheets=external_stylesheets, url_base_pathname='/ccoresources/SPLASHDT/')
 
 
@@ -48,8 +58,8 @@ def get_dawlish_wave_overtopping(api_url):
     response = requests.get(api_url)
     response.raise_for_status()
     overtopping_data = response.json()
-    seawall_crest_overtopping_df = utils.convert_list_to_dataframe(overtopping_data['seawall_crest_overtopping'])
-    railway_line_overtopping_df = utils.convert_list_to_dataframe(overtopping_data['railway_line_overtopping'])
+    seawall_crest_overtopping_df = utils.convert_overtopping_data_to_df(overtopping_data['seawall_crest_overtopping'])
+    railway_line_overtopping_df = utils.convert_overtopping_data_to_df(overtopping_data['railway_line_overtopping'])
     start_date = utils.format_range_date(seawall_crest_overtopping_df['time'].min())
     end_date = utils.format_range_date(seawall_crest_overtopping_df['time'].max())
     return seawall_crest_overtopping_df, railway_line_overtopping_df, start_date, end_date
@@ -59,12 +69,30 @@ def get_penzance_wave_overtopping(api_url):
     response = requests.get(api_url)
     response.raise_for_status()
     overtopping_data = response.json()
-    seawall_crest_overtopping_df = utils.convert_list_to_dataframe(overtopping_data['seawall_crest_overtopping'])
-    seawall_crest_sheltered_overtopping_df = utils.convert_list_to_dataframe(overtopping_data['seawall_crest_sheltered_overtopping'])
+    seawall_crest_overtopping_df = utils.convert_overtopping_data_to_df(overtopping_data['seawall_crest_overtopping'])
+    seawall_crest_sheltered_overtopping_df = utils.convert_overtopping_data_to_df(overtopping_data['seawall_crest_sheltered_overtopping'])
     start_date = utils.format_range_date(seawall_crest_overtopping_df['time'].min())
     end_date = utils.format_range_date(seawall_crest_overtopping_df['time'].max())
 
     return seawall_crest_overtopping_df, seawall_crest_sheltered_overtopping_df, start_date, end_date
+
+
+def get_features_data(root_endpoint, resource_name, params, feature_list_name, feature_name):
+    resource_url = utils.add_resource(root_endpoint, resource_name)
+    full_url = utils.add_query_params(resource_url, params)
+    response = requests.get(full_url)
+    response.raise_for_status()
+    feature_overtopping_data = response.json()
+    feature_df = utils.convert_feature_list_to_df(feature_overtopping_data[feature_list_name], feature_name)
+    overtopping_times_df = utils.convert_feature_list_to_df(feature_overtopping_data['overtopping_times'], feature_name)
+    return feature_df, overtopping_times_df
+
+
+def get_all_features_data(root_endpoint, params):
+    significant_wave_height_df, swh_overtopping_times_df = get_features_data(root_endpoint, 'significant-wave-height', params, 'significant_wave_heights', 'significant_wave_height')
+    tidal_level_df, tl_overtopping_times_df = get_features_data(root_endpoint, 'tidal-level', params, 'tidal_levels', 'tidal_level')
+    wind_speed_df, ws_overtopping_times_df = get_features_data(root_endpoint, 'wind-speed', params, 'wind_speeds', 'wind_speed')
+    return significant_wave_height_df, swh_overtopping_times_df, tidal_level_df, tl_overtopping_times_df, wind_speed_df, ws_overtopping_times_df
 
 
 # def get_significant_wave_height_data():
@@ -130,7 +158,6 @@ def render_contour_wave_height(longitudes, latitudes, z_data, U, V, lon_grid, la
     )
 
     # Create scatter plot for markers
-    # Create scatter plot for Dawlish marker
     scatter_dawlish = go.Scatter(
         x=[dawlish_lon_seawall],
         y=[dawlish_lat_seawall],
@@ -194,6 +221,9 @@ def get_default_forecast_dates():
 # Render Splash dashboard
 def render_dashboard():
 
+    # Header components
+    header_panel = cc.get_header_components()
+
     # Search components
     dropdown_panel = ogc.get_dropdown_panel()
 
@@ -221,34 +251,16 @@ def render_dashboard():
         dcc.Store(id='previous-dataframe-2'),
         dcc.Store(id='current-dataframe-1'),
         dcc.Store(id='current-dataframe-2'),
-        dbc.Row([
-            html.Div(
-            children=[
-                html.Div(
-                    children=[
-                        html.Img(src='./assets/imgs/splash_logo.png', className='splash-logo'),  # Add image here
-                        html.Div(
-                            children=[
-                                html.Div(DASHBOARD_NAME, className='dashboard-title'),
-                                html.Div(DASHBOARD_BRIEF_DESCRIPTION, className='dashboard-sub-title')
-                            ],
-                            className='title-sub-title-container'
-                        )
-                    ],
-                    className='head-container'
-                )
-            ],
-            style={'paddingLeft': '72px'}
-        )]),
+        dbc.Row(header_panel, style={'paddingLeft': '72px', 'paddingRight': '62px'}),
         dbc.Row(
             html.Div(DASHBOARD_SUBTITLE, className='dashboard-description'),
-            style={'paddingLeft': '72px', 'paddingTop': '60px', 'paddingBottom': '5px'}
+            style={'paddingLeft': '72px', 'paddingTop': '51px', 'paddingBottom': '5px'}
         ),
         dbc.Row(
             dbc.Col([
                 html.P(DASHBOARD_FULL_DESC_P1, className='dashboard-summary'),
-                html.P(DASHBOARD_FULL_DESC_P2, className='dashboard-summary'),
-                html.P(DASHBOARD_FULL_DESC_P3, className='dashboard-summary'),
+                html.P([DASHBOARD_FULL_DESC_P2_1, html.A('CPRG', href=CPRG_LINK), DASHBOARD_FULL_DESC_P2_2], className='dashboard-summary'),
+                html.P([DASHBOARD_FULL_DESC_P3_1, html.A('AI models', href=AI_MODELS_LINK), DASHBOARD_FULL_DESC_P3_2, html.A('using field measurements of wave overtopping', href=WIREWALL_LINK), DASHBOARD_FULL_DESC_P3_3], className='dashboard-summary'),
             ], md=9, style={'paddingLeft': '0', 'paddingRight': '0'}),
             style={'paddingLeft': '72px', 'paddingRight': '72px'}
         ),
@@ -287,6 +299,15 @@ def render_dashboard():
             dbc.Col(dcc.Graph(id='scatter-plot-rig1', style={'border': '1.011px solid #8A8D90'}), md=6, style={'padding': '0px'}),
             dbc.Col(dcc.Graph(id='scatter-plot-rig2', style={'border': '1.011px solid #8A8D90'}), md=6, style={'paddingLeft': '16px', 'paddingRight': '0px'})
         ], style={'paddingTop': '22px', 'paddingLeft': '72px', 'paddingRight': '72px'}),
+        dbc.Row(
+            dbc.Col(dcc.Graph(id='line-plot-swh', style={'border': '1.011px solid #8A8D90'}), md=12, style={'padding': '24px 72px'})
+        ),
+        dbc.Row(
+            dbc.Col(dcc.Graph(id='line-plot-tidal-level', style={'border': '1.011px solid #8A8D90'}), md=12, style={'padding': '24px 72px'})
+        ),
+        dbc.Row(
+            dbc.Col(dcc.Graph(id='line-plot-wind-speed', style={'border': '1.011px solid #8A8D90'}), md=12, style={'padding': '24px 72px'})
+        ),
     ], fluid=True, className='body-container')
 
 
@@ -322,6 +343,9 @@ def get_dataframes_to_save(n_clicks, trigger_id, generated_df_1, generated_df_2,
      Output('forecast-range', 'start_date'),
      Output('forecast-range', 'end_date'),
      Output('overtopping-graph-legend', 'children'),
+     Output('line-plot-swh', 'figure'),
+     Output('line-plot-tidal-level', 'figure'),
+     Output('line-plot-wind-speed', 'figure'),
     ],
     Input('submit-button', 'n_clicks'),
     Input('dd_site_location', 'value'),
@@ -350,8 +374,15 @@ def submit_slider_values(submit_n_clicks, site_location_val, sig_wave_height_val
     show_full_legend = False if trigger_id is None or trigger_id == 'dd_site_location' else True
     full_legend = ogc.get_full_legend(show_full_legend)
     if utils.find_words_with_suffix(site_location_val, 'Dawlish'):
-        api_url = utils.add_query_params(DAWLISH_API_ENDPOINT, params)
+        api_url = utils.add_resource(DAWLISH_API_ROOT_ENDPOINT, 'wave-overtopping')
+        api_url = utils.add_query_params(api_url, params)
         data_dawlish_seawall_crest, data_dawlish_railway_line, forecast_start_date, forecast_end_date = get_dawlish_wave_overtopping(api_url)       
+        
+        swh_df, swh_overtopping_times_df, tidal_level_df, tl_overtopping_times_df, wind_speed_df, ws_overtopping_times_df = get_all_features_data(DAWLISH_API_ROOT_ENDPOINT, params)
+        swh_fig = fc.render_feature_plot('Dawlish - Significant wave height', swh_df, 'significant_wave_height', 'Significant Wave Height (Hm)', 0, 5, swh_overtopping_times_df)
+        tidal_level_fig = fc.render_feature_plot('Dawlish - Tidal Level ', tidal_level_df, 'tidal_level', 'Tidal Level (m)', 0, 6, tl_overtopping_times_df)
+        wind_speed_fig = fc.render_feature_plot('Dawlish - Wind Speed ', wind_speed_df, 'wind_speed', 'Wind Speed (m/s)', 0, 25, ws_overtopping_times_df)
+
         data_dawlish_seawall_crest['stage'] = 'forecast' if trigger_id is None or trigger_id == 'dd_site_location' else 'adjusted_forecast'
         data_dawlish_railway_line['stage'] = 'forecast' if trigger_id is None or trigger_id == 'dd_site_location' else 'adjusted_forecast'
         tmp_previous_df_1, tmp_previous_df_2, tmp_current_df_1, tmp_current_df_2 = get_dataframes_to_save(submit_n_clicks, trigger_id, data_dawlish_seawall_crest, data_dawlish_railway_line, current_df_1, current_df_2)
@@ -360,8 +391,15 @@ def submit_slider_values(submit_n_clicks, site_location_val, sig_wave_height_val
         fig_dawlish_seawall_crest = ogc.render_dawlish_seawall_crest_graph(joined_dsc)
         fig_dawlish_railway_line = ogc.render_dawlish_railway_line_graph(joined_drl)
     else:
-        api_url = utils.add_query_params(PENZANCE_API_ENDPOINT, params)
+        api_url = utils.add_resource(PENZANCE_API_ROOT_ENDPOINT, 'wave-overtopping')
+        api_url = utils.add_query_params(api_url, params)
         data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered, forecast_start_date, forecast_end_date = get_penzance_wave_overtopping(api_url)
+
+        swh_df, swh_overtopping_times_df, tidal_level_df, tl_overtopping_times_df, wind_speed_df, ws_overtopping_times_df = get_all_features_data(PENZANCE_API_ROOT_ENDPOINT, params)
+        swh_fig = fc.render_feature_plot('Penzance - Significant wave height', swh_df, 'significant_wave_height', 'Significant Wave Height (Hm)', 0, 5, swh_overtopping_times_df)
+        tidal_level_fig = fc.render_feature_plot('Penzance - Tidal Level ', tidal_level_df, 'tidal_level', 'Tidal Level (m)', 0, 6, tl_overtopping_times_df)
+        wind_speed_fig = fc.render_feature_plot('Penzance - Wind Speed ', wind_speed_df, 'wind_speed', 'Wind Speed (m/s)', 0, 25, ws_overtopping_times_df)
+
         data_penzance_seawall_crest['stage'] = 'forecast' if trigger_id is None or trigger_id == 'dd_site_location' else 'adjusted_forecast'
         data_penzance_seawall_crest_sheltered['stage'] = 'forecast' if trigger_id is None or trigger_id == 'dd_site_location' else 'adjusted_forecast'
         tmp_previous_df_1, tmp_previous_df_2, tmp_current_df_1, tmp_current_df_2 = get_dataframes_to_save(submit_n_clicks, trigger_id, data_penzance_seawall_crest, data_penzance_seawall_crest_sheltered, current_df_1, current_df_2)
@@ -369,12 +407,11 @@ def submit_slider_values(submit_n_clicks, site_location_val, sig_wave_height_val
         joined_pscs = pd.concat([tmp_previous_df_2, tmp_current_df_2], ignore_index=True)
         fig_penzance_seawall_crest = ogc.render_penzance_seawall_crest_graph(joined_psc)
         fig_penzance_seawall_crest_sheltered = ogc.render_penzance_seawall_crest_sheltered_graph(joined_pscs)
-
     
     fig1 = fig_dawlish_seawall_crest if utils.find_words_with_suffix(site_location_val, 'Dawlish') else fig_penzance_seawall_crest
     fig2 = fig_penzance_seawall_crest_sheltered if utils.find_words_with_suffix(site_location_val, 'Penzance') else fig_dawlish_railway_line
-
-    return fig1, fig2, tmp_previous_df_1.to_dict('records'), tmp_previous_df_2.to_dict('records'), tmp_current_df_1.to_dict('records'), tmp_current_df_2.to_dict('records'), forecast_start_date, forecast_end_date, full_legend
+    
+    return fig1, fig2, tmp_previous_df_1.to_dict('records'), tmp_previous_df_2.to_dict('records'), tmp_current_df_1.to_dict('records'), tmp_current_df_2.to_dict('records'), forecast_start_date, forecast_end_date, full_legend, swh_fig, tidal_level_fig, wind_speed_fig
 
 
 # Callback for significant wave height slider
