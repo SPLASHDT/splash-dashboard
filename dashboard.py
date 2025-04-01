@@ -29,7 +29,7 @@ PERCENTAGE_CHAR = '%'
 DEGREE_CHAR = '°'
 
 external_stylesheets = [dbc.themes.BOOTSTRAP, './assets/css/dashboard.css']
-app = Dash(__name__, external_stylesheets=external_stylesheets, url_base_pathname='/ccoresource/SPLASHDT/')
+app = Dash(__name__, external_stylesheets=external_stylesheets, url_base_pathname='/ccoresources/SPLASHDT/')
 
 
 # Get overtopping counts of Dawlish
