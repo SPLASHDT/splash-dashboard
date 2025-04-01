@@ -14,7 +14,6 @@ import asyncio
 
 utils.loadConfigFile()
 
-# Create the app
 DAWLISH_API_ROOT_ENDPOINT = os.environ.get("DAWLISH_API_ROOT_ENDPOINT")
 PENZANCE_API_ROOT_ENDPOINT = os.environ.get("PENZANCE_API_ROOT_ENDPOINT")
 dawlish_lat_seawall = os.environ.get("DAWLISH_LAT_SEAWALL")
@@ -69,10 +68,10 @@ async def fetch_data(api_url):
     try:
         async with aiohttp.ClientSession() as session:
             async with session.get(api_url) as response:
-                response.raise_for_status()  # Raise HTTPError for bad responses (4xx or 5xx)
+                response.raise_for_status()
                 data = (
                     await response.json()
-                )  # or response.json() if you are expecting json.
+                )
                 return data
     except aiohttp.ClientError as e:
         return f"Error: {e}"
@@ -80,8 +79,16 @@ async def fetch_data(api_url):
         return f"Unexpected Error: {e}"
 
 
-# Get overtopping counts of Dawlish
 def get_dawlish_wave_overtopping(api_url):
+    """Get overtopping counts of Dawlish
+
+    Args:
+        api_url (string): Query url to send a request to backend API
+
+    Returns:
+        Tuple: Forecast overtopping data of seawall crest and railway line, forecast start date and end date
+    """
+
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     overtopping_data = loop.run_until_complete(fetch_data(api_url))
@@ -104,6 +111,15 @@ def get_dawlish_wave_overtopping(api_url):
 
 
 def get_penzance_wave_overtopping(api_url):
+    """Get overtopping counts of Penzance
+
+    Args:
+        api_url (string): Query url to send a request to backend API
+
+    Returns:
+        Tuple: Forecast overtopping data of seawall crest and seawall crest sheltered, forecast start date and end date
+    """
+
     loop = asyncio.new_event_loop()
     asyncio.set_event_loop(loop)
     overtopping_data = loop.run_until_complete(fetch_data(api_url))
@@ -128,6 +144,19 @@ def get_penzance_wave_overtopping(api_url):
 def get_features_data(
     root_endpoint, resource_name, params, feature_list_name, feature_name
 ):
+    """Get features data and overtopping events times
+
+    Args:
+        root_endpoint (string): Root of query url of backend API
+        resource_name (string): Wave or atmospheric variable name
+        params (string): Wave or atmospheric parameters
+        feature_list_name (string): Feature list name in json data
+        feature_name (string): Feature name for each record in feature list
+
+    Returns:
+        Dataframes: Feature dataframe and forecast overtopping events dataframe
+    """
+
     resource_url = utils.add_resource(root_endpoint, resource_name)
     full_url = utils.add_query_params(resource_url, params)
     loop = asyncio.new_event_loop()
@@ -144,6 +173,16 @@ def get_features_data(
 
 
 def get_all_features_data(root_endpoint, params):
+    """Get all features data
+
+    Args:
+        root_endpoint (string): Base query endpoint to get features data
+        params (string): Wave or atmospheric parameters
+
+    Returns:
+        Tuple: Features and overtopping events times dataframes
+    """
+
     significant_wave_height_df, swh_overtopping_times_df = get_features_data(
         root_endpoint,
         "significant-wave-height",
@@ -168,49 +207,44 @@ def get_all_features_data(root_endpoint, params):
 
 
 def get_default_forecast_dates():
+    """Get default forecast dates
+
+    Returns:
+        Dates: Forecast start date and end date
+    """
+
     str_start_date = utils.format_date_to_str(datetime.now().date(), "%m-%d-%Y")
     end_date = datetime.now().date() + timedelta(days=5)
     str_end_date = utils.format_date_to_str(end_date, "%m-%d-%Y")
     return str_start_date, str_end_date
 
 
-# Render Splash dashboard
 def render_dashboard():
+    """Render Splash dashboard
+    """
 
-    # Header components
     header_panel = cc.get_header_components()
 
-    # Search components
     dropdown_panel = ogc.get_dropdown_panel()
 
-    # Forecast dates
     start_date, end_date = get_default_forecast_dates()
 
-    # Forecast range
     forecast_range = ogc.get_date_picker_range(start_date, end_date)
 
-    # Forecast range date button
     info_button = ogc.get_date_picker_range_button()
 
-    # Forecast range date info
     date_picker_range_popover = ogc.get_date_picker_range_popover()
 
-    # Legend
     full_legend = ogc.get_full_legend(False)
 
-    # Wave variables and mean wave direction panels
     wave_variables_panels = ogc.get_wave_variables_panels()
 
-    # Atmospheric variables and wind direction panels
     atmospheric_variables_panels = ogc.get_atmospheric_variables_panels()
 
-    # Buttons panel
     buttons_panel = ogc.get_buttons_panel()
 
-    # Footer panel
     footer_panel = cc.get_footer_components()
 
-    # App layout
     app.layout = dbc.Container(
         [
             dcc.Store(id="previous-dataframe-1"),
@@ -407,6 +441,17 @@ render_dashboard()
 
 
 def render_feature_line_plots(location_name, variables_ot_dfs, show_dynamic_y_axis):
+    """Render feature line plots
+
+    Args:
+        location_name (string): Location name e.g. Dawlish or Penzance
+        variables_ot_dfs (dataframes): Forecast and adjusted forecast wave and atmospheric variables dataframes
+        show_dynamic_y_axis (boolean): Flag to display y-axis dynamically when generating adjusted forecast overtopping data
+
+    Returns:
+        Figures: Significant wave height, tidal level and wind speed figures
+    """
+
     (
         prev_swh_df,
         cur_swh_df,
@@ -470,6 +515,15 @@ def render_feature_line_plots(location_name, variables_ot_dfs, show_dynamic_y_ax
 
 
 def get_overtopping_data_stage(trigger_id):
+    """Get overtopping data's stage
+
+    Args:
+        trigger_id (string): Element's id which has triggered an event
+
+    Returns:
+        string: Value that defines if it's either forecast or adjusted forecast data
+    """
+
     return (
         "forecast"
         if trigger_id is None or trigger_id == "dd_site_location"
@@ -478,20 +532,33 @@ def get_overtopping_data_stage(trigger_id):
 
 
 def get_final_overtopping_dfs(
-    dawlish_first_loc_data,
+    first_location_data,
     current_df_1,
-    dawlish_second_loc_data,
+    second_location_data,
     current_df_2,
     trigger_id,
     submit_n_clicks,
 ):
-    dawlish_first_loc_data["stage"] = get_overtopping_data_stage(trigger_id)
-    dawlish_second_loc_data["stage"] = get_overtopping_data_stage(trigger_id)
+    """Get final overtopping dataframes
+
+    Args:
+        first_location_data (Dataframe): First location dataframe e.g. Dawlish seawall crest data
+        current_df_1 (Dataframe): Adjusted first location dataframe
+        second_location_data (Dataframe): Second location dataframe e.g. Dawlish railway line data
+        current_df_2 (Dataframe): Adjusted second location dataframe
+        trigger_id (integer): Element's id which has triggered an event
+        submit_n_clicks (integer): Number of clicks of submit button
+
+    Returns:
+        Dataframes: Joined dataframes, forecast and adjusted forecast overtopping events dataframes
+    """
+    first_location_data["stage"] = get_overtopping_data_stage(trigger_id)
+    second_location_data["stage"] = get_overtopping_data_stage(trigger_id)
 
     dfs_to_store = [
-        dawlish_first_loc_data,
+        first_location_data,
         current_df_1,
-        dawlish_second_loc_data,
+        second_location_data,
         current_df_2,
     ]
     tmp_previous_df_1, tmp_current_df_1, tmp_previous_df_2, tmp_current_df_2 = (
@@ -525,6 +592,28 @@ def get_final_variables_dfs(
     trigger_id,
     submit_n_clicks,
 ):
+    """Get final wave and atmospheric variables dataframes
+
+    Args:
+        swh_df (Dataframe): Significant wave height dataframe
+        current_swh_df (Dataframe): Adjusted significant wave height dataframe
+        swh_overtopping_times_df (Dataframe): Forecast overtopping event times dataframe for significant wave height data
+        current_swh_ot_df (Dataframe): Adjusted forecast overtopping event times dataframe for significant wave height data
+        tidal_level_df (Dataframe): Tidal level dataframe
+        curren_tl_df (Dataframe): Adjusted tidal level dataframe
+        tl_overtopping_times_df (Dataframe): Forecast overtopping event times dataframe for tidal level data
+        current_tl_ot_df (Dataframe): Adjusted forecast overtopping event times dataframe for tidal level data
+        wind_speed_df (Dataframe): Wind speed dataframe
+        current_ws_df (Dataframe): Adjusted wind speed dataframe
+        ws_overtopping_times_df (Dataframe): Forecast overtopping event times dataframe for wind speed data
+        current_ws_ot_df (Dataframe): Adjusted forecast overtopping event times dataframe for wind speed data
+        trigger_id (Dataframe): Element's id which has triggered an event
+        submit_n_clicks (Dataframe): Number of clicks of submit button
+
+    Returns:
+        Tuple: Dataframes to store, and final forecast and adjust forecast significant-wave-height, tidal-level and wind-speed dataframes
+    """
+
     swh_df["stage"] = get_overtopping_data_stage(trigger_id)
     tidal_level_df["stage"] = get_overtopping_data_stage(trigger_id)
     wind_speed_df["stage"] = get_overtopping_data_stage(trigger_id)
@@ -591,7 +680,6 @@ def get_final_variables_dfs(
     )
 
 
-# Callback to render overtopping graphs when picking a location or submitting any variable
 @app.callback(
     [
         Output("scatter-plot-rig1", "figure"),
@@ -628,8 +716,6 @@ def get_final_variables_dfs(
     State("mean-wave-direction", "value"),
     State("wind-speed", "value"),
     State("wind-direction", "value"),
-    State("previous-dataframe-1", "data"),
-    State("previous-dataframe-2", "data"),
     State("current-dataframe-1", "data"),
     State("current-dataframe-2", "data"),
     State("current-swh", "data"),
@@ -653,8 +739,6 @@ def submit_slider_values(
     mean_wave_dir_val,
     wind_speed_val,
     wind_dir_val,
-    previous_df_1,
-    previous_df_2,
     current_df_1,
     current_df_2,
     current_swh_df,
@@ -664,6 +748,31 @@ def submit_slider_values(
     current_ws_df,
     current_ws_ot_df,
 ):
+    """Callback to render overtopping graphs when picking a location or submitting any variable
+
+    Args:
+        submit_n_clicks (integer): Number of clicks of submit button
+        site_location_val (string): Site location value of dropdown box
+        sig_wave_height_val (integer): Significant wave height value
+        freeboard_val (integer): Freeboard value
+        mean_wave_period_val (integer): Mean wave period value
+        mean_wave_dir_val (integer): Mean wave direction value
+        wind_speed_val (integer): Wind speed value
+        wind_dir_val (integer): Wind direction value
+        current_df_1 (Dataframe): Adjusted forecast overtopping data of first location
+        current_df_2 (Dataframe): Adjusted forecast overtopping data of second location
+        current_swh_df (Dataframe): Significant wave height dataframe
+        current_swh_ot_df (Dataframe): Forecast overtopping events times dataframe of significant wave height data
+        curren_tl_df (Dataframe): Tidal level dataframe
+        current_tl_ot_df (Dataframe): Forecast overtopping events times dataframe of tidal level data
+        current_ws_df (Dataframe): Wind speed dataframe
+        current_ws_ot_df (Dataframe): Forecast overtopping events times dataframe of wind speed data
+
+    Returns:
+        Figures, data, div's children, Figure, data, div's children : Overtopping events scatter plots, overtopping events data to store, 
+        legend's components; significant wave height, tidal level and wind speed line plot figures; significant wave height, tidal level and wind speed data to store
+    """
+
     trigger_id = ctx.triggered_id
     dfs_to_store = []
     if (
@@ -876,7 +985,6 @@ def submit_slider_values(
     )
 
 
-# Callback for significant wave height slider
 @app.callback(
     Output("sig-wave-height", "value"),
     Input("sig-wave-height", "value"),
@@ -896,6 +1004,20 @@ def update_slider(
     site_location_value,
     current_step,
 ):
+    """Callback for significant wave height slider
+
+    Args:
+        slider_value (integer): Significant wave height slider's value
+        n_clicks_inc (integer): Number of clicks of increase button
+        n_clicks_dec (integer): Number of clicks of decrease button
+        n_clicks_reset (integer): Number of clicks of reset button
+        n_clicks_reset_wad (integer): Number of clicks of reset button for wave variables sliders
+        site_location_value (string): Dropdown box's value
+        current_step (integer): Current slider's value
+
+    Returns:
+        integer: Adjusted slider's value
+    """
 
     if (
         n_clicks_inc == 0
@@ -919,11 +1041,10 @@ def update_slider(
         or trigger_id == "dd_site_location"
     ):
         return PERCENTAGE_DEFAULT_VALUE
-    else:  # Slider moved
+    else: 
         return slider_value
 
 
-# Callback for freeboard slider
 @app.callback(
     Output("freeboard", "value"),
     Input("freeboard", "value"),
@@ -943,6 +1064,20 @@ def update_slider(
     site_location_value,
     current_step,
 ):
+    """Callback for freeboard slider
+
+    Args:
+        slider_value (integer): Freeboard slider's value
+        n_clicks_inc (integer): Number of clicks of increase button
+        n_clicks_dec (integer): Number of clicks of decrease button
+        n_clicks_reset (integer): Number of clicks of reset button
+        n_clicks_reset_wad (integer): Number of clicks of reset button for wave variables sliders
+        site_location_value (string): Dropdown box's value
+        current_step (integer): Current slider's value
+
+    Returns:
+        integer: Adjusted slider's value
+    """
 
     if (
         n_clicks_inc == 0
@@ -966,11 +1101,10 @@ def update_slider(
         or trigger_id == "dd_site_location"
     ):
         return PERCENTAGE_DEFAULT_VALUE
-    else:  # Slider moved
+    else:
         return slider_value
 
 
-# Callback for mean wave period slider
 @app.callback(
     Output("mean-wave-period", "value"),
     Input("mean-wave-period", "value"),
@@ -990,6 +1124,20 @@ def update_slider(
     site_location_value,
     current_step,
 ):
+    """Callback for mean wave period slider
+
+    Args:
+        slider_value (integer): Mean wave period slider's value
+        n_clicks_inc (integer):  Number of clicks of increase button
+        n_clicks_dec (integer): Number of clicks of decrease button
+        n_clicks_reset (integer): Number of clicks of reset button
+        n_clicks_reset_wad (integer): Number of clicks of reset button for wave variables sliders
+        site_location_value (string): Dropdown box's value
+        current_step (integer):  Current slider's value
+
+    Returns:
+        integer: Adjusted slider's value
+    """
 
     if (
         n_clicks_inc == 0
@@ -1013,11 +1161,10 @@ def update_slider(
         or trigger_id == "dd_site_location"
     ):
         return PERCENTAGE_DEFAULT_VALUE
-    else:  # Slider moved
+    else:
         return slider_value
 
 
-# Callback for mean wave direction slider
 @app.callback(
     Output("mean-wave-direction", "value"),
     Input("mean-wave-direction", "value"),
@@ -1037,6 +1184,20 @@ def update_slider(
     site_location_value,
     current_step,
 ):
+    """Callback for mean wave direction slider
+
+    Args:
+        slider_value (integer): Mean wave direction slider's value
+        n_clicks_inc (integer):  Number of clicks of increase button
+        n_clicks_dec (integer): Number of clicks of decrease button
+        n_clicks_reset (integer): Number of clicks of reset button
+        n_clicks_reset_mwd (integer): Number of clicks of reset button for wind direction variable slider
+        site_location_value (string): Dropdown box's value
+        current_step (integer): Current slider's value
+
+    Returns:
+        integer: Adjusted slider's value
+    """
 
     if (
         n_clicks_inc == 0
@@ -1060,11 +1221,10 @@ def update_slider(
         or trigger_id == "dd_site_location"
     ):
         return DEGREE_DEFAULT_VALUE
-    else:  # Slider moved
+    else:
         return slider_value
 
 
-# Callback for wind speed slider
 @app.callback(
     Output("wind-speed", "value"),
     Input("wind-speed", "value"),
@@ -1084,6 +1244,20 @@ def update_slider(
     site_location_value,
     current_step,
 ):
+    """Callback for wind speed slider
+
+    Args:
+        slider_value (integer): Wind speed slider's value
+        n_clicks_inc (integer):  Number of clicks of increase button
+        n_clicks_dec (integer): Number of clicks of decrease button
+        n_clicks_reset (integer): Number of clicks of reset button
+        n_clicks_reset_aad (integer): Number of clicks of reset button for atmospheric variables sliders
+        site_location_value (string): Dropdown box's value
+        current_step (integer): Current slider's value
+
+    Returns:
+        integer: Adjusted slider's value
+    """
 
     if (
         n_clicks_inc == 0
@@ -1107,11 +1281,10 @@ def update_slider(
         or trigger_id == "dd_site_location"
     ):
         return PERCENTAGE_DEFAULT_VALUE
-    else:  # Slider moved
+    else:
         return slider_value
 
 
-# Callback for wind direction slider
 @app.callback(
     Output("wind-direction", "value"),
     Input("wind-direction", "value"),
@@ -1131,6 +1304,20 @@ def update_slider(
     site_location_value,
     current_step,
 ):
+    """Callback for wind direction slider
+
+    Args:
+        slider_value (integer): Wind direction slider's value
+        n_clicks_inc (integer):  Number of clicks of increase button
+        n_clicks_dec (integer): Number of clicks of decrease button
+        n_clicks_reset (integer): Number of clicks of reset button
+        n_clicks_reset_wd (integer):  Number of clicks of reset button for wind direction variable slider
+        site_location_value (string): Dropdown box's value
+        current_step (integer): Current slider's value
+
+    Returns:
+        integer: Adjusted slider's value
+    """
 
     if (
         n_clicks_inc == 0
@@ -1154,10 +1341,9 @@ def update_slider(
         or trigger_id == "dd_site_location"
     ):
         return DEGREE_DEFAULT_VALUE
-    else:  # Slider moved
+    else: 
         return slider_value
 
 
-# Run the app
 if __name__ == "__main__":
     app.run(debug=True)

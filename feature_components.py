@@ -4,6 +4,17 @@ import plotly.graph_objects as go
 def render_feature_scatter_plot(
     feature_fig, feature_data, feature_name, trace_name, trace_color, is_forecast_data
 ):
+    """Render feature scatter plot
+
+    Args:
+        feature_fig (Figure): Feature's figure
+        feature_data (Dataframe): Feature's data
+        feature_name (string): Feature column's name
+        trace_name (string): Feature's name to display it on legend
+        trace_color (string): Trace's colour
+        is_forecast_data (bool): Flag to identify if data is forecast or adjusted forecast
+    """
+
     if is_forecast_data:
         line_size = {"width": 2}
     else:
@@ -24,6 +35,16 @@ def render_feature_scatter_plot(
 def render_overtopping_events_plot(
     feature_fig, cur_overtopping_times_df, feature_name, trace_name, trace_color
 ):
+    """Render overtopping events plot
+
+    Args:
+        feature_fig (Figure): Feature's figure
+        cur_overtopping_times_df (Dataframe): Adjusted forecast overtopping events times dataframe
+        feature_name (string): Feature column's name
+        trace_name (string): Feature's name to display it on legend
+        trace_color (string): Trace's colour
+    """
+
     feature_fig.add_trace(
         go.Scatter(
             x=cur_overtopping_times_df["time"],
@@ -36,7 +57,6 @@ def render_overtopping_events_plot(
     )
 
 
-# Render feature line plot
 def render_feature_plot(
     plot_title,
     prev_feature_data,
@@ -50,6 +70,25 @@ def render_feature_plot(
     cur_overtopping_times_df,
     show_dynamic_y_axis,
 ):
+    """Render feature line plot
+
+    Args:
+        plot_title (string): Plot's title
+        prev_feature_data (Dataframe): Feature data
+        cur_feature_data (Dataframe): Adjusted feature data
+        feature_name (string): Feature's name
+        features_description (tuple): Original feature and adjusted feature data descriptions
+        overtopping_evts_desc (string): Forecast overtopping events and adjusted forecast overtopping events data descriptions
+        y_min_value (integer): Minimum value of y-axis
+        y_max_value (integer): Maximum value of y-axis
+        prev_overtopping_times_df (Dataframe): Forecast overtopping events dataframe
+        cur_overtopping_times_df (Dataframe): Adjusted forecast overtopping events dataframe
+        show_dynamic_y_axis (bool): Flag to display y-axis dynamically
+
+    Returns:
+        Figure: Feature's line plot and scatter plot
+    """
+
     feature_fig = go.Figure()
 
     forecast_feature_desc, adjusted_feature_desc = features_description
@@ -99,30 +138,30 @@ def render_feature_plot(
 
     if show_dynamic_y_axis:
         y_axis_dict = dict(
-            showgrid=True,  # Show y-axis gridlines
-            gridcolor="#8A8D90",  # Set y-axis gridline color to light gray
-            linecolor="#8A8D90",  # Set y-axis line color to gray
+            showgrid=True,
+            gridcolor="#8A8D90",
+            linecolor="#8A8D90",
             title=dict(text=""),
         )
     else:
         y_axis_dict = dict(
             range=[y_min_value, y_max_value],
-            showgrid=True,  # Show y-axis gridlines
-            gridcolor="#8A8D90",  # Set y-axis gridline color to light gray
-            linecolor="#8A8D90",  # Set y-axis line color to gray
+            showgrid=True,
+            gridcolor="#8A8D90",
+            linecolor="#8A8D90",
             title=dict(text=""),
         )
 
     feature_fig.update_layout(
         title=dict(
-            text=plot_title,  # Just the text title
+            text=plot_title,
             font=dict(family="Helvetica Neue", size=22, color="#3279B7", weight=500),
         ),
-        plot_bgcolor="white",  # Set the plot background color to white
+        plot_bgcolor="white",
         xaxis=dict(
-            showgrid=True,  # Show x-axis gridlines
-            gridcolor="#8A8D90",  # Set x-axis gridline color to light gray
-            linecolor="#8A8D90",  # Set x-axis line color to gray
+            showgrid=True,
+            gridcolor="#8A8D90",
+            linecolor="#8A8D90",
             title=dict(text=""),
         ),
         yaxis=y_axis_dict,

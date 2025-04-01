@@ -10,6 +10,12 @@ GITHUB_REPO_LINK = "https://github.com/orgs/SPLASHDT/repositories"
 
 
 def get_header_components():
+    """Get header components
+
+    Returns:
+        Array: Array of header components
+    """
+
     header_components = [
         dbc.Col(
             html.Div(
@@ -60,6 +66,12 @@ def get_header_components():
 
 
 def get_footer_components():
+    """Get footer components
+
+    Returns:
+        Array: Array of footer components
+    """
+
     footer_components = [
         dbc.Col(
             html.Div(

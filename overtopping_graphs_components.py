@@ -13,8 +13,17 @@ PERCENTAGE_CHAR = "%"
 DEGREE_CHAR = "°"
 
 
-# Render overtopping plot
 def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
+    """Render overtopping plot
+
+    Args:
+        plot_title (string): Plot's title
+        plot_logo (string): Relative path to plot's log
+        overtopping_data (Dataframe): Forecast overtopping events dataframe
+
+    Returns:
+        Figure: Forecast overtopping events figure
+    """
 
     fig_rf1_rf2_tmp = px.scatter(
         overtopping_data,
@@ -29,16 +38,15 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
         },
     )
 
-    # Add the image as an annotation
     fig_rf1_rf2_tmp.add_layout_image(
         dict(
             source="./assets/imgs/" + plot_logo,
             xref="paper",
             yref="paper",
             x=0.30,
-            y=1.03,  # Adjust position as needed
+            y=1.03,
             sizex=0.06,
-            sizey=0.06,  # Adjust size as needed
+            sizey=0.06,
             xanchor="left",
             yanchor="bottom",
         )
@@ -46,30 +54,29 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
 
     fig_rf1_rf2_tmp.update_layout(
         title=dict(
-            text=plot_title,  # Just the text title
+            text=plot_title,
             font=dict(family="Helvetica Neue", size=22, color="#3279B7", weight=500),
             xref="container",
             yref="container",
             x=0.4,
-            y=0.91,  # Adjust title position if necessary
+            y=0.91,
             xanchor="left",
             yanchor="bottom",
         ),
-        plot_bgcolor="white",  # Set the plot background color to white
+        plot_bgcolor="white",
         xaxis=dict(
-            showgrid=True,  # Show x-axis gridlines
-            gridcolor="#8A8D90",  # Set x-axis gridline color to light gray
-            linecolor="#8A8D90",  # Set x-axis line color to gray
+            showgrid=True,
+            gridcolor="#8A8D90",
+            linecolor="#8A8D90",
         ),
         yaxis=dict(
-            showgrid=True,  # Show y-axis gridlines
-            gridcolor="#8A8D90",  # Set y-axis gridline color to light gray
-            linecolor="#8A8D90",  # Set y-axis line color to gray
+            showgrid=True,
+            gridcolor="#8A8D90",
+            linecolor="#8A8D90",
         ),
         showlegend=False,
     )
 
-    # Customize the symbols
     fig_rf1_rf2_tmp.update_traces(
         selector=dict(type="scatter", mode="markers"),
         marker=dict(
@@ -201,17 +208,33 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
     return fig_rf1_rf2_tmp
 
 
-def render_dawlish_seawall_crest_graph(data_dawlish_seawall_crest):
-    # Plot for RF1 & RF2 - Dawlish Seawall Crest
+def render_dawlish_seawall_crest_graph(dawlish_seawall_crest_data):
+    """Render Dawlish seawall crest graph
+
+    Args:
+        dawlish_seawall_crest_data (Dataframe): Forecast overtopping events dataframe
+
+    Returns:
+        Figure: Forecast overtopping events graph
+    """
+
     fig_dawlish_seawall_crest = render_overtopping_plot(
-        "Dawlish Seawall Crest", "dawlish_seawall_crest.png", data_dawlish_seawall_crest
+        "Dawlish Seawall Crest", "dawlish_seawall_crest.png", dawlish_seawall_crest_data
     )
 
     return fig_dawlish_seawall_crest
 
 
 def render_dawlish_railway_line_graph(data_dawlish_railway_line):
-    # Plot for RF3 & RF4 - Dawlish Railway Line
+    """Render Dawlish railway line graph
+
+    Args:
+        data_dawlish_railway_line (_type_): Forecast overtopping events dataframe
+
+    Returns:
+       Figure: Forecast overtopping events graph
+    """
+    
     fig_dawlish_railway_line = render_overtopping_plot(
         "Dawlish Railway Line", "dawlish_railway_line.png", data_dawlish_railway_line
     )
@@ -219,12 +242,20 @@ def render_dawlish_railway_line_graph(data_dawlish_railway_line):
     return fig_dawlish_railway_line
 
 
-def render_penzance_seawall_crest_graph(data_penzance_seawall_crest):
-    # Plot for RF1 & RF2 - Penzance Seawall Crest
+def render_penzance_seawall_crest_graph(penzance_seawall_crest_data):
+    """Render Penzance seawall crest graph
+
+    Args:
+        penzance_seawall_crest_data (Dataframe): Forecast overtopping events dataframe
+
+    Returns:
+        Figure: Forecast overtopping events graph
+    """
+
     fig_penzance_seawall_crest = render_overtopping_plot(
         "Penzance Seawall Crest",
         "dawlish_seawall_crest.png",
-        data_penzance_seawall_crest,
+        penzance_seawall_crest_data,
     )
 
     return fig_penzance_seawall_crest
@@ -233,7 +264,15 @@ def render_penzance_seawall_crest_graph(data_penzance_seawall_crest):
 def render_penzance_seawall_crest_sheltered_graph(
     data_penzance_seawall_crest_sheltered,
 ):
-    # # Plot for RF2 & RF4 - Penzance, Seawall Crest (sheltered)
+    """Render Penzance seawall crest sheltered graph
+
+    Args:
+        data_penzance_seawall_crest_sheltered (Dataframe): Forecast overtopping events dataframe
+
+    Returns:
+        Figure: Forecast overtopping events graph
+    """
+
     fig_penzance_seawall_crest_sheltered = render_overtopping_plot(
         "Penzance, Seawall Crest (sheltered) ",
         "dawlish_seawall_crest.png",
@@ -252,6 +291,21 @@ def get_variable_slider(
     decrease_btn_id,
     increase_btn_id,
 ):
+    """Get variable slider
+
+    Args:
+        identifier (string): Slider's id
+        min_value (integer): Slider's minimum value
+        max_value (integer): Slider's maximum value
+        default_value (integer): Slider's default value
+        template_symbol (string): Slider's template symbol
+        decrease_btn_id (string): Decrease button's id
+        increase_btn_id (string): Increase button's id
+
+    Returns:
+        Div: Slider's panel component
+    """
+
     variable_slider = html.Div(
         children=[
             html.Div(
@@ -311,7 +365,12 @@ def get_variable_slider(
 
 
 def get_wave_variables_panels():
-    # Wave variables and mean wave direction panels
+    """Get wave variables and mean wave direction panels
+
+    Returns:
+        Container: Container of wave variables and mean wave direction panels
+    """
+
     wave_variables_panels = dbc.Container(
         dbc.Row(
             [
@@ -331,7 +390,7 @@ def get_wave_variables_panels():
                                 html.Div(
                                     "Adjusted data", className="adjusted-data-panel"
                                 ),
-                                # Significant wave height
+
                                 html.Div(
                                     children=[
                                         html.Div(
@@ -355,7 +414,7 @@ def get_wave_variables_panels():
                                     "swh-decrease-btn",
                                     "swh-increase-btn",
                                 ),
-                                # Freeboard
+
                                 html.Div(
                                     children=[
                                         html.Div(
@@ -378,7 +437,7 @@ def get_wave_variables_panels():
                                     "fb-decrease-btn",
                                     "fb-increase-btn",
                                 ),
-                                # Mean Wave Period
+
                                 html.Div(
                                     children=[
                                         html.Div(
@@ -412,7 +471,7 @@ def get_wave_variables_panels():
                     dbc.Card(
                         dbc.CardBody(
                             [
-                                # Mean wave direction
+
                                 html.Div(
                                     dbc.Button(
                                         "Reset",
@@ -459,6 +518,12 @@ def get_wave_variables_panels():
 
 
 def get_atmospheric_variables_panels():
+    """Get atmospheric variables panels
+
+    Returns:
+        Container: Container of atmospheric variables panels
+    """
+
     atmospheric_variables_panels = dbc.Container(
         dbc.Row(
             [
@@ -478,7 +543,7 @@ def get_atmospheric_variables_panels():
                                 html.Div(
                                     "Adjusted data", className="adjusted-data-panel"
                                 ),
-                                # Wind speed
+
                                 html.Div(
                                     children=[
                                         html.Div(
@@ -513,7 +578,6 @@ def get_atmospheric_variables_panels():
                     dbc.Card(
                         dbc.CardBody(
                             [
-                                # Wind direction
                                 html.Div(
                                     dbc.Button(
                                         "Reset",
@@ -560,6 +624,12 @@ def get_atmospheric_variables_panels():
 
 
 def get_buttons_panel():
+    """Get buttons panel
+
+    Returns:
+        Container: Container of buttons panel
+    """
+
     buttons_panel = dbc.Container(
         dbc.Row(
             [
@@ -595,6 +665,12 @@ def get_buttons_panel():
 
 
 def get_forecast_legend():
+    """Get forecast legend
+
+    Returns:
+        Row: Row of forecast legend
+    """
+
     forecast_legend = dbc.Row(
         [
             dbc.Col(html.Div("Key"), md=1, class_name="key-subtitle-legend"),
@@ -684,6 +760,12 @@ def get_forecast_legend():
 
 
 def get_adjusted_forecast_legend():
+    """Get adjusted forecast legend
+
+    Returns:
+        Row: Row of adjusted forecast legend
+    """
+
     adjusted_forecast_legend = dbc.Row(
         [
             dbc.Col(md=1, class_name="key-subtitle-legend"),
@@ -788,6 +870,15 @@ def get_adjusted_forecast_legend():
 
 
 def get_full_legend(show_full_legend):
+    """Get full legend
+
+    Args:
+        show_full_legend (bool): Flag to display forecast and adjusted forecast legends
+
+    Returns:
+        Tuple: Forecast and adjusted forecast legends when show_full_legend is True. Forecast legend when show_full_legend is False.
+    """
+
     forecast_legend = get_forecast_legend()
     adjusted_forecast_legend = get_adjusted_forecast_legend()
     full_legend = (
@@ -800,6 +891,12 @@ def get_full_legend(show_full_legend):
 
 
 def get_dropdown_panel():
+    """Get dropdown panel
+
+    Returns:
+        Div: Div container of dropdown box
+    """
+
     dropdown_panel = html.Div(
         [
             "Site location",
@@ -826,6 +923,16 @@ def get_dropdown_panel():
 
 
 def get_date_picker_range(f_start_date, f_end_date):
+    """Get date picker range
+
+    Args:
+        f_start_date (string): Forecast start date
+        f_end_date (string): Forecast end date
+
+    Returns:
+        Div: Div container of datepicker range
+    """
+
     date_picker_range_panel = html.Div(
         [
             "Forecast start date + 5 days",
@@ -844,6 +951,12 @@ def get_date_picker_range(f_start_date, f_end_date):
 
 
 def get_date_picker_range_button():
+    """Get date picker range button
+
+    Returns:
+        Button: Button to display information about forecast date range
+    """
+
     info_button = dbc.Button(
         "i",
         id="forecast-range-date-info-btn",
@@ -855,6 +968,12 @@ def get_date_picker_range_button():
 
 
 def get_date_picker_range_popover():
+    """Get date picker range popover
+
+    Returns:
+        Popover: Popover to display information about forecast date range
+    """
+    
     info_popover = dbc.Popover(
         [
             dbc.PopoverHeader("Why can I only see data for today and five days ahead?"),
