@@ -234,7 +234,7 @@ def render_dawlish_railway_line_graph(data_dawlish_railway_line):
     Returns:
        Figure: Forecast overtopping events graph
     """
-    
+
     fig_dawlish_railway_line = render_overtopping_plot(
         "Dawlish Railway Line", "dawlish_railway_line.png", data_dawlish_railway_line
     )
@@ -390,7 +390,6 @@ def get_wave_variables_panels():
                                 html.Div(
                                     "Adjusted data", className="adjusted-data-panel"
                                 ),
-
                                 html.Div(
                                     children=[
                                         html.Div(
@@ -414,7 +413,6 @@ def get_wave_variables_panels():
                                     "swh-decrease-btn",
                                     "swh-increase-btn",
                                 ),
-
                                 html.Div(
                                     children=[
                                         html.Div(
@@ -437,7 +435,6 @@ def get_wave_variables_panels():
                                     "fb-decrease-btn",
                                     "fb-increase-btn",
                                 ),
-
                                 html.Div(
                                     children=[
                                         html.Div(
@@ -471,7 +468,6 @@ def get_wave_variables_panels():
                     dbc.Card(
                         dbc.CardBody(
                             [
-
                                 html.Div(
                                     dbc.Button(
                                         "Reset",
@@ -543,7 +539,6 @@ def get_atmospheric_variables_panels():
                                 html.Div(
                                     "Adjusted data", className="adjusted-data-panel"
                                 ),
-
                                 html.Div(
                                     children=[
                                         html.Div(
@@ -973,7 +968,7 @@ def get_date_picker_range_popover():
     Returns:
         Popover: Popover to display information about forecast date range
     """
-    
+
     info_popover = dbc.Popover(
         [
             dbc.PopoverHeader("Why can I only see data for today and five days ahead?"),

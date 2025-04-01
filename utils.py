@@ -7,8 +7,7 @@ import pandas as pd
 
 
 def loadConfigFile():
-    """Load configuration file based on environment variable value
-    """
+    """Load configuration file based on environment variable value"""
 
     environment = os.getenv("SPLASH_ENV")
 
@@ -39,7 +38,7 @@ def find_words_with_suffix(text, suffix):
         return None
 
     escaped_suffix = re.escape(suffix)
-    pattern = r"\b\w*" + escaped_suffix + r"\b" 
+    pattern = r"\b\w*" + escaped_suffix + r"\b"
     matches = re.findall(pattern, text, re.IGNORECASE)
     return bool(matches)
 
@@ -283,7 +282,7 @@ def get_dataframe_to_save(n_clicks, trigger_id, generated_df, stored_current_df)
     Returns:
         Dataframes: Forecast and adjusted forecast dataframes
     """
-    
+
     if (
         n_clicks is None
         or n_clicks == 0

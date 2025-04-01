@@ -69,9 +69,7 @@ async def fetch_data(api_url):
         async with aiohttp.ClientSession() as session:
             async with session.get(api_url) as response:
                 response.raise_for_status()
-                data = (
-                    await response.json()
-                )
+                data = await response.json()
                 return data
     except aiohttp.ClientError as e:
         return f"Error: {e}"
@@ -220,8 +218,7 @@ def get_default_forecast_dates():
 
 
 def render_dashboard():
-    """Render Splash dashboard
-    """
+    """Render Splash dashboard"""
 
     header_panel = cc.get_header_components()
 
@@ -769,7 +766,7 @@ def submit_slider_values(
         current_ws_ot_df (Dataframe): Forecast overtopping events times dataframe of wind speed data
 
     Returns:
-        Figures, data, div's children, Figure, data, div's children : Overtopping events scatter plots, overtopping events data to store, 
+        Figures, data, div's children, Figure, data, div's children : Overtopping events scatter plots, overtopping events data to store,
         legend's components; significant wave height, tidal level and wind speed line plot figures; significant wave height, tidal level and wind speed data to store
     """
 
@@ -1041,7 +1038,7 @@ def update_slider(
         or trigger_id == "dd_site_location"
     ):
         return PERCENTAGE_DEFAULT_VALUE
-    else: 
+    else:
         return slider_value
 
 
@@ -1341,7 +1338,7 @@ def update_slider(
         or trigger_id == "dd_site_location"
     ):
         return DEGREE_DEFAULT_VALUE
-    else: 
+    else:
         return slider_value
 
 
