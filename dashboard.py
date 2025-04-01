@@ -29,7 +29,7 @@ PERCENTAGE_CHAR = '%'
 DEGREE_CHAR = '°'
 
 external_stylesheets = [dbc.themes.BOOTSTRAP, './assets/css/dashboard.css']
-app = Dash(__name__, external_stylesheets=external_stylesheets)
+app = Dash(__name__, external_stylesheets=external_stylesheets, url_base_pathname='/ccoresource/SPLASHDT/')
 
 
 # Get overtopping counts of Dawlish
@@ -43,7 +43,7 @@ def get_dawlish_wave_overtopping(api_url):
     return seawall_crest_overtopping_df, railway_line_overtopping_df
 
 
-def get_penzance_wave_overtopping(api_url):        
+def get_penzance_wave_overtopping(api_url):
     response = requests.get(api_url)
     response.raise_for_status()
     overtopping_data = response.json()
