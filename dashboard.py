@@ -513,7 +513,7 @@ if __name__ == "__main__":
     environment = os.getenv("SPLASH_ENV")
     if environment == "docker":
         #docker requests from outside the container don't come from 127.0.0.1, so we need to bind to 0.0.0.0 to receive them
-        app.run(host='0.0.0.0', debug=True)
+        app.run(host='0.0.0.0', debug=False)
     elif environment == "production":
         app.run(debug=False)
     else:
