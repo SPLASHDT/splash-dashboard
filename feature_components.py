@@ -1,4 +1,3 @@
-import plotly.express as px
 import plotly.graph_objects as go
 
 def render_feature_scatter_plot(feature_fig, feature_data, feature_name, trace_name, trace_color, is_forecast_data):

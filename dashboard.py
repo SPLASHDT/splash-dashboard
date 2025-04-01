@@ -1,13 +1,7 @@
-from dash import Dash, dcc, html, Input, Output, State, ctx, DiskcacheManager, no_update
-import plotly.express as px
-import plotly.graph_objects as go
+from dash import Dash, dcc, html, Input, Output, State, ctx, DiskcacheManager
 import dash_bootstrap_components as dbc
-import seaborn as sns
-import numpy as np
 import os
-import requests
 import pandas as pd
-from matplotlib.colors import Normalize
 import utils
 import overtopping_graphs_components as ogc
 import feature_components as fc
@@ -123,121 +117,6 @@ def get_all_features_data(root_endpoint, params):
     tidal_level_df, tl_overtopping_times_df = get_features_data(root_endpoint, 'tidal-level', params, 'tidal_levels', 'tidal_level')
     wind_speed_df, ws_overtopping_times_df = get_features_data(root_endpoint, 'wind-speed', params, 'wind_speeds', 'wind_speed')
     return significant_wave_height_df, swh_overtopping_times_df, tidal_level_df, tl_overtopping_times_df, wind_speed_df, ws_overtopping_times_df
-
-
-# def get_significant_wave_height_data():
-#     return ddt.plot_significant_wave_height()
-
-
-# Render countour significant wave height
-def render_contour_wave_height(longitudes, latitudes, z_data, U, V, lon_grid, lat_grid, skip,
-                       current_block_Met_office_final, time_label, output_folder, zmin=0):
-    """
-    Generates a Plotly plot of wave height, direction, and location markers.
-
-    Args:
-        longitudes (array-like): Longitude values.
-        latitudes (array-like): Latitude values.
-        z_data (array-like): Wave height data.
-        U (array-like): U component of wave direction.
-        V (array-like): V component of wave direction.
-        lon_grid (array-like): Grid of longitudes for quiver plot.
-        lat_grid (array-like): Grid of latitudes for quiver plot.
-        skip (int): Sampling interval for quiver plot.
-        current_block_Met_office_final (str): Block identifier.
-        time_label (str): Time label for the plot.
-        output_folder (str): Directory to save the plot.
-    """
-
-    mako_cmap = sns.color_palette("mako", as_cmap=True)
-    norm = Normalize(vmin=zmin, vmax=11)  # Use zmin in normalization
-
-    # Generate colorscale from zmin (Corrected)
-    colorscale = [[(i - zmin) / (11 - zmin), f'rgb({int(r*255)},{int(g*255)},{int(b*255)})'] 
-                  for i in range(zmin, 12) 
-                  for r, g, b, _ in [mako_cmap((i - zmin) / (11 - zmin))]] 
-
-
-    # Create contour plot
-    contour = go.Contour(
-        z=z_data,
-        x=latitudes,
-        y=longitudes,
-        colorscale='Picnic',
-        contours=dict(
-            start=0,
-            end=11,
-            size=0.5,
-        ),
-        colorbar=dict(
-            title='Significant Wave Height (Hs) [m]',
-            tickvals=np.linspace(0, 11, 12)
-        )
-    )
-
-    # Create quiver plot
-    quiver = go.Cone(
-        x=lon_grid[skip],
-        y=lat_grid[skip],
-        u=U[skip],
-        v=V[skip],
-        anchor="tail",
-        colorscale=[[0, 'white'], [1, 'white']],  # Set color to white
-        showscale=False,
-        sizeref=20,  # Adjust arrow size here
-    )
-
-    # Create scatter plot for markers
-    scatter_dawlish = go.Scatter(
-        x=[dawlish_lon_seawall],
-        y=[dawlish_lat_seawall],
-        mode='markers',
-        marker=dict(
-            color='red',
-            size=10,
-            symbol='circle'
-        ),
-        name='Dawlish',  # Separate name for Dawlish
-        text=['Dawlish'],
-        hoverinfo='text'
-    )
-
-    # Create scatter plot for Penzance marker
-    scatter_penzance = go.Scatter(
-        x=[penzance_lon_seawall],
-        y=[penzance_lat_seawall],
-        mode='markers',
-        marker=dict(
-            color='red',
-            size=10,
-            symbol='square'
-        ),
-        name='Penzance',  # Separate name for Penzance
-        text=['Penzance'],
-        hoverinfo='text'
-    )
-
-    # Create layout
-    layout = go.Layout(
-        title=f'Significant Wave Height (Hs)<br>Block: {current_block_Met_office_final}, Time: {time_label}',
-        xaxis=dict(title='Longitude'),
-        yaxis=dict(title='Latitude'),
-        showlegend=True,  # Show the legend
-        legend=dict(
-            x=0,  # Set x-coordinate to 0 (left side)
-            y=1,  # Set y-coordinate to 1 (top)
-            xanchor='left',  # Anchor legend to the left
-            yanchor='top'   # Anchor legend to the top
-        )
-    )
-
-    # Create figure
-    fig = go.Figure(data=[contour, quiver, scatter_dawlish, scatter_penzance], layout=layout)
-
-    # Save the plot
-    output_file = os.path.join(output_folder, f'hs_wave_direction_plot_block_{current_block_Met_office_final}_time_{time_label.replace(":", "_")}.html')
-    fig.write_html(output_file)
-    print(f"Saved plot for time {time_label} to {output_file}")
 
 
 def get_default_forecast_dates():
