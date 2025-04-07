@@ -480,7 +480,9 @@ def render_feature_line_plots(location_name, variables_ot_dfs, show_dynamic_y_ax
         cur_swh_overtopping_times_df,
         show_dynamic_y_axis,
     )
-    features_description = tuple(["Tidal level (m, CD)", "Adjusted tidal level (m, CD)"])
+    features_description = tuple(
+        ["Tidal level (m, CD)", "Adjusted tidal level (m, CD)"]
+    )
     tidal_level_fig = fc.render_feature_plot(
         location_name + " - Tidal Level ",
         prev_tl_df,
