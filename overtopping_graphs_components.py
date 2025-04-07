@@ -39,7 +39,9 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
         },
     )
 
-    logo_x_axis = 0.24 if not utils.find_words_with_suffix(plot_title, 'sheltered') else 0.10
+    logo_x_axis = (
+        0.24 if not utils.find_words_with_suffix(plot_title, "sheltered") else 0.10
+    )
     fig_rf1_rf2_tmp.add_layout_image(
         dict(
             source="./assets/imgs/" + plot_logo,
@@ -54,7 +56,9 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
         )
     )
 
-    title_x_axis = 0.35 if not utils.find_words_with_suffix(plot_title, 'sheltered') else 0.25  
+    title_x_axis = (
+        0.35 if not utils.find_words_with_suffix(plot_title, "sheltered") else 0.25
+    )
     fig_rf1_rf2_tmp.update_layout(
         title=dict(
             text=plot_title,
