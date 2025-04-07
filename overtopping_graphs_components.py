@@ -1,6 +1,7 @@
 from dash import dcc, html
 import plotly.express as px
 import dash_bootstrap_components as dbc
+import utils
 
 
 PERCENTAGE_MIN_VAL_SLIDER = -100
@@ -18,7 +19,7 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
 
     Args:
         plot_title (string): Plot's title
-        plot_logo (string): Relative path to plot's log
+        plot_logo (string): Relative path to plot's logo
         overtopping_data (Dataframe): Forecast overtopping events dataframe
 
     Returns:
@@ -38,12 +39,13 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
         },
     )
 
+    logo_x_axis = 0.24 if not utils.find_words_with_suffix(plot_title, 'sheltered') else 0.10
     fig_rf1_rf2_tmp.add_layout_image(
         dict(
             source="./assets/imgs/" + plot_logo,
             xref="paper",
             yref="paper",
-            x=0.30,
+            x=logo_x_axis,
             y=1.03,
             sizex=0.06,
             sizey=0.06,
@@ -52,13 +54,14 @@ def render_overtopping_plot(plot_title, plot_logo, overtopping_data):
         )
     )
 
+    title_x_axis = 0.35 if not utils.find_words_with_suffix(plot_title, 'sheltered') else 0.25  
     fig_rf1_rf2_tmp.update_layout(
         title=dict(
             text=plot_title,
             font=dict(family="Helvetica Neue", size=22, color="#3279B7", weight=500),
             xref="container",
             yref="container",
-            x=0.4,
+            x=title_x_axis,
             y=0.91,
             xanchor="left",
             yanchor="bottom",
