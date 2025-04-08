@@ -14,6 +14,7 @@ import asyncio
 
 utils.loadConfigFile()
 
+DEBUG = bool(os.environ.get("DEBUG"))
 DAWLISH_API_ROOT_ENDPOINT = os.environ.get("DAWLISH_API_ROOT_ENDPOINT")
 PENZANCE_API_ROOT_ENDPOINT = os.environ.get("PENZANCE_API_ROOT_ENDPOINT")
 dawlish_lat_seawall = os.environ.get("DAWLISH_LAT_SEAWALL")
@@ -1345,4 +1346,4 @@ def update_slider(
 
 
 if __name__ == "__main__":
-    app.run(debug=True)
+    app.run(debug=DEBUG)
