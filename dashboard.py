@@ -14,7 +14,9 @@ import asyncio
 
 utils.loadConfigFile()
 
-DEBUG = bool(os.environ.get("DEBUG"))
+DEBUG = eval(
+    os.environ.get("DEBUG").capitalize()
+)
 DAWLISH_API_ROOT_ENDPOINT = os.environ.get("DAWLISH_API_ROOT_ENDPOINT")
 PENZANCE_API_ROOT_ENDPOINT = os.environ.get("PENZANCE_API_ROOT_ENDPOINT")
 dawlish_lat_seawall = os.environ.get("DAWLISH_LAT_SEAWALL")
