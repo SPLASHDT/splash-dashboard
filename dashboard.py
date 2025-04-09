@@ -62,6 +62,7 @@ app = Dash(
     __name__,
     external_stylesheets=external_stylesheets,
     background_callback_manager=background_callback_manager,
+    url_base_pathname='/ccoresources/SPLASHDT/'
 )
 
 
@@ -1349,12 +1350,13 @@ if __name__ == "__main__":
     environment = os.getenv("SPLASH_ENV")
 
     if DEBUG == True:
-        print("DAWLISH_API_ENDPOINT=", DAWLISH_API_ROOT_ENDPOINT)
-        print("PENZANCE_API_ENDPOINT=", PENZANCE_API_ROOT_ENDPOINT)
+        print("DAWLISH_API_ROOT_ENDPOINT=", DAWLISH_API_ROOT_ENDPOINT)
+        print("PENZANCE_API_ROOT_ENDPOINT=", PENZANCE_API_ROOT_ENDPOINT)
 
     if environment == "docker":
         #docker requests from outside the container don't come from 127.0.0.1, so we need to bind to 0.0.0.0 to receive them
-        app.run_server(host='0.0.0.0', debug=DEBUG)
+        app.run(host='0.0.0.0', debug=DEBUG)
+    elif environment == "production":
+        app.run(debug=False)
     else:
         app.run(debug=DEBUG)
-
