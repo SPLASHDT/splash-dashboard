@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: © 2025 National Oceanography Centre and University of Plymouth
+
+# SPDX-License-Identifier: MIT
+
 from dash import dcc, html
 import plotly.express as px
 import dash_bootstrap_components as dbc

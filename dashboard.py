@@ -1,3 +1,7 @@
+# SPDX-FileCopyrightText: © 2025 National Oceanography Centre and University of Plymouth
+
+# SPDX-License-Identifier: MIT
+
 from dash import Dash, dcc, html, Input, Output, State, ctx, DiskcacheManager
 import dash_bootstrap_components as dbc
 import os
