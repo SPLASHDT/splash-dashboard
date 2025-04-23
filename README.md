@@ -13,6 +13,17 @@ The model has been developed at the University of Plymouth Coastal Processes Res
 
 SPLASH digital twin is based on AI models trained using field measurements of wave overtopping. The model is updated once a day and uses Met Office wave and wind data as input, as well as predicted water level. This tool provides overtopping forecast 5 days ahead for Dawlish and Penzance, and allows the user to modify wind and wave input variables to test the sensitivity of wave overtopping.
 
+# Architecture
+
+<p>
+    <img src="assets/imgs/splash_architecture.png">
+</p>
+
+1. Web application: Splash dashboard website that forecasts wave overtopping events of Dawlish and Penzance. Also, it displays trends of wave overtopping variables.
+2. Web server: Server hosts splash dashboard front-end which was build using Dash Plotly and Bootstrap for Dash.
+3. Backend server: Server hosts backend API's to support dashboard operations like forecasting wave overtopping events, return wave height, tidal level and wind speed data.
+4. Cron job: It downloads wave and wind data daily from external FTP server.
+
 # Documentation
 
 More details about Splash project can be found in the following link: https://www.plymouth.ac.uk/research/coastal-processes/splash-project 
