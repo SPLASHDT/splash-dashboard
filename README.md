@@ -19,8 +19,8 @@ SPLASH digital twin is based on AI models trained using field measurements of wa
     <img src="assets/imgs/splash_architecture.png">
 </p>
 
-1. Web application: Splash dashboard website that forecasts wave overtopping events of Dawlish and Penzance. Also, it displays trends of wave overtopping variables.
-2. Web server: Server hosts splash dashboard front-end which was build using Dash Plotly and Bootstrap for Dash.
+1. Web application: Splash dashboard that forecasts wave overtopping events of Dawlish and Penzance. Also, it displays trends of wave overtopping variables.
+2. Web server: Server hosts Splash dashboard front-end which was build using Dash Plotly and Bootstrap for Dash.
 3. Backend server: Server hosts backend API's to support dashboard operations like forecasting wave overtopping events, returning wave height, tidal level and wind speed data.
 4. Cron job: It downloads wave and wind data daily from external FTP server.
 
