@@ -51,3 +51,7 @@ More details about Splash project can be found in the following link: https://ww
 
 You can access dashboard application locally by using the following link: http://127.0.0.1:8050/.
 When accessing dashboard on other environments you must use a defined server domain. For example: https://splash.mydomain.net/
+
+# Digital Object Identifier
+
+[![DOI](https://zenodo.org/badge/892565766.svg)](https://doi.org/10.5281/zenodo.15281602)
